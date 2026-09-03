@@ -1,5 +1,2381 @@
 You are operating in Senior Engineering Team Mode.
 
+The Master Prompt and both Architecture volumes have already been completed and approved.
+
+The architecture is now the source of truth.
+
+Your task in this phase is to begin the REAL BACKEND IMPLEMENTATION for the Instagram-like global visual-social platform.
+
+This is implementation, not architecture discussion.
+
+Inspect the existing repository before making changes.
+
+Do not restart or replace existing work.
+
+Do not regenerate unchanged files.
+
+Do not invent architectural behavior that conflicts with the approved architecture.
+
+==================================================
+BACKEND VOLUME 1 SCOPE
+======================
+
+This volume establishes the backend foundation and implements the first core business domains.
+
+Implement:
+
+1. Backend project foundation
+2. NestJS application architecture
+3. Configuration management
+4. Logging and request context
+5. Error handling
+6. Validation
+7. Database and Prisma foundation
+8. Redis foundation
+9. Event/outbox foundation
+10. BullMQ foundation
+11. Authentication
+12. Accounts
+13. Profiles
+14. Devices and sessions
+15. Social graph foundation
+16. Follow relationships
+17. Follow requests
+18. Blocks
+19. Restrictions
+20. Close Friends
+21. Security and authorization foundation
+22. API documentation
+23. Initial automated tests
+
+==================================================
+IMPLEMENTATION RULES
+====================
+
+Every implementation must be production-grade.
+
+Never generate:
+
+- pseudo-code
+- TODOs
+- placeholders
+- empty services
+- fake implementations
+- fake API responses
+- unfinished methods
+- commented-out "future" code
+
+Every generated file must compile.
+
+Every database migration must be valid.
+
+Every API endpoint must be validated and authorized.
+
+Every state-changing operation must define transaction boundaries.
+
+Every important asynchronous side effect must use the approved event/outbox architecture.
+
+Every implementation must preserve backward compatibility with previously existing repository code.
+
+==================================================
+BACKEND ARCHITECTURE
+====================
+
+Use:
+
+- Node.js
+- NestJS
+- TypeScript
+- PostgreSQL
+- Prisma
+- Redis
+- Kafka or Redpanda
+- BullMQ
+- OpenSearch/Elasticsearch integration boundaries
+- AWS S3 integration boundaries
+- OpenTelemetry
+
+Do not implement frontend, mobile, or infrastructure in this volume.
+
+==================================================
+
+1. PROJECT FOUNDATION
+   ==================================================
+
+Inspect the current repository and establish the backend application structure.
+
+Use a maintainable organization separating:
+
+- domain
+- application
+- infrastructure
+- interfaces/API
+- configuration
+- shared kernel
+- testing
+
+Organize business modules by bounded context.
+
+Avoid a flat directory containing every service and controller.
+
+==================================================
+2. NESTJS BOOTSTRAP
+===================
+
+Implement:
+
+- application bootstrap
+- global validation
+- global exception handling
+- configuration initialization
+- structured logging
+- security headers where appropriate
+- request correlation
+- graceful shutdown
+- health infrastructure
+
+Configure production-safe defaults.
+
+==================================================
+3. CONFIGURATION
+================
+
+Create strongly typed configuration for:
+
+- application
+- database
+- Redis
+- Kafka/Redpanda
+- BullMQ
+- storage
+- search
+- authentication
+- security
+- observability
+
+Validate required configuration at startup.
+
+Never silently continue with missing required configuration.
+
+Never log secrets.
+
+==================================================
+4. REQUEST CONTEXT
+==================
+
+Implement request context containing where appropriate:
+
+- request ID
+- correlation ID
+- authenticated user ID
+- session ID
+- trace context
+
+The context must be available to:
+
+- logs
+- application services
+- events
+- background jobs
+
+Do not place unnecessary sensitive information into logs.
+
+==================================================
+5. ERROR ARCHITECTURE
+=====================
+
+Create standardized backend error handling.
+
+Support categories such as:
+
+- validation
+- authentication
+- authorization
+- not found
+- conflict
+- rate limiting
+- dependency failure
+- internal failure
+
+API responses must use the approved error contract.
+
+Do not expose stack traces in production responses.
+
+==================================================
+6. VALIDATION
+=============
+
+Implement request validation for:
+
+- params
+- query parameters
+- request bodies
+- headers where appropriate
+
+Reject:
+
+- unexpected fields where appropriate
+- malformed identifiers
+- invalid enums
+- invalid pagination
+- oversized values
+
+==================================================
+7. DATABASE FOUNDATION
+======================
+
+Configure Prisma.
+
+Establish:
+
+- datasource
+- client lifecycle
+- migrations
+- transaction utilities
+- repository conventions
+
+Implement the foundational models required by this volume.
+
+Do not attempt to create every model from the entire platform at once.
+
+==================================================
+8. DATABASE TRANSACTION PATTERN
+===============================
+
+Create reusable patterns for transactional use cases.
+
+A use case performing:
+
+- database mutation
+- invariant validation
+- outbox insertion
+
+must be able to perform those operations atomically.
+
+==================================================
+9. REDIS FOUNDATION
+===================
+
+Create a Redis abstraction.
+
+Support:
+
+- get
+- set
+- delete
+- TTL
+- atomic operations
+- distributed locking where required
+
+Do not expose raw Redis clients throughout every domain.
+
+Provide domain-appropriate abstractions over infrastructure access.
+
+==================================================
+10. REDIS KEY STRATEGY
+======================
+
+Create consistent namespacing.
+
+Keys must identify:
+
+- environment
+- domain
+- entity
+- purpose
+
+Temporary keys must have explicit TTL.
+
+Do not create unbounded cache keys.
+
+==================================================
+11. EVENT / OUTBOX FOUNDATION
+=============================
+
+Implement the transactional outbox pattern.
+
+Create:
+
+- OutboxEvent
+- event envelope
+- publisher
+- publishing worker/process
+- retry handling
+- dead-letter strategy
+
+The transactional pattern must be:
+
+Database transaction
+→ domain state change
+→ outbox record
+→ publisher
+→ Kafka/Redpanda
+
+Never publish a critical domain event independently of the source transaction when atomicity is required.
+
+==================================================
+12. EVENT ENVELOPE
+==================
+
+Every integration event must contain:
+
+- eventId
+- eventType
+- schemaVersion
+- timestamp
+- producer
+- aggregateId
+- correlationId
+- causationId where applicable
+- payload
+
+==================================================
+13. EVENT IDEMPOTENCY
+=====================
+
+Create infrastructure for idempotent event consumption.
+
+Consumers must be able to safely handle duplicate delivery.
+
+Do not assume exactly-once delivery.
+
+==================================================
+14. BULLMQ FOUNDATION
+=====================
+
+Create queue infrastructure for asynchronous work.
+
+Establish:
+
+- queue registration
+- job configuration
+- retries
+- exponential backoff where appropriate
+- timeout
+- concurrency
+- failure handling
+- graceful shutdown
+
+Do not create feature-specific queues unless this volume requires them.
+
+==================================================
+15. HEALTH CHECKS
+=================
+
+Implement health endpoints.
+
+Separate:
+
+- liveness
+- readiness
+
+Readiness may check required dependencies.
+
+Liveness must not restart healthy instances merely because an external dependency is temporarily unavailable.
+
+==================================================
+16. SECURITY FOUNDATION
+=======================
+
+Implement shared security infrastructure for:
+
+- authentication
+- authorization
+- guards
+- roles/permissions where applicable
+- request validation
+- rate-limit integration
+- secure headers
+- audit context
+
+==================================================
+17. AUTHENTICATION
+==================
+
+Implement:
+
+- registration
+- login
+- logout
+- session creation
+- session validation
+- session revocation
+- credential verification
+- password hashing
+- password change
+- password reset architecture
+- account verification architecture
+
+Use secure password hashing.
+
+Never store plaintext passwords.
+
+==================================================
+18. AUTHENTICATION SESSION MODEL
+================================
+
+Implement session state with:
+
+- session ID
+- user ID
+- creation time
+- expiration
+- revocation
+- device reference
+- security metadata
+
+Define session lifecycle explicitly.
+
+==================================================
+19. TOKEN/SESSION SECURITY
+==========================
+
+Use the authentication strategy defined by the architecture.
+
+Protect against:
+
+- session fixation
+- replay
+- expired sessions
+- revoked sessions
+- token misuse
+
+Do not place sensitive tokens in logs.
+
+==================================================
+20. ACCOUNT DOMAIN
+==================
+
+Implement Account/User functionality.
+
+Support:
+
+- create account
+- retrieve current account
+- account status
+- update allowed account data
+- deactivate where supported
+- deletion request foundation
+
+Account states must follow the approved architecture.
+
+==================================================
+21. USER IDENTITY
+=================
+
+Implement globally unique user identifiers.
+
+Do not use predictable public identifiers when the architecture requires opaque IDs.
+
+==================================================
+22. DEVICE DOMAIN
+=================
+
+Implement device registration.
+
+Store only the device metadata required by the architecture.
+
+Support:
+
+- register device
+- update device
+- revoke device
+- list authorized devices
+
+Do not store unnecessary device-sensitive information.
+
+==================================================
+23. PROFILE DOMAIN
+==================
+
+Implement:
+
+- profile creation
+- profile retrieval
+- profile update
+- username
+- display name
+- biography
+- links
+- avatar metadata
+- public/private state
+
+Separate account identity from profile presentation.
+
+==================================================
+24. USERNAME MANAGEMENT
+=======================
+
+Implement:
+
+- username validation
+- uniqueness
+- normalization
+- safe lookup
+- update
+
+Define canonical username rules.
+
+Prevent ambiguous representations where possible.
+
+==================================================
+25. PROFILE PRIVACY
+===================
+
+Implement public/private account behavior.
+
+Profile visibility must integrate with authorization.
+
+Private profiles must not expose protected data to unauthorized users.
+
+==================================================
+26. CREATOR/PROFESSIONAL PROFILE FOUNDATION
+===========================================
+
+Implement the foundational data model for:
+
+- creator
+- professional
+- business
+
+Do not implement full analytics, advertising, commerce, or monetization yet.
+
+Create the domain extension points needed by later volumes.
+
+==================================================
+27. SOCIAL GRAPH FOUNDATION
+===========================
+
+Implement relationship infrastructure.
+
+Support:
+
+- follow
+- follow request
+- block
+- restriction
+- close friends
+
+Define explicit relationship states.
+
+==================================================
+28. FOLLOW
+==========
+
+Implement:
+
+- follow user
+- unfollow user
+- get follow state
+
+For public accounts:
+
+follow should create the appropriate relationship immediately.
+
+For private accounts:
+
+follow should create a follow request.
+
+Use transaction boundaries.
+
+==================================================
+29. FOLLOW REQUESTS
+===================
+
+Implement:
+
+- create request
+- cancel request
+- accept request
+- decline request
+- list incoming requests
+- list outgoing requests where required
+
+State transitions must be guarded.
+
+==================================================
+30. FOLLOW IDEMPOTENCY
+======================
+
+Repeated follow requests must not create duplicate relationship records.
+
+Repeated unfollow operations must be safe.
+
+Concurrent requests must resolve correctly according to the domain rules.
+
+==================================================
+31. BLOCK
+=========
+
+Implement:
+
+- block
+- unblock
+- block status
+- blocked-account listing
+
+Blocking must have precedence over normal relationship-based access.
+
+==================================================
+32. BLOCK SIDE EFFECTS
+======================
+
+Define and implement the required immediate effects of blocking.
+
+At minimum address:
+
+- follow relationships
+- pending follow requests
+- interaction permissions
+- messaging eligibility where applicable
+- cached authorization state
+
+Do not leave stale access accidentally available.
+
+==================================================
+33. RESTRICTION
+===============
+
+Implement:
+
+- restrict
+- unrestrict
+- restriction state
+- restricted-account listing where required
+
+Use backend policy logic.
+
+==================================================
+34. CLOSE FRIENDS
+=================
+
+Implement:
+
+- add close friend
+- remove close friend
+- list close friends
+- membership state
+
+Ensure close-friend lists are private to the owner.
+
+==================================================
+35. AUTHORIZATION POLICIES
+==========================
+
+Create reusable authorization policies for:
+
+- account ownership
+- profile editing
+- following
+- follow requests
+- blocking
+- restrictions
+- close friends
+
+Do not duplicate checks across controllers.
+
+==================================================
+36. PRIVACY POLICIES
+====================
+
+Implement reusable policy evaluation for:
+
+- public profile
+- private profile
+- follower
+- blocked user
+- restricted user
+- owner
+
+This policy layer will be reused by content, stories, messaging, and discovery in later volumes.
+
+==================================================
+37. RATE LIMITING
+=================
+
+Apply rate-limit architecture to:
+
+- login
+- registration
+- password reset
+- username changes
+- follow
+- follow request
+- block
+- high-risk account operations
+
+Use Redis-backed distributed state where required.
+
+==================================================
+38. SECURITY AUDIT LOGGING
+==========================
+
+Create audit events for security-sensitive actions:
+
+- login
+- logout
+- password change
+- session revocation
+- account changes
+- follow actions where required
+- block
+- privacy changes
+
+Do not store credentials.
+
+==================================================
+39. API DESIGN
+==============
+
+Implement REST endpoints according to the approved API architecture.
+
+Suggested groups:
+
+/auth
+/accounts
+/profiles
+/social
+/sessions
+/devices
+
+Use consistent naming.
+
+Every endpoint must define:
+
+- authentication
+- authorization
+- validation
+- success response
+- error response
+
+==================================================
+40. API DOCUMENTATION
+=====================
+
+Integrate OpenAPI/Swagger documentation.
+
+Document:
+
+- authentication requirements
+- request bodies
+- responses
+- errors
+- pagination
+- security requirements
+
+Keep documentation synchronized with implementation.
+
+==================================================
+41. PAGINATION
+==============
+
+Use cursor pagination for:
+
+- follow lists
+- followers
+- following
+- follow requests
+- blocked users
+- restricted users
+- close friends where large enough
+
+Define opaque cursors.
+
+==================================================
+42. CACHE STRATEGY
+==================
+
+Cache only appropriate derived/read-heavy information.
+
+Potential caches:
+
+- profile summary
+- follow state
+- public profile data
+- social counters where applicable
+
+Never cache private information without explicit authorization-aware design.
+
+==================================================
+43. CACHE INVALIDATION
+======================
+
+A mutation must invalidate/update relevant cache state.
+
+Examples:
+
+Follow:
+
+- target profile
+- follower count
+- current relationship
+
+Block:
+
+- relationship state
+- authorization-related cached state
+
+Privacy change:
+
+- profile visibility
+- affected derived caches
+
+==================================================
+44. EVENTS
+==========
+
+Define and publish appropriate events such as:
+
+- UserRegistered
+- UserLoggedIn
+- SessionCreated
+- SessionRevoked
+- ProfileUpdated
+- FollowCreated
+- FollowRemoved
+- FollowRequestCreated
+- FollowRequestAccepted
+- FollowRequestDeclined
+- UserBlocked
+- UserUnblocked
+- UserRestricted
+- UserUnrestricted
+- CloseFriendAdded
+- CloseFriendRemoved
+
+Use the approved event envelope.
+
+==================================================
+45. ASYNC SIDE EFFECTS
+======================
+
+Where future domains depend on these events, publish them through the outbox.
+
+Do not synchronously call unrelated future domains merely to simulate integration.
+
+==================================================
+46. SECURITY REQUIREMENTS
+=========================
+
+Test protection against:
+
+- duplicate registration
+- account enumeration
+- username enumeration where inappropriate
+- brute-force login
+- session replay
+- unauthorized profile update
+- IDOR
+- follow manipulation
+- block bypass
+- private profile access
+- privilege escalation
+
+==================================================
+47. TESTING
+===========
+
+Implement tests for:
+
+Unit:
+
+- username normalization
+- account state
+- authorization
+- privacy
+- follow state
+- block state
+- restriction
+- close friends
+- session rules
+
+Integration:
+
+- PostgreSQL
+- Redis
+- authentication
+- social graph
+- outbox
+- event publishing
+
+E2E/API:
+
+- registration
+- login
+- logout
+- profile
+- follow
+- private-account request
+- request acceptance
+- block
+- restrict
+- close friends
+
+==================================================
+48. CONCURRENCY TESTING
+=======================
+
+Test concurrent:
+
+- follow
+- unfollow
+- follow request
+- accept request
+- block
+- unblock
+
+Verify there are no duplicate or contradictory relationship states.
+
+==================================================
+49. EVENT TESTING
+=================
+
+Test:
+
+- outbox creation
+- successful publication
+- publication failure
+- retry
+- duplicate delivery
+- correlation IDs
+- dead-letter behavior
+
+==================================================
+50. SECURITY TESTING
+====================
+
+Test:
+
+- invalid credentials
+- expired session
+- revoked session
+- unauthorized profile mutation
+- private profile access
+- block bypass
+- restricted access
+- rate-limit behavior
+
+==================================================
+51. MIGRATIONS
+==============
+
+All database changes must use Prisma migrations.
+
+Migration names must be descriptive.
+
+Do not manually modify production databases outside the established migration process.
+
+==================================================
+52. OBSERVABILITY
+=================
+
+Instrument:
+
+- authentication
+- profile operations
+- relationship mutations
+- database calls
+- Redis operations
+- event publishing
+- queue operations
+
+Expose:
+
+- metrics
+- structured logs
+- traces
+
+Never expose secrets in telemetry.
+
+==================================================
+53. GRACEFUL SHUTDOWN
+=====================
+
+Ensure the backend safely shuts down:
+
+- HTTP server
+- Prisma
+- Redis
+- Kafka producers/consumers
+- BullMQ
+- telemetry
+
+==================================================
+54. DOCUMENTATION
+=================
+
+Update backend documentation with:
+
+- module map
+- setup instructions
+- environment variables
+- database setup
+- migrations
+- authentication
+- social graph
+- API endpoints
+- events
+- local development
+- testing
+
+Documentation must match the actual implementation.
+
+==================================================
+55. IMPLEMENTATION DISCIPLINE
+=============================
+
+Before each change:
+
+1. Inspect the current repository.
+2. Identify existing files and abstractions.
+3. Reuse existing code.
+4. Determine dependencies.
+5. Implement the smallest coherent change.
+6. Add tests.
+7. Validate.
+8. Fix failures.
+9. Continue.
+
+Never overwrite unchanged files.
+
+==================================================
+56. VALIDATION
+==============
+
+Run the repository-supported:
+
+- formatter
+- lint
+- typecheck
+- unit tests
+- integration tests
+- API/E2E tests
+- build
+
+If a validation command fails:
+
+1. determine whether the failure is caused by your changes;
+2. fix the implementation;
+3. rerun the validation.
+
+Never suppress errors simply to obtain a passing result.
+
+==================================================
+FINAL ACCEPTANCE CRITERIA
+=========================
+
+Backend Volume 1 is complete when:
+
+FOUNDATION
+
+- NestJS application boots;
+- configuration is validated;
+- request context exists;
+- errors are standardized;
+- validation exists;
+- health checks exist;
+- graceful shutdown works.
+
+DATABASE
+
+- Prisma is configured;
+- migrations work;
+- repositories are organized;
+- transactions are supported.
+
+REDIS
+
+- Redis abstraction exists;
+- key conventions exist;
+- TTLs are applied appropriately.
+
+EVENTS
+
+- transactional outbox exists;
+- event envelope exists;
+- publishing works;
+- retry/idempotency foundations exist.
+
+QUEUES
+
+- BullMQ foundation exists;
+- job lifecycle is defined.
+
+AUTHENTICATION
+
+- registration works;
+- login works;
+- logout works;
+- sessions work;
+- revocation works;
+- password security works.
+
+ACCOUNTS
+
+- account lifecycle foundation works;
+- devices work;
+- profiles work;
+- usernames work;
+- privacy state works.
+
+SOCIAL GRAPH
+
+- follow works;
+- unfollow works;
+- private-account requests work;
+- requests can be accepted/declined;
+- block works;
+- restriction works;
+- close friends work.
+
+SECURITY
+
+- authorization works;
+- privacy policies work;
+- rate limiting is integrated;
+- security events are auditable.
+
+API
+
+- endpoints are documented;
+- validation works;
+- errors are standardized;
+- pagination is implemented where required.
+
+TESTING
+
+- unit tests exist;
+- integration tests exist;
+- critical API/E2E tests exist;
+- concurrency cases are covered;
+- security cases are covered.
+
+The repository must remain buildable and testable at the end of this volume.
+
+==================================================
+DO NOT IMPLEMENT IN THIS VOLUME
+===============================
+
+Do not implement:
+
+- posts
+- carousels
+- stories
+- reels
+- feed
+- recommendations
+- search
+- messaging
+- notifications
+- advertising
+- commerce
+- monetization
+- advanced analytics
+- infrastructure
+- Kubernetes
+- Terraform
+- frontend
+- mobile application
+
+Those systems must consume the foundation established here in later implementation volumes.
+
+BEGIN WITH:
+
+1. INSPECT THE EXISTING BACKEND REPOSITORY.
+2. ESTABLISH THE NESTJS/BACKEND FOUNDATION.
+3. IMPLEMENT THE DATABASE/PRISMA FOUNDATION.
+4. IMPLEMENT AUTHENTICATION, ACCOUNTS, PROFILES, AND SOCIAL GRAPH FOUNDATION
+
+You are operating in Senior Engineering Team Mode.
+
+The Master Prompt and both Architecture volumes have already been completed and approved.
+
+The architecture is now the source of truth.
+
+Your task in this phase is to begin the REAL BACKEND IMPLEMENTATION for the Instagram-like global visual-social platform.
+
+This is implementation, not architecture discussion.
+
+Inspect the existing repository before making changes.
+
+Do not restart or replace existing work.
+
+Do not regenerate unchanged files.
+
+Do not invent architectural behavior that conflicts with the approved architecture.
+
+==================================================
+BACKEND VOLUME 1 SCOPE
+======================
+
+This volume establishes the backend foundation and implements the first core business domains.
+
+Implement:
+
+1. Backend project foundation
+2. NestJS application architecture
+3. Configuration management
+4. Logging and request context
+5. Error handling
+6. Validation
+7. Database and Prisma foundation
+8. Redis foundation
+9. Event/outbox foundation
+10. BullMQ foundation
+11. Authentication
+12. Accounts
+13. Profiles
+14. Devices and sessions
+15. Social graph foundation
+16. Follow relationships
+17. Follow requests
+18. Blocks
+19. Restrictions
+20. Close Friends
+21. Security and authorization foundation
+22. API documentation
+23. Initial automated tests
+
+==================================================
+IMPLEMENTATION RULES
+====================
+
+Every implementation must be production-grade.
+
+Never generate:
+
+- pseudo-code
+- TODOs
+- placeholders
+- empty services
+- fake implementations
+- fake API responses
+- unfinished methods
+- commented-out "future" code
+
+Every generated file must compile.
+
+Every database migration must be valid.
+
+Every API endpoint must be validated and authorized.
+
+Every state-changing operation must define transaction boundaries.
+
+Every important asynchronous side effect must use the approved event/outbox architecture.
+
+Every implementation must preserve backward compatibility with previously existing repository code.
+
+==================================================
+BACKEND ARCHITECTURE
+====================
+
+Use:
+
+- Node.js
+- NestJS
+- TypeScript
+- PostgreSQL
+- Prisma
+- Redis
+- Kafka or Redpanda
+- BullMQ
+- OpenSearch/Elasticsearch integration boundaries
+- AWS S3 integration boundaries
+- OpenTelemetry
+
+Do not implement frontend, mobile, or infrastructure in this volume.
+
+==================================================
+
+1. PROJECT FOUNDATION
+   ==================================================
+
+Inspect the current repository and establish the backend application structure.
+
+Use a maintainable organization separating:
+
+- domain
+- application
+- infrastructure
+- interfaces/API
+- configuration
+- shared kernel
+- testing
+
+Organize business modules by bounded context.
+
+Avoid a flat directory containing every service and controller.
+
+==================================================
+2. NESTJS BOOTSTRAP
+===================
+
+Implement:
+
+- application bootstrap
+- global validation
+- global exception handling
+- configuration initialization
+- structured logging
+- security headers where appropriate
+- request correlation
+- graceful shutdown
+- health infrastructure
+
+Configure production-safe defaults.
+
+==================================================
+3. CONFIGURATION
+================
+
+Create strongly typed configuration for:
+
+- application
+- database
+- Redis
+- Kafka/Redpanda
+- BullMQ
+- storage
+- search
+- authentication
+- security
+- observability
+
+Validate required configuration at startup.
+
+Never silently continue with missing required configuration.
+
+Never log secrets.
+
+==================================================
+4. REQUEST CONTEXT
+==================
+
+Implement request context containing where appropriate:
+
+- request ID
+- correlation ID
+- authenticated user ID
+- session ID
+- trace context
+
+The context must be available to:
+
+- logs
+- application services
+- events
+- background jobs
+
+Do not place unnecessary sensitive information into logs.
+
+==================================================
+5. ERROR ARCHITECTURE
+=====================
+
+Create standardized backend error handling.
+
+Support categories such as:
+
+- validation
+- authentication
+- authorization
+- not found
+- conflict
+- rate limiting
+- dependency failure
+- internal failure
+
+API responses must use the approved error contract.
+
+Do not expose stack traces in production responses.
+
+==================================================
+6. VALIDATION
+=============
+
+Implement request validation for:
+
+- params
+- query parameters
+- request bodies
+- headers where appropriate
+
+Reject:
+
+- unexpected fields where appropriate
+- malformed identifiers
+- invalid enums
+- invalid pagination
+- oversized values
+
+==================================================
+7. DATABASE FOUNDATION
+======================
+
+Configure Prisma.
+
+Establish:
+
+- datasource
+- client lifecycle
+- migrations
+- transaction utilities
+- repository conventions
+
+Implement the foundational models required by this volume.
+
+Do not attempt to create every model from the entire platform at once.
+
+==================================================
+8. DATABASE TRANSACTION PATTERN
+===============================
+
+Create reusable patterns for transactional use cases.
+
+A use case performing:
+
+- database mutation
+- invariant validation
+- outbox insertion
+
+must be able to perform those operations atomically.
+
+==================================================
+9. REDIS FOUNDATION
+===================
+
+Create a Redis abstraction.
+
+Support:
+
+- get
+- set
+- delete
+- TTL
+- atomic operations
+- distributed locking where required
+
+Do not expose raw Redis clients throughout every domain.
+
+Provide domain-appropriate abstractions over infrastructure access.
+
+==================================================
+10. REDIS KEY STRATEGY
+======================
+
+Create consistent namespacing.
+
+Keys must identify:
+
+- environment
+- domain
+- entity
+- purpose
+
+Temporary keys must have explicit TTL.
+
+Do not create unbounded cache keys.
+
+==================================================
+11. EVENT / OUTBOX FOUNDATION
+=============================
+
+Implement the transactional outbox pattern.
+
+Create:
+
+- OutboxEvent
+- event envelope
+- publisher
+- publishing worker/process
+- retry handling
+- dead-letter strategy
+
+The transactional pattern must be:
+
+Database transaction
+→ domain state change
+→ outbox record
+→ publisher
+→ Kafka/Redpanda
+
+Never publish a critical domain event independently of the source transaction when atomicity is required.
+
+==================================================
+12. EVENT ENVELOPE
+==================
+
+Every integration event must contain:
+
+- eventId
+- eventType
+- schemaVersion
+- timestamp
+- producer
+- aggregateId
+- correlationId
+- causationId where applicable
+- payload
+
+==================================================
+13. EVENT IDEMPOTENCY
+=====================
+
+Create infrastructure for idempotent event consumption.
+
+Consumers must be able to safely handle duplicate delivery.
+
+Do not assume exactly-once delivery.
+
+==================================================
+14. BULLMQ FOUNDATION
+=====================
+
+Create queue infrastructure for asynchronous work.
+
+Establish:
+
+- queue registration
+- job configuration
+- retries
+- exponential backoff where appropriate
+- timeout
+- concurrency
+- failure handling
+- graceful shutdown
+
+Do not create feature-specific queues unless this volume requires them.
+
+==================================================
+15. HEALTH CHECKS
+=================
+
+Implement health endpoints.
+
+Separate:
+
+- liveness
+- readiness
+
+Readiness may check required dependencies.
+
+Liveness must not restart healthy instances merely because an external dependency is temporarily unavailable.
+
+==================================================
+16. SECURITY FOUNDATION
+=======================
+
+Implement shared security infrastructure for:
+
+- authentication
+- authorization
+- guards
+- roles/permissions where applicable
+- request validation
+- rate-limit integration
+- secure headers
+- audit context
+
+==================================================
+17. AUTHENTICATION
+==================
+
+Implement:
+
+- registration
+- login
+- logout
+- session creation
+- session validation
+- session revocation
+- credential verification
+- password hashing
+- password change
+- password reset architecture
+- account verification architecture
+
+Use secure password hashing.
+
+Never store plaintext passwords.
+
+==================================================
+18. AUTHENTICATION SESSION MODEL
+================================
+
+Implement session state with:
+
+- session ID
+- user ID
+- creation time
+- expiration
+- revocation
+- device reference
+- security metadata
+
+Define session lifecycle explicitly.
+
+==================================================
+19. TOKEN/SESSION SECURITY
+==========================
+
+Use the authentication strategy defined by the architecture.
+
+Protect against:
+
+- session fixation
+- replay
+- expired sessions
+- revoked sessions
+- token misuse
+
+Do not place sensitive tokens in logs.
+
+==================================================
+20. ACCOUNT DOMAIN
+==================
+
+Implement Account/User functionality.
+
+Support:
+
+- create account
+- retrieve current account
+- account status
+- update allowed account data
+- deactivate where supported
+- deletion request foundation
+
+Account states must follow the approved architecture.
+
+==================================================
+21. USER IDENTITY
+=================
+
+Implement globally unique user identifiers.
+
+Do not use predictable public identifiers when the architecture requires opaque IDs.
+
+==================================================
+22. DEVICE DOMAIN
+=================
+
+Implement device registration.
+
+Store only the device metadata required by the architecture.
+
+Support:
+
+- register device
+- update device
+- revoke device
+- list authorized devices
+
+Do not store unnecessary device-sensitive information.
+
+==================================================
+23. PROFILE DOMAIN
+==================
+
+Implement:
+
+- profile creation
+- profile retrieval
+- profile update
+- username
+- display name
+- biography
+- links
+- avatar metadata
+- public/private state
+
+Separate account identity from profile presentation.
+
+==================================================
+24. USERNAME MANAGEMENT
+=======================
+
+Implement:
+
+- username validation
+- uniqueness
+- normalization
+- safe lookup
+- update
+
+Define canonical username rules.
+
+Prevent ambiguous representations where possible.
+
+==================================================
+25. PROFILE PRIVACY
+===================
+
+Implement public/private account behavior.
+
+Profile visibility must integrate with authorization.
+
+Private profiles must not expose protected data to unauthorized users.
+
+==================================================
+26. CREATOR/PROFESSIONAL PROFILE FOUNDATION
+===========================================
+
+Implement the foundational data model for:
+
+- creator
+- professional
+- business
+
+Do not implement full analytics, advertising, commerce, or monetization yet.
+
+Create the domain extension points needed by later volumes.
+
+==================================================
+27. SOCIAL GRAPH FOUNDATION
+===========================
+
+Implement relationship infrastructure.
+
+Support:
+
+- follow
+- follow request
+- block
+- restriction
+- close friends
+
+Define explicit relationship states.
+
+==================================================
+28. FOLLOW
+==========
+
+Implement:
+
+- follow user
+- unfollow user
+- get follow state
+
+For public accounts:
+
+follow should create the appropriate relationship immediately.
+
+For private accounts:
+
+follow should create a follow request.
+
+Use transaction boundaries.
+
+==================================================
+29. FOLLOW REQUESTS
+===================
+
+Implement:
+
+- create request
+- cancel request
+- accept request
+- decline request
+- list incoming requests
+- list outgoing requests where required
+
+State transitions must be guarded.
+
+==================================================
+30. FOLLOW IDEMPOTENCY
+======================
+
+Repeated follow requests must not create duplicate relationship records.
+
+Repeated unfollow operations must be safe.
+
+Concurrent requests must resolve correctly according to the domain rules.
+
+==================================================
+31. BLOCK
+=========
+
+Implement:
+
+- block
+- unblock
+- block status
+- blocked-account listing
+
+Blocking must have precedence over normal relationship-based access.
+
+==================================================
+32. BLOCK SIDE EFFECTS
+======================
+
+Define and implement the required immediate effects of blocking.
+
+At minimum address:
+
+- follow relationships
+- pending follow requests
+- interaction permissions
+- messaging eligibility where applicable
+- cached authorization state
+
+Do not leave stale access accidentally available.
+
+==================================================
+33. RESTRICTION
+===============
+
+Implement:
+
+- restrict
+- unrestrict
+- restriction state
+- restricted-account listing where required
+
+Use backend policy logic.
+
+==================================================
+34. CLOSE FRIENDS
+=================
+
+Implement:
+
+- add close friend
+- remove close friend
+- list close friends
+- membership state
+
+Ensure close-friend lists are private to the owner.
+
+==================================================
+35. AUTHORIZATION POLICIES
+==========================
+
+Create reusable authorization policies for:
+
+- account ownership
+- profile editing
+- following
+- follow requests
+- blocking
+- restrictions
+- close friends
+
+Do not duplicate checks across controllers.
+
+==================================================
+36. PRIVACY POLICIES
+====================
+
+Implement reusable policy evaluation for:
+
+- public profile
+- private profile
+- follower
+- blocked user
+- restricted user
+- owner
+
+This policy layer will be reused by content, stories, messaging, and discovery in later volumes.
+
+==================================================
+37. RATE LIMITING
+=================
+
+Apply rate-limit architecture to:
+
+- login
+- registration
+- password reset
+- username changes
+- follow
+- follow request
+- block
+- high-risk account operations
+
+Use Redis-backed distributed state where required.
+
+==================================================
+38. SECURITY AUDIT LOGGING
+==========================
+
+Create audit events for security-sensitive actions:
+
+- login
+- logout
+- password change
+- session revocation
+- account changes
+- follow actions where required
+- block
+- privacy changes
+
+Do not store credentials.
+
+==================================================
+39. API DESIGN
+==============
+
+Implement REST endpoints according to the approved API architecture.
+
+Suggested groups:
+
+/auth
+/accounts
+/profiles
+/social
+/sessions
+/devices
+
+Use consistent naming.
+
+Every endpoint must define:
+
+- authentication
+- authorization
+- validation
+- success response
+- error response
+
+==================================================
+40. API DOCUMENTATION
+=====================
+
+Integrate OpenAPI/Swagger documentation.
+
+Document:
+
+- authentication requirements
+- request bodies
+- responses
+- errors
+- pagination
+- security requirements
+
+Keep documentation synchronized with implementation.
+
+==================================================
+41. PAGINATION
+==============
+
+Use cursor pagination for:
+
+- follow lists
+- followers
+- following
+- follow requests
+- blocked users
+- restricted users
+- close friends where large enough
+
+Define opaque cursors.
+
+==================================================
+42. CACHE STRATEGY
+==================
+
+Cache only appropriate derived/read-heavy information.
+
+Potential caches:
+
+- profile summary
+- follow state
+- public profile data
+- social counters where applicable
+
+Never cache private information without explicit authorization-aware design.
+
+==================================================
+43. CACHE INVALIDATION
+======================
+
+A mutation must invalidate/update relevant cache state.
+
+Examples:
+
+Follow:
+
+- target profile
+- follower count
+- current relationship
+
+Block:
+
+- relationship state
+- authorization-related cached state
+
+Privacy change:
+
+- profile visibility
+- affected derived caches
+
+==================================================
+44. EVENTS
+==========
+
+Define and publish appropriate events such as:
+
+- UserRegistered
+- UserLoggedIn
+- SessionCreated
+- SessionRevoked
+- ProfileUpdated
+- FollowCreated
+- FollowRemoved
+- FollowRequestCreated
+- FollowRequestAccepted
+- FollowRequestDeclined
+- UserBlocked
+- UserUnblocked
+- UserRestricted
+- UserUnrestricted
+- CloseFriendAdded
+- CloseFriendRemoved
+
+Use the approved event envelope.
+
+==================================================
+45. ASYNC SIDE EFFECTS
+======================
+
+Where future domains depend on these events, publish them through the outbox.
+
+Do not synchronously call unrelated future domains merely to simulate integration.
+
+==================================================
+46. SECURITY REQUIREMENTS
+=========================
+
+Test protection against:
+
+- duplicate registration
+- account enumeration
+- username enumeration where inappropriate
+- brute-force login
+- session replay
+- unauthorized profile update
+- IDOR
+- follow manipulation
+- block bypass
+- private profile access
+- privilege escalation
+
+==================================================
+47. TESTING
+===========
+
+Implement tests for:
+
+Unit:
+
+- username normalization
+- account state
+- authorization
+- privacy
+- follow state
+- block state
+- restriction
+- close friends
+- session rules
+
+Integration:
+
+- PostgreSQL
+- Redis
+- authentication
+- social graph
+- outbox
+- event publishing
+
+E2E/API:
+
+- registration
+- login
+- logout
+- profile
+- follow
+- private-account request
+- request acceptance
+- block
+- restrict
+- close friends
+
+==================================================
+48. CONCURRENCY TESTING
+=======================
+
+Test concurrent:
+
+- follow
+- unfollow
+- follow request
+- accept request
+- block
+- unblock
+
+Verify there are no duplicate or contradictory relationship states.
+
+==================================================
+49. EVENT TESTING
+=================
+
+Test:
+
+- outbox creation
+- successful publication
+- publication failure
+- retry
+- duplicate delivery
+- correlation IDs
+- dead-letter behavior
+
+==================================================
+50. SECURITY TESTING
+====================
+
+Test:
+
+- invalid credentials
+- expired session
+- revoked session
+- unauthorized profile mutation
+- private profile access
+- block bypass
+- restricted access
+- rate-limit behavior
+
+==================================================
+51. MIGRATIONS
+==============
+
+All database changes must use Prisma migrations.
+
+Migration names must be descriptive.
+
+Do not manually modify production databases outside the established migration process.
+
+==================================================
+52. OBSERVABILITY
+=================
+
+Instrument:
+
+- authentication
+- profile operations
+- relationship mutations
+- database calls
+- Redis operations
+- event publishing
+- queue operations
+
+Expose:
+
+- metrics
+- structured logs
+- traces
+
+Never expose secrets in telemetry.
+
+==================================================
+53. GRACEFUL SHUTDOWN
+=====================
+
+Ensure the backend safely shuts down:
+
+- HTTP server
+- Prisma
+- Redis
+- Kafka producers/consumers
+- BullMQ
+- telemetry
+
+==================================================
+54. DOCUMENTATION
+=================
+
+Update backend documentation with:
+
+- module map
+- setup instructions
+- environment variables
+- database setup
+- migrations
+- authentication
+- social graph
+- API endpoints
+- events
+- local development
+- testing
+
+Documentation must match the actual implementation.
+
+==================================================
+55. IMPLEMENTATION DISCIPLINE
+=============================
+
+Before each change:
+
+1. Inspect the current repository.
+2. Identify existing files and abstractions.
+3. Reuse existing code.
+4. Determine dependencies.
+5. Implement the smallest coherent change.
+6. Add tests.
+7. Validate.
+8. Fix failures.
+9. Continue.
+
+Never overwrite unchanged files.
+
+==================================================
+56. VALIDATION
+==============
+
+Run the repository-supported:
+
+- formatter
+- lint
+- typecheck
+- unit tests
+- integration tests
+- API/E2E tests
+- build
+
+If a validation command fails:
+
+1. determine whether the failure is caused by your changes;
+2. fix the implementation;
+3. rerun the validation.
+
+Never suppress errors simply to obtain a passing result.
+
+==================================================
+FINAL ACCEPTANCE CRITERIA
+=========================
+
+Backend Volume 1 is complete when:
+
+FOUNDATION
+
+- NestJS application boots;
+- configuration is validated;
+- request context exists;
+- errors are standardized;
+- validation exists;
+- health checks exist;
+- graceful shutdown works.
+
+DATABASE
+
+- Prisma is configured;
+- migrations work;
+- repositories are organized;
+- transactions are supported.
+
+REDIS
+
+- Redis abstraction exists;
+- key conventions exist;
+- TTLs are applied appropriately.
+
+EVENTS
+
+- transactional outbox exists;
+- event envelope exists;
+- publishing works;
+- retry/idempotency foundations exist.
+
+QUEUES
+
+- BullMQ foundation exists;
+- job lifecycle is defined.
+
+AUTHENTICATION
+
+- registration works;
+- login works;
+- logout works;
+- sessions work;
+- revocation works;
+- password security works.
+
+ACCOUNTS
+
+- account lifecycle foundation works;
+- devices work;
+- profiles work;
+- usernames work;
+- privacy state works.
+
+SOCIAL GRAPH
+
+- follow works;
+- unfollow works;
+- private-account requests work;
+- requests can be accepted/declined;
+- block works;
+- restriction works;
+- close friends work.
+
+SECURITY
+
+- authorization works;
+- privacy policies work;
+- rate limiting is integrated;
+- security events are auditable.
+
+API
+
+- endpoints are documented;
+- validation works;
+- errors are standardized;
+- pagination is implemented where required.
+
+TESTING
+
+- unit tests exist;
+- integration tests exist;
+- critical API/E2E tests exist;
+- concurrency cases are covered;
+- security cases are covered.
+
+The repository must remain buildable and testable at the end of this volume.
+
+==================================================
+DO NOT IMPLEMENT IN THIS VOLUME
+===============================
+
+Do not implement:
+
+- posts
+- carousels
+- stories
+- reels
+- feed
+- recommendations
+- search
+- messaging
+- notifications
+- advertising
+- commerce
+- monetization
+- advanced analytics
+- infrastructure
+- Kubernetes
+- Terraform
+- frontend
+- mobile application
+
+Those systems must consume the foundation established here in later implementation volumes.
+
+BEGIN WITH:
+
+1. INSPECT THE EXISTING BACKEND REPOSITORY.
+2. ESTABLISH THE NESTJS/BACKEND FOUNDATION.
+3. IMPLEMENT THE DATABASE/PRISMA FOUNDATION.
+4. IMPLEMENT AUTHENTICATION, ACCOUNTS, PROFILES, AND SOCIAL GRAPH FOUNDATION
+
+You are operating in Senior Engineering Team Mode.
+
 Build the production-ready backend foundation for an enterprise-scale global visual-social platform comparable in architectural scope to Instagram.
 
 The platform is an original implementation.

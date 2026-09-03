@@ -1,5 +1,1784 @@
 You are operating in Senior Engineering Team Mode.
 
+The Master Prompt has been provided and approved.
+
+Your task in this phase is to produce the COMPLETE FOUNDATIONAL ARCHITECTURE for the Instagram-like global visual-social platform.
+
+DO NOT IMPLEMENT SOURCE CODE.
+
+DO NOT GENERATE:
+
+- NestJS implementation
+- TypeScript implementation
+- React implementation
+- React Native implementation
+- Prisma schema code
+- SQL migrations
+- Terraform
+- Kubernetes
+- Helm
+- Dockerfiles
+- GitHub Actions
+- executable configuration
+
+This phase is architecture and engineering specification only.
+
+The architecture produced here becomes the source of truth for every subsequent implementation.
+
+All later backend, frontend, mobile, infrastructure, DevOps, security, and QA implementation must follow these decisions.
+
+Do not redesign the system during implementation unless a genuine architectural defect is discovered and documented through an Architecture Decision Record.
+
+==================================================
+ARCHITECTURE OBJECTIVE
+======================
+
+Design a complete production-grade architecture for an original global visual-social platform comparable in architectural scope to Instagram.
+
+The architecture must support:
+
+- massive read traffic
+- high-volume media
+- high-volume engagement
+- personalized feeds
+- recommendations
+- search
+- realtime messaging
+- notifications
+- creator workloads
+- business workloads
+- advertising
+- commerce
+- moderation
+- rights management
+- privacy operations
+- analytics
+- multi-region deployment
+- disaster recovery
+
+The architecture must remain understandable and maintainable.
+
+Avoid both:
+
+1. an unmaintainable monolith;
+2. unnecessary microservice fragmentation.
+
+Use domain boundaries to determine where modularization is needed.
+
+==================================================
+ARCHITECTURAL PRINCIPLES
+========================
+
+Follow:
+
+- Domain-Driven Design
+- Clean Architecture
+- SOLID
+- bounded contexts
+- explicit domain ownership
+- repository pattern
+- service/application layers
+- dependency inversion
+- event-driven architecture
+- transactional outbox
+- idempotent processing
+- horizontal scalability
+- secure-by-default design
+- privacy-by-design
+- least privilege
+- observability
+- fault tolerance
+- backward compatibility
+
+Use distributed-systems complexity only when justified.
+
+==================================================
+SYSTEM CONTEXT
+==============
+
+Describe the complete system context.
+
+Identify:
+
+External actors:
+
+- anonymous visitor
+- authenticated user
+- creator
+- professional/business user
+- advertiser
+- merchant
+- moderator
+- administrator
+- rights holder
+
+Client applications:
+
+- web
+- iOS/Android mobile application
+
+Platform components:
+
+- edge/CDN
+- API layer
+- application/domain modules
+- transactional database
+- cache
+- event streaming
+- background processing
+- search
+- object storage
+- media processing
+- realtime gateway
+- notification system
+- analytics
+- administration
+
+External providers:
+
+- cloud
+- payments
+- push notifications
+- email
+- maps/location
+- other approved integrations
+
+Explain the responsibilities and trust boundaries.
+
+==================================================
+HIGH-LEVEL ARCHITECTURE
+=======================
+
+Design the complete request/data flow:
+
+Client
+→ Edge
+→ Application/API
+→ Domain layer
+→ Persistence / Cache / Events / Jobs / External providers
+
+And:
+
+Application
+→ Event Stream
+→ Consumers
+→ Derived systems
+
+And:
+
+Client
+→ Upload Session
+→ Object Storage
+→ Media Processing
+→ Derived Media
+→ CDN
+
+And:
+
+Client
+→ Realtime Gateway
+→ Event Distribution
+→ Client
+
+Use clear textual architecture diagrams.
+
+==================================================
+ARCHITECTURAL LAYERS
+====================
+
+Define:
+
+Presentation Layer
+Application Layer
+Domain Layer
+Infrastructure Layer
+
+Explain responsibilities and dependency direction.
+
+The domain layer must not depend directly on:
+
+- PostgreSQL
+- Redis
+- Kafka
+- AWS SDK
+- Stripe
+- FCM/APNS
+- OpenSearch
+- external HTTP clients
+
+Use interfaces/adapters where necessary.
+
+==================================================
+BOUNDED CONTEXTS
+================
+
+Define bounded contexts for:
+
+1. Identity
+2. Accounts
+3. Profiles
+4. Social Graph
+5. Content
+6. Media
+7. Stories
+8. Reels
+9. Engagement
+10. Feed
+11. Recommendations
+12. Search
+13. Messaging
+14. Notifications
+15. Creator/Professional
+16. Monetization
+17. Advertising
+18. Commerce
+19. Moderation/Safety
+20. Rights Management
+21. Analytics
+22. Privacy/Data
+23. Administration
+24. Configuration/Feature Flags
+
+For each bounded context provide:
+
+- purpose
+- responsibilities
+- owned data
+- important entities
+- aggregate candidates
+- commands
+- queries
+- domain events
+- integration events
+- synchronous dependencies
+- asynchronous dependencies
+- consistency requirements
+- security boundary
+
+==================================================
+DOMAIN OWNERSHIP
+================
+
+Create an ownership matrix.
+
+Example:
+
+Domain
+→ authoritative service/module
+→ database ownership
+→ cache ownership
+→ event ownership
+→ external integrations
+
+No domain may silently become the source of truth for another domain's core data.
+
+==================================================
+IDENTITY ARCHITECTURE
+=====================
+
+Design:
+
+- User identity
+- Credentials
+- Sessions
+- Devices
+- Verification
+- Password reset
+- Security events
+- Recovery
+- Authentication factors where supported
+
+Define:
+
+- unique identifiers
+- session lifecycle
+- credential boundaries
+- device registration
+- revocation
+
+Specify which identity data is:
+
+- public
+- authenticated-only
+- owner-only
+- administrator-only
+
+==================================================
+ACCOUNT ARCHITECTURE
+====================
+
+Define account lifecycle states such as:
+
+- active
+- limited
+- suspended
+- deactivated
+- deletion_pending
+- deleted
+
+Define how account state affects:
+
+- authentication
+- profile visibility
+- content
+- messaging
+- recommendations
+- search
+- notifications
+- monetization
+- advertising
+- commerce
+
+==================================================
+PROFILE ARCHITECTURE
+====================
+
+Define:
+
+- Profile
+- Creator Profile
+- Business Profile
+- Professional Profile
+
+Support:
+
+- avatar
+- username
+- display name
+- biography
+- links
+- verification
+- account category
+- professional metadata
+
+Define ownership and update permissions.
+
+==================================================
+SOCIAL GRAPH ARCHITECTURE
+=========================
+
+Design:
+
+- Follow
+- FollowRequest
+- Block
+- Restriction
+- Mute
+- CloseFriend
+
+Define lifecycle and semantics.
+
+Explicitly define:
+
+- public-account follow
+- private-account follow
+- request approval
+- request cancellation
+- block precedence
+- restriction behavior
+- mute behavior
+
+==================================================
+RELATIONSHIP CONSISTENCY
+========================
+
+Classify social graph operations:
+
+Strong consistency where required:
+
+- blocks
+- privacy-critical relationship changes
+- ownership/security state
+
+Eventual consistency where acceptable:
+
+- counters
+- recommendation signals
+- analytics
+- derived feeds
+
+==================================================
+AUTHORIZATION ARCHITECTURE
+==========================
+
+Design centralized authorization.
+
+Authorization must consider:
+
+1. authentication
+2. account state
+3. ownership
+4. block state
+5. privacy state
+6. relationship state
+7. resource visibility
+8. feature permission
+9. administrative role
+10. regional/policy restrictions
+
+Define reusable policy concepts.
+
+Do not duplicate independent authorization logic in every domain.
+
+==================================================
+PRIVACY ARCHITECTURE
+====================
+
+Design a reusable privacy policy engine.
+
+Support:
+
+- public
+- private
+- followers
+- close friends
+- owner-only
+- custom audiences where supported
+- blocked
+- restricted
+
+Define privacy evaluation for:
+
+- profiles
+- posts
+- stories
+- reels
+- comments
+- messages
+- search
+- recommendations
+- notifications
+- analytics
+- media delivery
+
+==================================================
+CONTENT ARCHITECTURE
+====================
+
+Define:
+
+- Post
+- Carousel
+- Draft
+- Caption
+- Mention
+- Hashtag
+- Tagged User
+- Location
+- Publication
+- Visibility
+
+Define the lifecycle:
+
+draft
+→ upload
+→ processing
+→ ready
+→ scheduled/published
+→ updated
+→ deleted/restorable
+
+Specify ownership and invariants.
+
+==================================================
+POST AGGREGATE
+==============
+
+Define:
+
+- aggregate root
+- child entities
+- invariants
+- valid state transitions
+
+The aggregate must remain sufficiently small for transactional scalability.
+
+==================================================
+MEDIA ARCHITECTURE
+==================
+
+Design the complete media pipeline:
+
+Client
+→ Upload initialization
+→ upload authorization
+→ S3
+→ media processing
+→ metadata extraction
+→ derived media
+→ thumbnails
+→ HLS where required
+→ CDN
+
+Define:
+
+- upload session
+- media object
+- media variant
+- processing job
+- processing state
+- failure state
+
+==================================================
+MEDIA PROCESSING
+================
+
+Support:
+
+Images:
+
+- resizing
+- optimization
+- thumbnails
+- metadata sanitization
+
+Video:
+
+- validation
+- transcoding
+- thumbnails
+- HLS
+- bitrate variants
+- metadata
+
+Define processing isolation and retry behavior.
+
+==================================================
+MEDIA ACCESS CONTROL
+====================
+
+Define:
+
+- public media
+- private media
+- signed URLs/cookies
+- expiration
+- revocation
+- CDN authorization
+
+Private content must never become public merely because it is cached.
+
+==================================================
+STORY ARCHITECTURE
+==================
+
+Define:
+
+- Story
+- StoryMedia
+- StoryView
+- StoryReaction
+- StoryReply
+- Highlight
+- HighlightItem
+
+Define:
+
+- visibility
+- expiration
+- viewing
+- reactions
+- replies
+- highlights
+- deletion
+- moderation
+
+==================================================
+REELS ARCHITECTURE
+==================
+
+Define:
+
+- Reel
+- ReelMedia
+- ReelAudio
+- ReelWatchEvent
+
+Define relationships with:
+
+- content
+- media
+- feed
+- recommendations
+- search
+- engagement
+- rights
+- moderation
+- analytics
+
+==================================================
+ENGAGEMENT ARCHITECTURE
+=======================
+
+Create reusable concepts for:
+
+- likes
+- comments
+- replies
+- saves
+- collections
+- shares
+- reposts where supported
+
+Define idempotency and counter strategy.
+
+==================================================
+COUNTER ARCHITECTURE
+====================
+
+Counters such as:
+
+- likes
+- comments
+- followers
+- views
+- shares
+
+must be treated as derived/aggregated values unless strong consistency is explicitly required.
+
+Define:
+
+- source events
+- aggregation
+- reconciliation
+- cache strategy
+
+Never make counters the authoritative source of transactional truth.
+
+==================================================
+COMMENT ARCHITECTURE
+====================
+
+Define:
+
+- Comment
+- CommentReply
+- CommentLike
+- CommentModerationState
+
+Specify:
+
+- nesting depth
+- pagination
+- moderation
+- deletion
+- visibility
+- ownership
+
+==================================================
+COLLECTIONS
+===========
+
+Define:
+
+- Collection
+- CollectionItem
+- Save
+
+Specify:
+
+- private ownership
+- ordering
+- duplicates
+- deletion
+
+==================================================
+FEED ARCHITECTURE
+=================
+
+Design:
+
+- Home feed
+- Following feed
+- Reels feed
+- Story tray
+- Explore
+
+Each feed pipeline must separate:
+
+1. candidate generation
+2. eligibility
+3. ranking
+4. reranking
+5. diversification
+6. pagination
+7. response assembly
+
+==================================================
+FEED CANDIDATE SOURCES
+======================
+
+Possible candidates:
+
+- followed accounts
+- engaged accounts
+- recent content
+- recommended content
+- trending content
+- creator content
+- business content
+- sponsored content where applicable
+
+Specify source weighting at architectural level without implementing ranking formulas.
+
+==================================================
+FEED STORAGE STRATEGY
+=====================
+
+Evaluate:
+
+- fan-out-on-write
+- fan-out-on-read
+- hybrid
+
+Specify how to handle:
+
+- normal users
+- highly-followed creators
+- viral accounts
+- inactive users
+
+==================================================
+FEED ELIGIBILITY
+================
+
+Every candidate must pass:
+
+- account-state checks
+- block checks
+- privacy checks
+- relationship checks
+- content visibility
+- moderation
+- rights
+- region
+- recommendation policy
+
+before being returned.
+
+==================================================
+RECOMMENDATION ARCHITECTURE
+===========================
+
+Design recommendation pipelines for:
+
+- accounts
+- creators
+- businesses
+- posts
+- reels
+- hashtags
+- audio
+
+Separate:
+
+Candidate generation
+→ feature retrieval
+→ ranking
+→ reranking
+→ diversity
+→ policy filtering
+
+Support negative signals and feedback.
+
+==================================================
+TRENDING
+========
+
+Define trending architecture for:
+
+- hashtags
+- reels
+- audio
+- creators
+- topics
+
+Use time-windowed derived data.
+
+Define anti-manipulation considerations.
+
+==================================================
+SEARCH
+======
+
+Design search for:
+
+- users
+- creators
+- businesses
+- posts
+- reels
+- hashtags
+- audio
+- locations
+- products
+
+OpenSearch/Elasticsearch is derived state.
+
+PostgreSQL remains the authoritative source.
+
+==================================================
+SEARCH INDEXING
+===============
+
+Define:
+
+- indexing events
+- update events
+- deletion events
+- reindexing
+- reconciliation
+- index versions
+- retry
+- dead-letter behavior
+
+==================================================
+SEARCH PRIVACY
+==============
+
+Search results must respect:
+
+- private accounts
+- blocks
+- restrictions
+- moderation
+- rights
+- deleted content
+- regional restrictions
+
+==================================================
+MESSAGING ARCHITECTURE
+======================
+
+Define:
+
+- Conversation
+- Participant
+- Message
+- MessageAttachment
+- MessageReaction
+- MessageReply
+- MessageRequest
+- DeliveryState
+- ReadState
+- Presence
+- TypingState
+
+Support:
+
+- one-to-one
+- group conversations where supported
+- message requests
+- blocking
+- privacy
+- pagination
+
+==================================================
+MESSAGING CONSISTENCY
+=====================
+
+Classify:
+
+Strong/eventual consistency for:
+
+- message persistence
+- delivery
+- read receipts
+- reactions
+- typing
+- presence
+
+Avoid unnecessarily strong guarantees for ephemeral state.
+
+==================================================
+REALTIME ARCHITECTURE
+=====================
+
+Design WebSocket/Socket.IO architecture.
+
+Define:
+
+- connection authentication
+- authorization
+- room model
+- event routing
+- horizontal scaling
+- Redis adapter/coordination where appropriate
+- reconnect
+- duplicate detection
+- ordering
+- backpressure
+
+==================================================
+NOTIFICATION ARCHITECTURE
+=========================
+
+Define:
+
+- Notification
+- NotificationGroup
+- NotificationPreference
+- PushDevice
+
+Support:
+
+- in-app
+- push
+- email where appropriate
+
+Define fanout and aggregation strategy.
+
+==================================================
+CREATOR/BUSINESS ARCHITECTURE
+=============================
+
+Define capabilities for:
+
+- creator accounts
+- professional accounts
+- business accounts
+- dashboards
+- analytics
+- monetization
+- advertising
+- commerce
+
+Specify permission boundaries.
+
+==================================================
+MONETIZATION
+============
+
+Design:
+
+- SubscriptionPlan
+- Subscription
+- Entitlement
+- Earning
+- LedgerEntry
+- PlatformFee
+- PayoutRequest
+- Payout
+- Refund
+- Dispute
+- Settlement
+
+Use an immutable ledger model where appropriate.
+
+Every financial mutation must be idempotent.
+
+==================================================
+ADVERTISING
+===========
+
+Define:
+
+- Advertiser
+- Campaign
+- AdSet
+- Creative
+- Audience
+- Placement
+- Budget
+- Schedule
+- Review
+- AdEvent
+
+Define lifecycle states.
+
+Separate campaign configuration from serving/ranking infrastructure.
+
+==================================================
+COMMERCE
+========
+
+Define:
+
+- Storefront
+- Product
+- ProductVariant
+- ProductMedia
+- Collection
+- ProductTag
+- Cart
+- Checkout
+- Order
+- OrderItem
+- Payment
+- Fulfillment
+- Shipment
+- Return
+- Refund
+- InventoryReservation
+
+Define transaction boundaries and state machines.
+
+==================================================
+MODERATION
+==========
+
+Define:
+
+- Report
+- ModerationCase
+- ModerationAction
+- Enforcement
+- Appeal
+- SafetySignal
+
+Support:
+
+- automated signals
+- user reports
+- human review
+- enforcement
+- appeals
+- restoration
+
+==================================================
+RIGHTS MANAGEMENT
+=================
+
+Define:
+
+- RightsHolder
+- RightsClaim
+- RightsPolicy
+- RegionalRestriction
+- Takedown
+- CounterNotice
+- Restoration
+
+Define integrations with:
+
+- content
+- media
+- feed
+- search
+- CDN
+
+==================================================
+ANALYTICS
+=========
+
+Define analytics event categories for:
+
+- impressions
+- views
+- watch
+- engagement
+- follows
+- searches
+- creator metrics
+- business metrics
+- advertising
+- commerce
+- moderation
+
+Do not send:
+
+- private message bodies
+- passwords
+- secrets
+- unnecessary sensitive information
+
+==================================================
+PRIVACY AND DATA LIFECYCLE
+==========================
+
+Define:
+
+- export
+- deletion
+- retention
+- derived-data deletion
+- cache invalidation
+- search deletion
+- analytics handling
+- audit
+
+Deletion workflows must identify every derived system affected by a deleted account or resource.
+
+==================================================
+ADMINISTRATION
+==============
+
+Define:
+
+- AdminUser
+- Role
+- Permission
+- AuditLog
+- FeatureFlag
+- ConfigurationEntry
+
+Administrative operations must have a separate authorization boundary.
+
+==================================================
+EVENT ARCHITECTURE
+==================
+
+Define three major event categories:
+
+1. Domain Events
+   Internal bounded-context events.
+2. Integration Events
+   Cross-domain events.
+3. Analytics Events
+   High-volume behavioral/measurement events.
+
+Do not mix these semantics.
+
+==================================================
+EVENT ENVELOPE
+==============
+
+Every integration event should contain:
+
+- eventId
+- eventType
+- schemaVersion
+- timestamp
+- producer
+- aggregateId
+- correlationId
+- causationId where required
+- payload
+
+==================================================
+TRANSACTIONAL OUTBOX
+====================
+
+Define:
+
+Transaction
+→ domain state change
+→ outbox record
+→ publisher
+→ event stream
+→ consumers
+
+Specify:
+
+- retries
+- idempotency
+- dead letters
+- replay
+- ordering
+
+==================================================
+QUEUE ARCHITECTURE
+==================
+
+Define job categories for:
+
+- media
+- notifications
+- feed
+- recommendations
+- search
+- moderation
+- analytics
+- privacy export
+- deletion
+- cleanup
+- scheduling
+- reconciliation
+
+Each queue must have:
+
+- owner
+- job schema
+- retry policy
+- idempotency behavior
+- failure handling
+
+==================================================
+API ARCHITECTURE
+================
+
+Establish API domain boundaries.
+
+Expected groups include:
+
+- auth
+- accounts
+- profiles
+- social
+- posts
+- stories
+- reels
+- feed
+- explore
+- search
+- messages
+- notifications
+- creator
+- advertising
+- commerce
+- moderation
+- rights
+- privacy
+- admin
+
+Define REST design principles.
+
+==================================================
+API CONTRACT PRINCIPLES
+=======================
+
+Every API must define:
+
+- request
+- response
+- authentication
+- authorization
+- validation
+- errors
+- pagination
+- rate limits
+- idempotency when required
+
+==================================================
+PAGINATION
+==========
+
+Use cursor pagination for:
+
+- feed
+- notifications
+- messages
+- comments
+- search results
+- social graph lists
+- large administrative collections
+
+Define:
+
+- cursor opacity
+- ordering
+- limits
+- maximum page size
+- next cursor
+
+==================================================
+API ERRORS
+==========
+
+Create standardized error semantics.
+
+At minimum:
+
+- authentication error
+- authorization error
+- validation error
+- not found
+- conflict
+- rate limited
+- dependency failure
+- internal error
+
+Do not expose internal implementation details.
+
+==================================================
+API RATE LIMITING
+=================
+
+Define rate limits by category:
+
+- anonymous
+- authenticated
+- write-heavy
+- login/authentication
+- messaging
+- uploads
+- privileged
+- administrative
+
+Support distributed coordination through Redis where required.
+
+==================================================
+IDEMPOTENCY
+===========
+
+Define idempotency for:
+
+- content creation
+- message sending
+- payments
+- orders
+- webhooks
+- exports
+- deletion
+- important relationship mutations
+
+==================================================
+WEBHOOKS
+========
+
+Design secure webhook handling.
+
+Support:
+
+- signature verification
+- timestamp validation
+- replay protection
+- idempotency
+- persistence
+- retry
+- dead-letter
+
+==================================================
+CONSISTENCY MODEL
+=================
+
+Create a formal consistency classification.
+
+Strong consistency candidates:
+
+- authentication
+- authorization
+- blocks
+- privacy-critical state
+- financial ledger
+- order state
+- ownership
+
+Eventual consistency candidates:
+
+- feed
+- recommendations
+- search
+- notification aggregation
+- analytics
+- engagement counters
+- trending
+
+Ephemeral:
+
+- typing
+- presence
+- transient realtime indicators
+
+Document exceptions.
+
+==================================================
+FAILURE MODEL
+=============
+
+Define behavior when:
+
+- PostgreSQL unavailable
+- Redis unavailable
+- Kafka/Redpanda unavailable
+- OpenSearch unavailable
+- S3 unavailable
+- CDN unavailable
+- push provider unavailable
+- email unavailable
+- payment provider unavailable
+- worker pool unavailable
+- realtime unavailable
+
+For every dependency identify:
+
+- hard dependency
+- soft dependency
+- degraded behavior
+- retry
+- recovery
+
+==================================================
+SECURITY ARCHITECTURE
+=====================
+
+Define security boundaries between:
+
+- browser
+- mobile device
+- edge
+- API
+- application modules
+- workers
+- database
+- cache
+- event system
+- object storage
+- search
+- admin
+
+==================================================
+THREAT MODEL
+============
+
+Identify threats including:
+
+- account takeover
+- credential abuse
+- scraping
+- spam
+- bot activity
+- privilege escalation
+- IDOR
+- malicious uploads
+- injection
+- SSRF
+- WebSocket abuse
+- webhook spoofing
+- payment abuse
+- fraud
+- data exfiltration
+- insider/admin abuse
+
+For each major threat specify architectural mitigations.
+
+==================================================
+OBSERVABILITY
+=============
+
+Define:
+
+Logs:
+
+- structured
+- correlated
+- privacy-safe
+
+Metrics:
+
+- latency
+- throughput
+- errors
+- queue depth
+- event lag
+- resource utilization
+
+Traces:
+
+- API
+- database
+- Redis
+- Kafka
+- queues
+- external providers
+
+Use:
+
+- OpenTelemetry
+- Prometheus
+- Grafana
+- Loki
+- Tempo
+
+==================================================
+SLO/SLI ARCHITECTURE
+====================
+
+Define candidate SLI categories for:
+
+- API
+- feed
+- search
+- messaging
+- notifications
+- media processing
+- event processing
+- queues
+- infrastructure
+
+Do not invent numerical targets without evidence.
+
+==================================================
+MULTI-REGION ARCHITECTURE
+=========================
+
+Design:
+
+- primary region
+- secondary region
+- regional application stacks
+- global traffic management
+- data replication
+- event replication
+- media replication
+- regional failover
+- failback
+
+Explicitly classify each subsystem as:
+
+- active-active
+- active-passive
+- region-local
+- globally replicated
+- reconstructable
+
+Do not assume every system should be active-active.
+
+==================================================
+DISASTER RECOVERY
+=================
+
+Define recovery architecture for:
+
+- database
+- Redis
+- search
+- event streaming
+- queues
+- object storage
+- Kubernetes/application workloads
+
+Define:
+
+- backups
+- snapshots
+- replication
+- replay
+- restoration
+- failover
+- failback
+
+RPO/RTO values must be defined later using validated operational requirements.
+
+==================================================
+SCALING STRATEGY
+================
+
+Define scaling dimensions for:
+
+- API replicas
+- workers
+- WebSocket gateways
+- database
+- Redis
+- search
+- event streaming
+- media processing
+
+Identify likely bottlenecks and mitigation strategies.
+
+==================================================
+HOTSPOT STRATEGY
+================
+
+Explicitly address:
+
+- viral content
+- celebrity/large creator accounts
+- hot Redis keys
+- popular hashtags
+- popular audio
+- high-traffic profiles
+- database hot rows
+- notification fanout
+
+==================================================
+CAPACITY MODEL
+==============
+
+Define the categories of capacity that must be measured:
+
+- requests per second
+- active users
+- concurrent WebSocket connections
+- media uploads
+- media processing jobs
+- event throughput
+- queue throughput
+- search requests
+- database connections
+- Redis memory
+
+Do not invent final numbers.
+
+==================================================
+ARCHITECTURAL DECISION RECORDS
+==============================
+
+Create ADRs for at least:
+
+ADR-001:
+Modular architecture strategy.
+
+ADR-002:
+PostgreSQL source-of-truth strategy.
+
+ADR-003:
+Redis responsibilities.
+
+ADR-004:
+Kafka/Redpanda event architecture.
+
+ADR-005:
+Transactional outbox.
+
+ADR-006:
+Feed architecture.
+
+ADR-007:
+Recommendation architecture.
+
+ADR-008:
+Search architecture.
+
+ADR-009:
+Media/storage/CDN architecture.
+
+ADR-010:
+Realtime architecture.
+
+ADR-011:
+Messaging consistency.
+
+ADR-012:
+Financial ledger.
+
+ADR-013:
+Privacy/authorization architecture.
+
+ADR-014:
+Multi-region strategy.
+
+ADR-015:
+Disaster recovery strategy.
+
+Every ADR must include:
+
+- Context
+- Problem
+- Decision
+- Alternatives
+- Consequences
+
+==================================================
+ARCHITECTURAL OUTPUT REQUIREMENTS
+=================================
+
+Produce a comprehensive architecture document with:
+
+1. Executive Summary
+2. System Context
+3. High-Level Architecture
+4. Architectural Layers
+5. Bounded Context Map
+6. Domain Ownership
+7. Identity Architecture
+8. Account Architecture
+9. Profile Architecture
+10. Social Graph
+11. Authorization
+12. Privacy
+13. Content
+14. Media
+15. Stories
+16. Reels
+17. Engagement
+18. Feed
+19. Recommendations
+20. Trending
+21. Search
+22. Messaging
+23. Realtime
+24. Notifications
+25. Creator/Business
+26. Monetization
+27. Advertising
+28. Commerce
+29. Moderation
+30. Rights Management
+31. Analytics
+32. Privacy/Data Lifecycle
+33. Administration
+34. API Architecture
+35. Event Architecture
+36. Queue Architecture
+37. Webhook Architecture
+38. Consistency Model
+39. Failure Model
+40. Security Architecture
+41. Threat Model
+42. Observability
+43. SLO/SLI Model
+44. Multi-Region Architecture
+45. Disaster Recovery
+46. Scaling Strategy
+47. Capacity Model
+48. ADR Index
+49. Data Ownership Matrix
+50. Dependency Matrix
+
+==================================================
+DIAGRAM REQUIREMENTS
+====================
+
+Include textual diagrams for:
+
+- system context
+- high-level architecture
+- bounded contexts
+- content/media pipeline
+- feed pipeline
+- recommendation pipeline
+- search pipeline
+- messaging/realtime
+- event architecture
+- notification fanout
+- privacy evaluation
+- multi-region topology
+- disaster recovery
+
+==================================================
+DATABASE ARCHITECTURE REQUIREMENT
+=================================
+
+This volume must describe the logical database architecture, but it must NOT generate executable Prisma schema code.
+
+Define:
+
+- domain ownership
+- major entity groups
+- aggregate boundaries
+- transactional boundaries
+- high-level relationships
+- indexing philosophy
+- partitioning philosophy
+- retention philosophy
+
+The detailed field-level entity model and API contracts will be completed in the next architecture specification phase.
+
+==================================================
+IMPORTANT
+=========
+
+Do not generate source code.
+
+Do not generate implementation files.
+
+Do not generate executable schemas.
+
+Do not generate deployment manifests.
+
+Do not generate infrastructure code.
+
+Produce architecture, engineering specifications, diagrams, models, responsibilities, consistency rules, and decisions only.
+
+The architecture must be internally consistent.
+
+Do not leave important architectural questions unresolved.
+
+Where an exact implementation choice can safely be deferred, explicitly identify the boundary and the constraint that future implementation must respect.
+
+BEGIN WITH:
+
+1. EXECUTIVE ARCHITECTURE SUMMARY
+2. SYSTEM CONTEXT
+3. HIGH-LEVEL ARCHITECTURE
+4. ARCHITECTURAL LAYERS
+5. BOUNDED CONTEXT MAP
+6. DOMAIN OWNERSH
+
+You are operating in Senior Engineering Team Mode.
+
 Design the complete foundational architecture for an enterprise-scale global visual-social platform comparable in architectural scope to Instagram.
 
 The platform is an original implementation.
