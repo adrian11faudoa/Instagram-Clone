@@ -1,3 +1,1408 @@
+# PROJECT 1 — INSTAGRAM-LIKE GLOBAL SOCIAL PLATFORM
+
+# ARCHITECTURE PROMPT — VOLUME 1
+
+# SYSTEM ARCHITECTURE, DOMAIN MODEL, DATA ARCHITECTURE & DISTRIBUTED DESIGN
+
+You are the Principal Software Architect and senior engineering team responsible for defining the production architecture of an Instagram-like global social platform.
+
+This prompt is fully standalone. It does not depend on any other prompt, document, previous conversation, previous architecture, approval, implementation phase, or hidden context.
+
+The architecture described here must be sufficiently complete for engineers to implement the platform correctly without relying on another prompt.
+
+Do not generate application source code in this architecture phase.
+
+Produce architecture, specifications, domain models, contracts, engineering decisions, constraints, and implementation guidance only.
+
+Do not use pseudo-code as a substitute for architectural decisions.
+
+Do not use TODOs or placeholder architecture sections.
+
+==================================================
+
+1. PLATFORM OBJECTIVE
+   ==================================================
+
+Design a globally scalable social platform supporting:
+
+- user accounts
+- authentication
+- profiles
+- social relationships
+- public and private accounts
+- posts
+- image and video media
+- stories
+- reels / short-form video
+- likes
+- comments
+- replies
+- saves
+- shares
+- mentions
+- hashtags
+- feeds
+- search
+- recommendations
+- notifications
+- direct messaging
+- blocking
+- muting
+- restricting
+- reporting
+- moderation
+- media processing
+- creator-oriented capabilities
+- analytics
+- push notifications
+- real-time features
+
+The architecture must support:
+
+- web clients
+- iOS clients
+- Android clients
+- horizontal backend scaling
+- asynchronous processing
+- high-volume media delivery
+- geographically distributed users
+- fault isolation
+- graceful degradation
+- observability
+- secure operations
+
+==================================================
+2. REQUIRED TECHNOLOGY FOUNDATION
+=================================
+
+Web:
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- TanStack Query
+- Zustand
+
+Mobile:
+
+- React Native
+- Expo
+- TypeScript
+- Zustand
+- TanStack Query
+- React Navigation
+
+Backend:
+
+- Node.js
+- NestJS
+- TypeScript
+
+Transactional database:
+
+- PostgreSQL
+- Prisma ORM
+
+Caching and ephemeral state:
+
+- Redis
+
+Event streaming:
+
+- Kafka or Redpanda
+
+Background jobs:
+
+- BullMQ
+
+Search:
+
+- OpenSearch or Elasticsearch
+
+Object storage:
+
+- AWS S3
+
+CDN:
+
+- AWS CloudFront
+
+Media processing:
+
+- FFmpeg
+
+Real-time communication:
+
+- Socket.IO
+- WebSockets
+
+Push notifications:
+
+- Firebase Cloud Messaging
+- Apple Push Notification service
+
+Infrastructure:
+
+- Docker
+- Kubernetes
+- Helm
+- Terraform
+- AWS
+- GitHub Actions
+
+Observability:
+
+- OpenTelemetry
+- Prometheus
+- Grafana
+- Loki
+- Tempo
+
+==================================================
+3. ARCHITECTURAL STYLE
+======================
+
+Use a modular architecture based on:
+
+- Domain-Driven Design
+- Clean Architecture
+- SOLID
+- dependency inversion
+- explicit module boundaries
+- repository abstraction
+- application services
+- domain services
+- infrastructure adapters
+
+The backend must initially permit a modular-monolith deployment model while maintaining boundaries that allow selected workloads to become independently deployable services later.
+
+Do not split every domain into a microservice simply because microservices are possible.
+
+The architecture should favor:
+
+- clear ownership
+- low coupling
+- high cohesion
+- independent scaling where justified
+- asynchronous communication for long-running or non-critical work
+- transactional consistency for critical user actions
+
+==================================================
+4. HIGH-LEVEL SYSTEM
+====================
+
+Define the platform as the following major architectural areas:
+
+1. Edge / CDN
+2. Web application
+3. Mobile applications
+4. API layer
+5. Identity and authentication
+6. User/profile domain
+7. Social graph domain
+8. Content domain
+9. Media domain
+10. Feed and ranking domain
+11. Engagement domain
+12. Story domain
+13. Messaging domain
+14. Notification domain
+15. Search and discovery domain
+16. Moderation and safety domain
+17. Analytics domain
+18. Background-processing subsystem
+19. Event-streaming subsystem
+20. Data/storage subsystem
+21. Observability subsystem
+22. Platform/infrastructure subsystem
+
+Clearly define responsibilities and ownership for each.
+
+==================================================
+5. DOMAIN-DRIVEN BOUNDARIES
+===========================
+
+Define bounded contexts for at least:
+
+---
+
+Identity
+--------
+
+Responsibilities:
+
+- registration
+- login
+- authentication
+- session management
+- credentials
+- password reset
+- email verification
+- account security
+- device sessions
+
+Identity is authoritative for authentication state.
+
+---
+
+Profile
+-------
+
+Responsibilities:
+
+- username
+- display name
+- biography
+- avatar
+- website
+- profile settings
+- account metadata
+- privacy state
+
+---
+
+Social Graph
+------------
+
+Responsibilities:
+
+- follow relationships
+- follow requests
+- follower/following state
+- blocking
+- muting
+- restricting
+- relationship visibility
+
+---
+
+Content
+-------
+
+Responsibilities:
+
+- posts
+- captions
+- media associations
+- mentions
+- hashtags
+- visibility
+- content lifecycle
+
+---
+
+Stories
+-------
+
+Responsibilities:
+
+- temporary content
+- story sequencing
+- expiration
+- story viewers
+- story privacy
+- story interactions
+
+---
+
+Short-Form Video
+----------------
+
+Responsibilities:
+
+- reels
+- video metadata
+- media variants
+- discovery metadata
+- engagement metadata
+
+---
+
+Engagement
+----------
+
+Responsibilities:
+
+- likes
+- comments
+- replies
+- saves
+- shares
+- engagement counters
+
+---
+
+Feed
+----
+
+Responsibilities:
+
+- candidate generation
+- feed assembly
+- ranking
+- pagination
+- personalization
+
+---
+
+Messaging
+---------
+
+Responsibilities:
+
+- conversations
+- messages
+- message states
+- typing indicators
+- presence
+- read receipts
+
+---
+
+Notification
+------------
+
+Responsibilities:
+
+- in-app notifications
+- push notification orchestration
+- notification preferences
+- aggregation
+- delivery state
+
+---
+
+Search
+------
+
+Responsibilities:
+
+- indexing
+- user search
+- hashtag search
+- content discovery
+- autocomplete
+- ranking
+
+---
+
+Moderation
+----------
+
+Responsibilities:
+
+- reports
+- content review state
+- policy enforcement
+- abuse prevention
+- trust and safety workflows
+
+==================================================
+6. DATA OWNERSHIP
+=================
+
+Every domain must have a clearly defined source of truth.
+
+PostgreSQL is the authoritative transactional datastore.
+
+Redis is not an authoritative source of truth for durable business state.
+
+OpenSearch/Elasticsearch is a derived index.
+
+Kafka/Redpanda is an event transport and durable event-streaming mechanism, not the primary transactional database.
+
+S3 is authoritative for durable media object storage.
+
+Application services must not make business-critical decisions using stale derived indexes when authoritative PostgreSQL state is required.
+
+==================================================
+7. CORE ENTITY MODEL
+====================
+
+Define architecture-level models for:
+
+- User
+- Credential
+- Session
+- Device
+- Profile
+- PrivacySettings
+- Follow
+- FollowRequest
+- Block
+- Mute
+- Restriction
+- Post
+- PostMedia
+- MediaAsset
+- MediaVariant
+- Story
+- StoryItem
+- StoryView
+- Reel
+- Like
+- Comment
+- CommentReply
+- Save
+- Share
+- Hashtag
+- Mention
+- FeedItem
+- Conversation
+- ConversationParticipant
+- Message
+- MessageAttachment
+- MessageReceipt
+- Notification
+- NotificationPreference
+- PushDevice
+- Report
+- ModerationCase
+- SearchDocument
+- AuditRecord
+
+For every entity, define:
+
+- purpose
+- ownership domain
+- lifecycle
+- important identifiers
+- relationships
+- transactional requirements
+- indexing considerations
+- deletion semantics
+- privacy implications
+
+Do not assume every entity must be physically isolated in its own database.
+
+==================================================
+8. IDENTIFIER STRATEGY
+======================
+
+Define a globally safe identifier strategy.
+
+Identifiers must:
+
+- avoid predictable sequential exposure where inappropriate
+- be safe for distributed generation
+- work across services
+- remain stable across derived systems
+
+Use opaque public identifiers where exposing database implementation details would create security or scalability concerns.
+
+==================================================
+9. USER ACCOUNT MODEL
+=====================
+
+Define account states including:
+
+- active
+- pending verification
+- restricted
+- suspended
+- disabled
+- deleted
+
+Define:
+
+- username uniqueness
+- username normalization
+- account visibility
+- privacy state
+- creator status
+- account lifecycle
+
+Account deletion must define:
+
+- immediate user-facing effect
+- asynchronous cleanup
+- media cleanup
+- search cleanup
+- cache invalidation
+- notification cleanup
+- relationship behavior
+- compliance/audit considerations
+
+==================================================
+10. SOCIAL GRAPH ARCHITECTURE
+=============================
+
+The social graph must support high-volume relationships.
+
+Design:
+
+- follows
+- follower lists
+- following lists
+- private account requests
+- blocks
+- mutes
+- restrictions
+
+Define consistency requirements separately for:
+
+- transactional relationship state
+- relationship counters
+- cached relationship lookups
+- search visibility
+- feed candidate generation
+
+Protect against:
+
+- duplicate relationships
+- race conditions
+- unauthorized follows
+- follow-request abuse
+- block bypass
+
+The architecture must account for extremely high-degree accounts.
+
+==================================================
+11. CONTENT ARCHITECTURE
+========================
+
+Define a general content model capable of representing:
+
+- single-image post
+- multi-image post
+- video post
+- reel
+- story content
+
+Separate:
+
+- content metadata
+- media metadata
+- object storage
+- derived processing results
+- moderation state
+- visibility state
+- engagement counters
+
+Content visibility must support:
+
+- public
+- followers
+- private/account-restricted visibility
+- direct/private contexts where applicable
+
+Visibility enforcement must occur server-side.
+
+==================================================
+12. MEDIA ARCHITECTURE
+======================
+
+Use S3 for original and processed media.
+
+Use CloudFront for content delivery.
+
+Media architecture must support:
+
+- upload sessions
+- signed upload authorization
+- MIME validation
+- file-size limits
+- media-type validation
+- metadata extraction
+- virus/malware scanning where applicable
+- image optimization
+- video transcoding
+- thumbnails
+- multiple resolutions
+- streaming-friendly outputs
+- content moderation
+- failed-processing recovery
+
+The API servers must not unnecessarily proxy large media files.
+
+Use asynchronous processing for expensive operations.
+
+Define media lifecycle states such as:
+
+- pending
+- uploaded
+- validating
+- processing
+- ready
+- rejected
+- failed
+- deleted
+
+==================================================
+13. MEDIA PROCESSING PIPELINE
+=============================
+
+Architect a pipeline:
+
+Client
+→ upload authorization
+→ object storage
+→ processing event
+→ validation
+→ metadata extraction
+→ transcoding
+→ thumbnail generation
+→ moderation
+→ variant registration
+→ searchable metadata update
+→ CDN availability
+
+The workflow must support:
+
+- idempotency
+- retries
+- dead-letter handling
+- duplicate event protection
+- partial failure recovery
+- observability
+
+A processing failure must not cause silent permanent loss of state.
+
+==================================================
+14. STORY ARCHITECTURE
+======================
+
+Stories are time-bound content.
+
+Define:
+
+- story creation
+- sequencing
+- visibility
+- expiration
+- views
+- interactions
+- deletion
+- archive behavior if supported
+
+Expiration must be enforced through both:
+
+- application-level validation
+- scheduled/background cleanup
+
+Do not rely solely on deletion jobs for access control.
+
+An expired story must be inaccessible even if cleanup has not yet completed.
+
+==================================================
+15. REELS / SHORT-FORM VIDEO
+============================
+
+Design reels as media-heavy content with:
+
+- video source
+- generated variants
+- thumbnails
+- duration
+- dimensions
+- captions
+- hashtags
+- mentions
+- audio metadata where applicable
+- moderation status
+- engagement data
+
+The architecture must support large concurrent playback demand.
+
+Use:
+
+- object storage
+- CDN
+- transcoded variants
+- efficient metadata APIs
+- caching
+- preloading strategies
+
+Playback must not require the API server to stream the full video payload.
+
+==================================================
+16. ENGAGEMENT ARCHITECTURE
+===========================
+
+Likes, saves, comments and shares should be modeled as independently manageable workloads.
+
+Define:
+
+- transactional behavior
+- deduplication
+- counter strategy
+- cache strategy
+- event propagation
+- notification triggers
+
+Counters may be eventually consistent.
+
+The underlying unique interaction state must remain correct.
+
+Examples:
+
+A user should not be able to create multiple logical likes for the same post unless the product explicitly supports such behavior.
+
+==================================================
+17. COMMENTS
+============
+
+Design comments to support:
+
+- top-level comments
+- replies
+- deletion
+- moderation
+- pagination
+- mentions
+- reporting
+
+Avoid unbounded recursive relational structures.
+
+Use a bounded comment-reply model unless there is a strong requirement for arbitrary tree depth.
+
+Define ordering and pagination strategy.
+
+==================================================
+18. FEED ARCHITECTURE
+=====================
+
+The feed is one of the highest-scale components.
+
+Support a hybrid feed architecture.
+
+Candidate generation may use:
+
+- social graph signals
+- recent content
+- engagement signals
+- creator relationships
+- content freshness
+- personalization
+
+Use combinations of:
+
+- fanout-on-write
+- fanout-on-read
+- cached candidate sets
+- ranking
+
+For high-follower accounts, avoid generating massive synchronous fanout workloads.
+
+Feed delivery must use cursor-based pagination.
+
+Define strategies for:
+
+- feed hydration
+- stale candidates
+- deleted content
+- blocked users
+- private accounts
+- muted users
+- unavailable media
+- ranking failures
+
+The feed should degrade gracefully to a valid fallback ordering when ranking infrastructure is unavailable.
+
+==================================================
+19. FEED CONSISTENCY
+====================
+
+The architecture must explicitly define which properties are:
+
+Strongly consistent:
+
+- authorization
+- account ownership
+- relationship mutation
+- content deletion
+- block state
+- visibility enforcement
+
+Eventually consistent:
+
+- engagement counters
+- recommendation scores
+- search indexes
+- notification aggregation
+- feed candidate propagation
+
+Do not use eventual consistency where it creates a privacy or authorization vulnerability.
+
+==================================================
+20. SEARCH ARCHITECTURE
+=======================
+
+Use OpenSearch or Elasticsearch as the derived search layer.
+
+Indexes should include only data permitted to be discoverable.
+
+Potential indexes:
+
+- profiles
+- hashtags
+- posts
+- reels
+- creators
+
+Every indexed document must carry enough state to determine or enforce visibility safely.
+
+Search index updates should be event-driven from authoritative state changes.
+
+Index rebuilds must be possible from PostgreSQL/S3-backed authoritative data.
+
+==================================================
+21. PRIVACY-AWARE SEARCH
+========================
+
+Private or restricted content must not become discoverable through stale search indexes.
+
+Define mechanisms for:
+
+- visibility filtering
+- blocked-user filtering
+- deleted-content removal
+- suspended-user removal
+- delayed-index consistency
+
+For highly sensitive visibility decisions, revalidate against authoritative application state before returning results.
+
+==================================================
+22. NOTIFICATION ARCHITECTURE
+=============================
+
+Notifications are derived from domain events.
+
+Example triggers:
+
+- follow
+- follow request
+- like
+- comment
+- mention
+- message
+- story interaction
+
+Notification creation should be asynchronous where possible.
+
+Push delivery must be separate from notification persistence.
+
+The system must support:
+
+- retries
+- invalid-device-token cleanup
+- preference filtering
+- rate limiting
+- aggregation
+- duplicate suppression
+
+==================================================
+23. REAL-TIME ARCHITECTURE
+==========================
+
+Use Socket.IO/WebSockets.
+
+Real-time capabilities:
+
+- messaging
+- typing
+- presence
+- read receipts
+- live notification delivery
+- selected engagement updates
+
+Multiple application instances must share real-time coordination through infrastructure such as Redis and/or event streaming.
+
+Do not maintain authoritative multi-user presence only in one process.
+
+Define:
+
+- connection authentication
+- channel authorization
+- reconnection behavior
+- heartbeat
+- idle connection handling
+- event ordering
+- duplicate-event handling
+
+==================================================
+24. DIRECT MESSAGING ARCHITECTURE
+=================================
+
+Messaging must support:
+
+- conversations
+- participants
+- messages
+- attachments
+- delivery state
+- read receipts
+- typing indicators
+- presence
+
+Message persistence belongs in PostgreSQL or an appropriately selected durable datastore.
+
+Real-time delivery is a transport mechanism and must not become the sole source of truth.
+
+Clients must be able to recover state after:
+
+- disconnects
+- reconnects
+- app restarts
+- temporary network failures
+
+Define message ordering rules and client synchronization strategy.
+
+==================================================
+25. CACHE ARCHITECTURE
+======================
+
+Redis may cache:
+
+- sessions
+- profile summaries
+- relationship lookups
+- feed candidates
+- rate-limit counters
+- notification counters
+- presence
+- temporary processing state
+
+Every cache entry must have:
+
+- purpose
+- TTL policy
+- invalidation strategy
+- stale-data tolerance
+
+Cache failure must not make the entire application unusable unless the cached value is explicitly required for correctness.
+
+==================================================
+26. EVENT ARCHITECTURE
+======================
+
+Kafka/Redpanda events must be designed with:
+
+- event names
+- event versions
+- event identifiers
+- aggregate/entity identifiers
+- timestamps
+- producer identity
+- schema version
+- correlation ID
+- trace ID where appropriate
+
+Events must be:
+
+- replayable
+- idempotently consumable
+- observable
+- versionable
+
+Avoid publishing events that expose sensitive personal or private information unnecessarily.
+
+==================================================
+27. EXAMPLE DOMAIN EVENTS
+=========================
+
+Define architecture-level events for cases such as:
+
+- UserRegistered
+- UserVerified
+- ProfileUpdated
+- FollowCreated
+- FollowRemoved
+- FollowRequestCreated
+- UserBlocked
+- UserUnblocked
+- PostCreated
+- PostUpdated
+- PostDeleted
+- MediaUploaded
+- MediaProcessingCompleted
+- MediaProcessingFailed
+- StoryCreated
+- StoryExpired
+- ReelPublished
+- PostLiked
+- PostUnliked
+- CommentCreated
+- CommentDeleted
+- PostSaved
+- PostUnsaved
+- MessageCreated
+- MessageRead
+- NotificationCreated
+- ReportCreated
+- ModerationDecisionApplied
+
+For each event define:
+
+- producer
+- consumers
+- delivery requirements
+- idempotency expectations
+- ordering requirements
+- retention considerations
+
+==================================================
+28. FAILURE ISOLATION
+=====================
+
+The architecture must isolate failure between:
+
+- API
+- search
+- media processing
+- notification delivery
+- analytics
+- feed ranking
+- real-time messaging
+- object storage
+- Redis
+- Kafka/Redpanda
+
+Examples:
+
+Search outage must not prevent users from viewing their own profiles.
+
+Notification provider outage must not prevent likes from being persisted.
+
+Feed-ranking outage must not prevent content creation.
+
+Media-processing outage must not corrupt already-created post metadata.
+
+==================================================
+29. SECURITY ARCHITECTURE
+=========================
+
+Every request that accesses protected data must pass:
+
+Authentication
+→ identity resolution
+→ authorization
+→ domain validation
+→ business operation
+
+Never trust:
+
+- client user IDs
+- client role claims without verification
+- client visibility flags
+- client ownership declarations
+
+Authorization must be based on authoritative state.
+
+==================================================
+30. RATE LIMITING
+=================
+
+Architect differentiated limits for:
+
+- login
+- registration
+- password reset
+- follow operations
+- comments
+- likes
+- messages
+- uploads
+- search
+- report creation
+- API requests
+- WebSocket connections
+
+Rate limits should support:
+
+- per-user
+- per-IP
+- per-device
+- per-endpoint
+
+Use Redis-backed distributed rate limiting where appropriate.
+
+==================================================
+31. AUDITING
+============
+
+Sensitive operations should produce auditable records.
+
+Examples:
+
+- account security changes
+- password changes
+- email changes
+- moderation decisions
+- account suspension
+- administrative actions
+- privacy changes
+
+Audit records must avoid unnecessary sensitive content.
+
+==================================================
+32. OBSERVABILITY ARCHITECTURE
+==============================
+
+Use OpenTelemetry across:
+
+- HTTP
+- database
+- Redis
+- Kafka/Redpanda
+- BullMQ
+- WebSockets
+- S3 interactions
+- search
+- external APIs
+
+Collect:
+
+- metrics
+- logs
+- traces
+
+Metrics must include both infrastructure and business indicators.
+
+Examples:
+
+- request latency
+- error rate
+- queue latency
+- media-processing latency
+- feed-generation latency
+- search latency
+- message delivery latency
+- notification success rate
+- cache hit ratio
+
+==================================================
+33. GLOBAL SCALABILITY
+======================
+
+The architecture must be capable of scaling:
+
+- users
+- media
+- feed reads
+- engagement writes
+- WebSocket connections
+- search queries
+- notifications
+- background jobs
+
+Scale horizontally.
+
+Avoid single-node bottlenecks.
+
+Design explicit strategies for:
+
+- hot partitions
+- celebrity accounts
+- viral content
+- burst traffic
+- queue backlogs
+- cache stampedes
+- database connection exhaustion
+
+==================================================
+34. HOTSPOT MITIGATION
+======================
+
+The architecture must account for high-traffic objects such as:
+
+- celebrity profiles
+- viral posts
+- popular reels
+- trending hashtags
+
+Do not create designs where one database row or one cache key becomes an unavoidable global bottleneck.
+
+Use:
+
+- sharded counters where needed
+- asynchronous aggregation
+- cache distribution
+- partitioning
+- batched processing
+- request coalescing
+
+==================================================
+35. DATABASE ARCHITECTURE
+=========================
+
+PostgreSQL must be designed around:
+
+- domain ownership
+- transactional integrity
+- indexes
+- foreign keys where appropriate
+- uniqueness constraints
+- efficient pagination
+- connection pooling
+- migration safety
+
+Identify tables that are likely to become large.
+
+Define strategies for:
+
+- indexing
+- partitioning
+- archival
+- retention
+- vacuuming
+- query performance
+- read replicas where appropriate
+
+Avoid querying full datasets.
+
+==================================================
+36. FILE AND OBJECT STORAGE
+===========================
+
+Object paths must be predictable for backend ownership but opaque enough to avoid exposing unnecessary internal structure.
+
+Define logical namespaces for:
+
+- original uploads
+- processed media
+- thumbnails
+- avatars
+- story assets
+- reel assets
+- message attachments
+
+Object metadata must remain synchronized with authoritative application records.
+
+==================================================
+37. DATA DELETION
+=================
+
+Every domain must define deletion semantics.
+
+Differentiate:
+
+- soft deletion
+- hard deletion
+- asynchronous cleanup
+- legal/compliance retention where required
+
+Deletion must propagate to:
+
+- PostgreSQL
+- Redis
+- search
+- event consumers
+- CDN/object storage
+- notification systems
+- derived feed data
+
+==================================================
+38. API GATEWAY / ENTRY ARCHITECTURE
+====================================
+
+Define a unified external API boundary responsible for:
+
+- authentication context
+- request validation
+- rate limiting
+- request IDs
+- observability
+- routing
+- error normalization
+
+Do not embed all domain logic in gateway middleware.
+
+Business decisions belong inside the appropriate application/domain layer.
+
+==================================================
+39. CLIENT ARCHITECTURE
+=======================
+
+Web and mobile applications should consume stable backend contracts.
+
+Clients must not implement server-authoritative business rules such as:
+
+- ownership
+- visibility
+- permissions
+- account restrictions
+
+Clients may optimize presentation and caching, but authorization remains server-controlled.
+
+Use TanStack Query for server-state management.
+
+Use Zustand for appropriate client-local/application state.
+
+==================================================
+40. ACCEPTANCE CRITERIA
+=======================
+
+The architecture is complete only when it clearly defines:
+
+- bounded contexts
+- component responsibilities
+- source-of-truth ownership
+- entity relationships
+- persistence responsibilities
+- caching strategy
+- event architecture
+- asynchronous workflows
+- media pipeline
+- feed strategy
+- search strategy
+- messaging strategy
+- notification strategy
+- security boundaries
+- privacy enforcement
+- failure isolation
+- scalability strategy
+- observability strategy
+- deletion strategy
+- API boundary
+- client/backend responsibilities
+
+The architecture must be implementable by a professional engineering team without requiring undocumented architectural assumptions.
+
+==================================================
+41. ARCHITECTURAL OUTPUT STANDARD
+=================================
+
+When producing the architecture document, organize it into:
+
+1. Executive Architecture Summary
+2. System Context
+3. Container-Level Architecture
+4. Bounded Contexts
+5. Domain Model
+6. Data Ownership
+7. Database Architecture
+8. Cache Architecture
+9. Event Architecture
+10. Media Architecture
+11. Feed Architecture
+12. Search Architecture
+13. Messaging Architecture
+14. Notification Architecture
+15. Security Architecture
+16. Privacy Architecture
+17. Reliability Architecture
+18. Scalability Architecture
+19. Observability Architecture
+20. API Boundary
+21. Client Architecture
+22. Deployment Considerations
+23. Architectural Tradeoffs
+24. Risks and Mitigations
+25. Acceptance Criteria
+
+Be precise.
+
+Resolve architectural ambiguity through explicit engineering decisions.
+
+Do not defer critical architectural decisions to an unspecified future phase.
+
+Do not claim that another prompt or phase has already defined anything.
+
+The architecture itself must stand on its ow
+
 You are operating in Senior Engineering Team Mode.
 
 The Master Prompt has been provided and approved.
