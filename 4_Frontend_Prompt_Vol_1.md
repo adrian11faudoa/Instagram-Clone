@@ -1,3 +1,1374 @@
+# PROJECT 1 — INSTAGRAM-LIKE GLOBAL SOCIAL PLATFORM
+
+# FRONTEND PROMPT — VOLUME 1
+
+# WEB APPLICATION — CORE USER EXPERIENCE, AUTHENTICATION, PROFILES, SOCIAL GRAPH, FEED & CONTENT
+
+You are the Staff Frontend Engineering team responsible for implementing the web application of a production-grade Instagram-like global social platform.
+
+This prompt is fully standalone. It does not depend on any other prompt, document, previous conversation, previous implementation, previous architecture, previous volume, approval, or hidden context.
+
+You must inspect the current repository before making changes and integrate with compatible existing implementation.
+
+Repository state is the source of truth for existing code.
+
+Implement real production functionality.
+
+Do not generate pseudo-code.
+
+Do not create placeholder screens or fake functionality.
+
+Do not use TODO/FIXME as substitutes for implementation.
+
+Do not claim a feature is complete when it is not implemented.
+
+Do not regenerate unchanged files.
+
+Preserve existing working unrelated functionality.
+
+==================================================
+
+1. PRODUCT OBJECTIVE
+   ==================================================
+
+Build the web application for a global social platform supporting:
+
+- registration
+- login
+- account recovery
+- profile management
+- public/private accounts
+- following
+- follow requests
+- followers/following
+- blocking
+- muting
+- restricting
+- home feed
+- following feed
+- posts
+- image/video media
+- multi-media posts
+- stories
+- reels
+- likes
+- comments
+- saves
+- shares
+- hashtags
+- mentions
+- search
+- discovery
+- notifications
+- messaging entry points
+- settings
+- privacy controls
+- moderation/reporting flows
+
+The web application must be responsive, accessible, performant, secure, and production-ready.
+
+==================================================
+2. REQUIRED WEB TECHNOLOGY
+==========================
+
+Use:
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- TanStack Query
+- Zustand
+
+Use the latest compatible versions already present in the repository when the project is initialized.
+
+Do not unnecessarily upgrade dependencies solely for stylistic reasons.
+
+==================================================
+3. FRONTEND ARCHITECTURE
+========================
+
+Use a modular frontend architecture.
+
+Organize functionality into domains such as:
+
+- authentication
+- profile
+- social graph
+- feed
+- posts
+- stories
+- reels
+- comments
+- search
+- discovery
+- notifications
+- messaging integration
+- settings
+- moderation
+- shared UI
+- API client
+- state
+- utilities
+
+Avoid placing all application logic inside route components.
+
+Use reusable hooks, services, components, schemas, and domain-specific modules.
+
+==================================================
+4. NEXT.JS ARCHITECTURE
+=======================
+
+Use the Next.js App Router where compatible with the existing application.
+
+Clearly distinguish:
+
+- Server Components
+- Client Components
+- server-side data needs
+- browser-only functionality
+
+Use Client Components only where interactivity, browser APIs, or client state require them.
+
+Do not make the entire application a Client Component unnecessarily.
+
+==================================================
+5. ROUTING
+==========
+
+Implement a coherent route structure.
+
+Representative routes may include:
+
+/
+ /login
+ /register
+ /forgot-password
+ /reset-password
+ /explore
+ /search
+ /notifications
+ /messages
+ /settings
+ /settings/account
+ /settings/privacy
+ /settings/security
+ /u/[username]
+ /p/[postId]
+ /reel/[reelId]
+
+Use the repository's existing routing conventions when already established.
+
+Routes containing user-generated identifiers must validate server responses rather than trusting the URL.
+
+==================================================
+6. AUTHENTICATION EXPERIENCE
+============================
+
+Implement:
+
+- registration
+- login
+- logout
+- session restoration
+- token refresh handling
+- verification
+- password reset
+- session/device management
+
+Authentication state must be integrated with the backend contract.
+
+Do not store sensitive authentication credentials in insecure browser storage.
+
+Use secure cookie/session mechanisms according to the backend authentication architecture.
+
+==================================================
+7. AUTHENTICATION ERROR UX
+==========================
+
+Handle:
+
+- invalid credentials
+- expired session
+- revoked session
+- unverified account
+- rate limiting
+- network failure
+- server failure
+
+Use clear user-facing messages without exposing security-sensitive information.
+
+Do not expose raw server exceptions.
+
+==================================================
+8. ROUTE PROTECTION
+===================
+
+Protect authenticated routes.
+
+Unauthenticated users attempting protected pages should be redirected appropriately.
+
+Do not rely solely on client-side route guards for security.
+
+The backend remains authoritative for authorization.
+
+==================================================
+9. API CLIENT
+=============
+
+Create a centralized typed API client.
+
+It should provide:
+
+- base URL configuration
+- authentication handling
+- request headers
+- request IDs where supported
+- error normalization
+- retries only for safe/transient operations
+- cancellation support
+- response typing
+
+Do not scatter raw fetch calls throughout the application.
+
+==================================================
+10. TANSTACK QUERY
+==================
+
+Use TanStack Query for server state.
+
+Manage:
+
+- queries
+- mutations
+- invalidation
+- cache
+- pagination
+- optimistic updates where safe
+- loading states
+- error states
+
+Do not duplicate remote server data unnecessarily in Zustand.
+
+==================================================
+11. ZUSTAND
+===========
+
+Use Zustand for appropriate client/application state such as:
+
+- UI state
+- modal state
+- navigation-related state
+- draft state
+- transient interaction state
+- selected media state
+
+Do not make Zustand the authoritative store for server-side authorization or permissions.
+
+==================================================
+12. DESIGN SYSTEM
+=================
+
+Use Tailwind CSS and shadcn/ui.
+
+Create consistent primitives for:
+
+- buttons
+- inputs
+- forms
+- dialogs
+- dropdowns
+- avatars
+- cards
+- tabs
+- tooltips
+- menus
+- sheets
+- alerts
+- toasts
+- skeletons
+- pagination/loading states
+
+Avoid duplicated custom styles when an existing design-system component solves the problem.
+
+==================================================
+13. VISUAL LANGUAGE
+===================
+
+Create a modern, polished social-media interface.
+
+Prioritize:
+
+- clean typography
+- strong visual hierarchy
+- intuitive navigation
+- high-quality media presentation
+- subtle interaction feedback
+- responsive layouts
+- accessible controls
+
+Avoid excessive animation.
+
+Animations should communicate state or improve perceived responsiveness.
+
+==================================================
+14. RESPONSIVE DESIGN
+=====================
+
+Support:
+
+- desktop
+- laptop
+- tablet
+- mobile web
+
+Layouts must adapt without breaking content.
+
+Do not simply scale desktop UI down to mobile.
+
+Use appropriate responsive navigation patterns.
+
+==================================================
+15. ACCESSIBILITY
+=================
+
+Implement accessible interfaces.
+
+Support:
+
+- semantic HTML
+- keyboard navigation
+- visible focus
+- ARIA where necessary
+- accessible dialogs
+- accessible menus
+- accessible form errors
+- proper labels
+- alt text for images
+- screen-reader-friendly state changes
+
+Do not use color alone to communicate important state.
+
+==================================================
+16. PROFILE PAGE
+================
+
+Implement profile pages supporting:
+
+- avatar
+- username
+- display name
+- biography
+- website
+- follower count
+- following count
+- post count
+- follow button
+- requested state
+- following state
+- blocked state where appropriate
+- profile content grid
+- private-account state
+
+The UI must reflect backend authorization.
+
+Do not assume that visibility from cached client state means content is accessible.
+
+==================================================
+17. PROFILE EDITING
+===================
+
+Support:
+
+- display name
+- biography
+- website
+- avatar
+- username where supported
+
+Handle:
+
+- validation
+- duplicate username
+- image upload
+- upload errors
+- unsaved changes
+- loading
+- success/error feedback
+
+==================================================
+18. AVATAR UPLOAD
+=================
+
+Implement a secure avatar upload flow using the backend media API.
+
+The browser should:
+
+- request upload authorization
+- upload directly to the approved storage workflow
+- notify backend of completion
+- refresh profile state
+
+Do not send large files through the Next.js server unnecessarily.
+
+==================================================
+19. FOLLOW UI
+=============
+
+Support:
+
+- Follow
+- Following
+- Requested
+- Unfollow
+- Approve request
+- Reject request
+
+The UI must handle race conditions.
+
+For example, after a double click or repeated action, the final server state must remain authoritative.
+
+==================================================
+20. FOLLOWERS/FOLLOWING
+=======================
+
+Implement modal or dedicated views for:
+
+- followers
+- following
+- pending requests
+
+Use cursor-based pagination.
+
+Support:
+
+- loading more
+- empty state
+- errors
+- blocked users
+- removed users
+
+Avoid requesting the entire relationship set at once.
+
+==================================================
+21. BLOCK/MUTE/RESTRICT
+=======================
+
+Implement settings and profile controls for:
+
+- block
+- unblock
+- mute
+- unmute
+- restrict
+- unrestrict
+
+Use confirmation dialogs for destructive or consequential operations.
+
+After mutation:
+
+- invalidate relevant queries
+- update visible relationship state
+- remove content where appropriate
+
+Never rely on UI-only state to enforce these rules.
+
+==================================================
+22. HOME FEED
+=============
+
+Implement the main feed.
+
+Support:
+
+- feed items
+- multiple media
+- image/video playback
+- author information
+- timestamps
+- captions
+- mentions
+- hashtags
+- likes
+- comments
+- saves
+- shares
+- content menus
+
+Use TanStack Query infinite queries for cursor pagination.
+
+==================================================
+23. FEED LOADING
+================
+
+Provide:
+
+- initial skeletons
+- incremental loading
+- empty state
+- error state
+- retry
+- pull/refresh behavior where appropriate for web
+
+Avoid layout shifts.
+
+Use stable media dimensions.
+
+==================================================
+24. FEED ERROR HANDLING
+=======================
+
+If ranking or recommendation services fail, the backend may return fallback content.
+
+The frontend must display the returned content without exposing internal dependency failures.
+
+Do not tell the user that internal infrastructure components failed unless the API deliberately returns a user-safe state.
+
+==================================================
+25. FEED PERFORMANCE
+====================
+
+Optimize for large media-heavy pages.
+
+Use:
+
+- lazy loading
+- image optimization
+- responsive image sizes
+- prefetching where useful
+- virtualization where appropriate
+- stable keys
+- query caching
+- bounded rendering
+
+Do not load full-resolution media before it is needed.
+
+==================================================
+26. POST CARD
+=============
+
+Create reusable post-card components.
+
+Support:
+
+- author
+- avatar
+- media
+- carousel
+- caption
+- hashtags
+- mentions
+- like action
+- save action
+- share
+- comment entry
+- overflow menu
+- accessibility labels
+
+The same primitives should be reusable across feed, profile, search, and discovery surfaces.
+
+==================================================
+27. MEDIA CAROUSEL
+==================
+
+Support multi-media posts.
+
+Provide:
+
+- previous/next controls
+- swipe/touch support where appropriate
+- position indicator
+- keyboard support
+- accessible labels
+
+Do not load every media object at full quality unnecessarily.
+
+==================================================
+28. VIDEO PLAYBACK
+==================
+
+Implement browser video playback using backend-provided playback metadata.
+
+Support:
+
+- poster
+- play/pause
+- mute/unmute
+- progress
+- duration
+- responsive sizing
+
+Do not expose private storage credentials.
+
+Do not assume every browser supports every format.
+
+Use supported fallback behavior.
+
+==================================================
+29. STORY UI
+============
+
+Implement:
+
+- story tray
+- story avatars
+- unread state
+- viewer
+- next/previous story
+- progress indicators
+- close
+- expiration handling
+- interaction states
+
+The backend remains authoritative for story availability.
+
+==================================================
+30. STORY VIEWER
+================
+
+The viewer should:
+
+- load story media efficiently
+- mark stories viewed
+- stop progression when paused where appropriate
+- handle media loading failures
+- skip unavailable/expired content
+
+Do not assume a story remains valid because it was previously cached.
+
+==================================================
+31. REELS
+=========
+
+Implement a web reels experience.
+
+Support:
+
+- vertically oriented media
+- video playback
+- creator
+- caption
+- hashtags
+- likes
+- comments
+- saves
+- shares
+
+Use efficient media loading.
+
+Avoid loading multiple high-resolution videos simultaneously.
+
+==================================================
+32. REELS INTERACTION
+=====================
+
+Support:
+
+- autoplay under browser policy
+- mute state
+- play/pause
+- next/previous navigation
+- intersection-based playback where appropriate
+
+Respect browser autoplay restrictions.
+
+Do not create an aggressive autoplay loop that consumes excessive bandwidth.
+
+==================================================
+33. POST CREATION
+=================
+
+Implement a production post composer.
+
+Support:
+
+- selecting media
+- previews
+- reordering media
+- removing media
+- caption
+- hashtags
+- mentions
+- visibility
+- publishing
+- upload progress
+- processing state
+- failure recovery
+
+==================================================
+34. MEDIA UPLOAD UX
+===================
+
+The composer must distinguish:
+
+- upload progress
+- uploaded
+- processing
+- ready
+- rejected
+- failed
+
+Do not tell the user a post is published while required media is still invalid or unavailable.
+
+==================================================
+35. DRAFT STATE
+===============
+
+Use appropriate local state for unfinished post composition.
+
+Support recovery from accidental navigation where practical.
+
+Do not persist large media blobs unnecessarily in browser state.
+
+==================================================
+36. POST VISIBILITY UI
+======================
+
+Provide clear controls for supported visibility options.
+
+The UI must display the current selection.
+
+Do not allow the browser to submit unsupported values without validation.
+
+Backend authorization remains authoritative.
+
+==================================================
+37. LIKES
+=========
+
+Implement:
+
+- like
+- unlike
+- like count
+- current-user like state
+
+Use optimistic updates only where rollback is reliable.
+
+Repeated clicks must not create inconsistent UI state.
+
+==================================================
+38. COMMENTS
+============
+
+Implement:
+
+- comment list
+- comment creation
+- reply interaction
+- comment deletion where authorized
+- mentions
+- loading
+- pagination
+- moderation/report actions
+
+Use cursor pagination for large comment sets.
+
+==================================================
+39. SAVES
+=========
+
+Implement:
+
+- save
+- unsave
+- saved-state display
+- saved-content page where applicable
+
+Never display inaccessible saved content without refreshing authorization state from the backend.
+
+==================================================
+40. SHARING
+===========
+
+Support appropriate web sharing.
+
+Use:
+
+- share dialogs
+- copy link
+- supported native/browser sharing APIs
+
+Never expose a private media object directly to unauthorized users.
+
+==================================================
+41. HASHTAGS
+============
+
+Render hashtags as navigable links.
+
+Use normalized hashtag routes such as:
+
+/explore/tags/[tag]
+
+Search/tag pages must support pagination and proper loading/error states.
+
+==================================================
+42. MENTIONS
+============
+
+Render valid mentions as profile links.
+
+Do not allow malformed user-generated mention markup to create arbitrary links.
+
+Use backend-parsed structured mention information where possible rather than trusting raw HTML.
+
+==================================================
+43. SEARCH UI
+=============
+
+Implement global search with:
+
+- query input
+- autocomplete
+- users
+- hashtags
+- content
+- recent searches where supported
+- loading
+- empty state
+- errors
+
+Use debouncing for autocomplete.
+
+Cancel stale requests when query changes rapidly.
+
+==================================================
+44. SEARCH SECURITY
+===================
+
+Do not render results simply because the API returned stale cached data.
+
+Respect server-provided visibility.
+
+Private or blocked content must not be surfaced.
+
+==================================================
+45. EXPLORE/DISCOVERY
+=====================
+
+Implement discovery surfaces supporting:
+
+- recommended content
+- trending content
+- creators
+- hashtags
+- reels
+
+Use responsive media grids and efficient loading.
+
+==================================================
+46. NOTIFICATIONS UI
+====================
+
+Implement:
+
+- notifications list
+- unread state
+- mark read
+- mark all read
+- notification grouping
+- actor avatars
+- target links
+
+Use polling, server events, or WebSockets according to repository/backend support.
+
+Do not create an aggressive polling loop.
+
+==================================================
+47. NOTIFICATION REAL-TIME UPDATES
+==================================
+
+When real-time notification delivery is available:
+
+- update unread count
+- insert new notifications
+- avoid duplicates
+- invalidate related queries when required
+
+A reconnecting client must be able to resynchronize from the API.
+
+==================================================
+48. SETTINGS
+============
+
+Implement settings pages for:
+
+- account
+- privacy
+- security
+- notifications
+- sessions/devices
+- blocked accounts
+- muted accounts
+- restricted accounts
+
+Use clear navigation and responsive layouts.
+
+==================================================
+49. PRIVACY SETTINGS UI
+=======================
+
+Support public/private account settings.
+
+Changing privacy should:
+
+- show current state
+- require appropriate confirmation if necessary
+- update server
+- refresh dependent UI state
+
+Do not assume all existing content becomes public/private solely through client cache updates.
+
+==================================================
+50. SECURITY SETTINGS UI
+========================
+
+Support:
+
+- change password
+- session list
+- revoke session
+- logout all devices where supported
+- verification/security state
+
+Never display raw credentials or tokens.
+
+==================================================
+51. REPORTING
+=============
+
+Implement report flows for:
+
+- users
+- posts
+- reels
+- comments
+- other supported content
+
+Use a clear reason-selection dialog.
+
+Prevent accidental duplicate submissions.
+
+Provide success/failure feedback.
+
+==================================================
+52. CONTENT MENUS
+=================
+
+Reusable content menus may include:
+
+- save
+- share
+- report
+- not interested
+- mute
+- block
+- restrict
+- delete/edit for owners
+
+Available actions must depend on backend-provided permissions/state.
+
+==================================================
+53. FORMS
+=========
+
+Use strongly typed forms.
+
+Validate:
+
+- required fields
+- length limits
+- URL fields
+- usernames
+- captions
+- comments
+- search input
+
+Error messages should appear close to the relevant input.
+
+==================================================
+54. ERROR BOUNDARIES
+====================
+
+Use React/Next.js error boundaries appropriately.
+
+A failure in one content component should not unnecessarily crash the entire application.
+
+Provide safe recovery actions such as:
+
+- retry
+- refresh
+- return home
+
+Do not expose stack traces.
+
+==================================================
+55. LOADING STATES
+==================
+
+Implement intentional loading states.
+
+Use:
+
+- skeletons
+- spinners where appropriate
+- disabled mutation controls
+- optimistic placeholders
+
+Avoid flashing unrelated content between states.
+
+==================================================
+56. EMPTY STATES
+================
+
+Create useful empty states for:
+
+- no followers
+- no following
+- no posts
+- no saved content
+- no notifications
+- no search results
+- no message history where relevant
+- no discovery results
+
+Empty states should provide appropriate next actions without inventing unavailable features.
+
+==================================================
+57. URL AND NAVIGATION STATE
+============================
+
+Keep shareable application state in URLs when appropriate.
+
+Examples:
+
+- search query
+- profile username
+- post ID
+- reel ID
+- hashtag
+
+Do not encode sensitive state into URLs.
+
+==================================================
+58. BROWSER SECURITY
+====================
+
+Protect against frontend security issues including:
+
+- unsafe HTML rendering
+- XSS
+- malicious URL injection
+- unsafe third-party script usage
+- insecure token handling
+
+Do not use dangerouslySetInnerHTML unless absolutely necessary and properly sanitized.
+
+==================================================
+59. IMAGE SECURITY
+==================
+
+Treat user-uploaded images as untrusted.
+
+Use the backend media pipeline.
+
+Do not attempt to infer authorization from image URLs.
+
+==================================================
+60. ACCESSIBILITY TESTING
+=========================
+
+Test:
+
+- keyboard navigation
+- tab order
+- focus trapping
+- dialogs
+- menus
+- forms
+- screen-reader labels
+- media controls
+
+==================================================
+61. PERFORMANCE
+===============
+
+Optimize:
+
+- initial page load
+- route transitions
+- media rendering
+- feed scrolling
+- image loading
+- search responsiveness
+
+Use Next.js capabilities such as:
+
+- route-level code splitting
+- image optimization
+- prefetching where appropriate
+- caching where safe
+
+Do not cache private user data publicly.
+
+==================================================
+62. SEO
+=======
+
+For public pages, provide appropriate metadata for:
+
+- user profiles
+- public posts
+- public reels
+- public hashtags
+
+Never expose private content through search-engine metadata.
+
+==================================================
+63. ANALYTICS INTEGRATION
+=========================
+
+Where analytics are supported, emit client-side events for meaningful product interactions.
+
+Examples:
+
+- post view
+- reel play
+- profile view
+- follow
+- like
+- save
+- share
+- search
+- story view
+
+Do not collect unnecessary sensitive data.
+
+==================================================
+64. REAL-TIME INTEGRATION
+=========================
+
+Prepare frontend infrastructure to consume authenticated WebSocket/Socket.IO events for:
+
+- notifications
+- messaging indicators
+- presence where applicable
+- live engagement where supported
+
+The browser must recover from:
+
+- disconnect
+- reconnect
+- expired session
+- server restart
+
+==================================================
+65. NETWORK FAILURE
+===================
+
+Handle:
+
+- timeout
+- offline state
+- transient connection failure
+- server error
+- authentication expiration
+
+Mutations must not blindly repeat unsafe requests.
+
+Use idempotency mechanisms where supported by the backend.
+
+==================================================
+66. CLIENT CACHING
+==================
+
+Define cache policies for:
+
+- feed
+- profiles
+- posts
+- comments
+- stories
+- reels
+- search
+- notifications
+
+Use invalidation after mutations.
+
+Avoid long-lived stale privacy-sensitive state.
+
+==================================================
+67. SECURITY-CRITICAL UI RULE
+=============================
+
+The frontend must never be the final authority for:
+
+- permissions
+- ownership
+- privacy
+- blocked status
+- moderation decisions
+- account restrictions
+
+The backend remains authoritative.
+
+The frontend should reflect authoritative server responses.
+
+==================================================
+68. TESTING
+===========
+
+Implement:
+
+- unit tests
+- component tests
+- integration tests
+- route tests
+- API-client tests
+- accessibility tests
+- critical end-to-end tests
+
+Critical flows include:
+
+- registration
+- login
+- logout
+- password reset
+- profile editing
+- follow
+- private-account request
+- block
+- mute
+- create post
+- upload media
+- like
+- comment
+- save
+- search
+- notifications
+- reporting
+
+==================================================
+69. END-TO-END TESTING
+======================
+
+Test complete user journeys such as:
+
+New user
+→ registration
+→ verification
+→ login
+→ profile setup
+→ follow another user
+→ view feed
+→ create post
+→ engage with content
+
+Private account
+→ request follow
+→ approval
+→ view protected content
+
+User blocking
+→ block account
+→ verify protected interactions disappear
+
+Content creation
+→ upload media
+→ processing
+→ publish
+→ retrieve post
+
+==================================================
+70. FRONTEND ACCEPTANCE CRITERIA
+================================
+
+The implementation is complete only when:
+
+- Next.js application works
+- routing works
+- authentication works
+- protected routes work
+- API client works
+- TanStack Query integration works
+- Zustand state is appropriate
+- design system is coherent
+- responsive layouts work
+- accessibility requirements are addressed
+- profile pages work
+- profile editing works
+- avatar upload works
+- follow workflows work
+- followers/following work
+- block/mute/restrict controls work
+- home feed works
+- feed pagination works
+- post cards work
+- media carousels work
+- video playback works
+- story UI works
+- reels UI works
+- post composer works
+- media upload UX works
+- likes work
+- comments work
+- saves work
+- sharing works
+- hashtag navigation works
+- mentions work
+- search works
+- autocomplete works
+- discovery works
+- notifications work
+- settings work
+- privacy settings work
+- security settings work
+- reporting works
+- error boundaries exist
+- loading/empty/error states exist
+- security controls are respected
+- frontend tests exist
+- end-to-end critical paths work
+- TypeScript compilation succeeds
+- linting succeeds
+- no required UI is left as a placeholder
+
+==================================================
+71. IMPLEMENTATION FINISHING RULE
+=================================
+
+Do not stop after creating routes, components, interfaces, or design placeholders.
+
+Implement the actual production experience.
+
+Inspect the current repository first.
+
+Reuse compatible components and infrastructure.
+
+Integrate with existing APIs and backend contracts.
+
+Do not recreate unchanged functionality.
+
+Validate:
+
+- TypeScript
+- linting
+- build
+- unit tests
+- component tests
+- integration tests
+- accessibility
+- critical end-to-end workflows
+- responsive behavior
+- authentication flows
+- authorization-dependent UI
+- media upload flows
+- error and offline states
+
+The resulting web application must be a real production-grade social platform interface rather than a visual prototyp
+
 You are operating in Senior Engineering Team Mode.
 
 You are the Principal Frontend Architect, Staff Frontend Engineer, Staff UI/UX Engineer, Accessibility Engineer, Performance Engineer, Security Engineer, QA Engineer, and Technical Writer for this Instagram-like global social platform.

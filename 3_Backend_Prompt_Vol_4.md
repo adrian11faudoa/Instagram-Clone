@@ -1,2449 +1,1391 @@
-You are operating in Senior Engineering Team Mode.
+# PROJECT 1 — INSTAGRAM-LIKE GLOBAL SOCIAL PLATFORM
 
-Build the production-ready backend for messaging, notifications, moderation, safety, reporting, copyright/rights, creator analytics, business analytics, advertising foundations, commerce foundations, administration, privacy, audit, feature flags, dynamic configuration, and final platform hardening for an enterprise-scale global visual-social platform comparable in architectural scope to Instagram.
+# BACKEND PROMPT — VOLUME 4
 
-The platform is an original implementation.
+# DIRECT MESSAGING, REAL-TIME COMMUNICATION, PRESENCE, PUSH & SECURITY HARDENING
 
-Do not copy proprietary source code, internal architecture, branding, confidential implementation details, proprietary algorithms, proprietary datasets, private implementation details, or internal systems from Instagram, Meta, or any other company.
+You are the Staff Backend Engineering team responsible for implementing the production-grade direct messaging, real-time communication, presence, delivery-state, push-notification integration, and associated security systems of an Instagram-like global social platform.
 
-This prompt is completely independent and may be executed in a separate conversation.
+This prompt is fully standalone. It does not depend on any other prompt, document, previous conversation, previous implementation, previous architecture, previous volume, approval, or hidden context.
 
-Use the approved architecture and previously implemented backend foundations as the single source of truth.
+You must inspect the current repository before making changes and integrate with compatible existing implementation.
 
-Do not redesign the approved architecture.
+Repository state is the source of truth for existing code.
 
-Do not generate frontend code.
+Implement real production functionality.
 
-Do not generate mobile code.
+Do not generate pseudo-code.
 
-Do not generate infrastructure implementation code.
+Do not create placeholder implementations.
 
-Do not generate Terraform.
+Do not use TODO/FIXME as substitutes for implementation.
 
-Do not generate Kubernetes manifests.
+Do not claim functionality exists when it has not been implemented.
 
-Do not generate CI/CD workflows.
+Do not regenerate unchanged files.
 
-────────────────────────────────────────
+Preserve existing working unrelated functionality.
 
-MISSION
+==================================================
 
-Implement production-ready backend domains for:
+1. BACKEND SCOPE
+   ==================================================
 
-• Direct messaging
-• Group messaging
-• Message requests
-• Conversation permissions
-• Messages
-• Message attachments
-• Message delivery
-• Read receipts
-• Message reactions
-• Message replies
-• Typing indicators
-• Presence foundation
-• Real-time messaging
-• Notifications
-• Notification preferences
-• Push notifications
-• FCM
-• APNS
-• In-app notifications
-• Email notification foundation
-• User reports
-• Content reports
-• Moderation cases
-• Moderation actions
-• Appeals
-• Safety workflows
-• Abuse prevention
-• Copyright claims
-• Content rights
-• Audio rights
-• Regional restrictions
-• Rights appeals
-• Rights restoration
-• Creator analytics
-• Business analytics
-• Advertising foundation
-• Advertiser accounts
-• Campaigns
-• Ad sets
-• Creatives
-• Placements
-• Frequency caps
-• Ad events
-• Commerce foundation
-• Product catalogs
-• Products
-• Product collections
-• Product tags
-• Privacy requests
-• Data export
-• Data deletion
-• Retention
-• Administration
-• Audit
-• Feature flags
-• Dynamic configuration
-• Reconciliation
-• Operational hardening
-• Final backend production integration
+Implement the backend required for:
 
-The implementation must integrate with:
+- one-to-one direct messaging
+- conversations
+- conversation participants
+- text messages
+- message attachments
+- message persistence
+- message delivery state
+- read receipts
+- typing indicators
+- online/offline presence
+- WebSocket authentication
+- Socket.IO communication
+- reconnection
+- synchronization after disconnect
+- unread message state
+- push notifications
+- device registration
+- FCM integration
+- APNS integration
+- notification delivery retries
+- blocking/privacy enforcement
+- message authorization
+- abuse prevention
+- message rate limiting
+- real-time observability
+- failure recovery
 
-• Identity
-• Accounts
-• Profiles
-• Creators
-• Businesses
-• Devices
-• Sessions
-• Social graph
-• Follows
-• Blocks
-• Restrictions
-• Close Friends
-• Posts
-• Reels
-• Stories
-• Media
-• Audio
-• Hashtags
-• Locations
-• Feed
-• Explore
-• Recommendations
-• Search
-• PostgreSQL
-• Prisma
-• Redis
-• Kafka/Redpanda
-• BullMQ
-• OpenSearch
-• WebSockets
-• S3
-• CloudFront
-• Observability
-• Security
-• Privacy
+The system must support multiple backend instances and horizontal scaling.
 
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
+==================================================
+2. REQUIRED TECHNOLOGY
+======================
 
 Backend:
 
-• Node.js
-• NestJS
-• TypeScript
+- Node.js
+- NestJS
+- TypeScript
 
-Database:
+Persistence:
 
-• PostgreSQL
-• Prisma ORM
+- PostgreSQL
+- Prisma ORM
 
-Cache:
+Distributed state:
 
-• Redis
+- Redis
 
 Event streaming:
 
-• Kafka or Redpanda
+- Kafka or Redpanda
 
-Background processing:
+Background jobs:
 
-• BullMQ
-
-Search:
-
-• Elasticsearch/OpenSearch
-
-Object storage:
-
-• AWS S3
+- BullMQ
 
 Real-time:
 
-• WebSockets
-• Socket.IO
+- Socket.IO
+- WebSockets
 
-Notifications:
+Object storage:
 
-• FCM
-• APNS
-• Email provider abstraction
+- AWS S3
+
+CDN:
+
+- AWS CloudFront
+
+Push notifications:
+
+- Firebase Cloud Messaging
+- Apple Push Notification service
 
 Observability:
 
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
+- OpenTelemetry
+- Prometheus
+- Grafana
+- Loki
+- Tempo
 
-Testing:
+==================================================
+3. DOMAIN MODULES
+=================
 
-• Jest
-• Supertest
-• Integration testing
+Create or integrate modules for:
 
-────────────────────────────────────────
+- messaging
+- conversations
+- messages
+- attachments
+- receipts
+- presence
+- realtime
+- websocket-authentication
+- push-notifications
+- devices
+- messaging-security
+- abuse-controls
+- event-publishing
+- background-workers
 
-IMPLEMENTATION RULES
+Keep controllers, application logic, domain rules, and infrastructure adapters separated.
 
-Never generate pseudo-code.
+==================================================
+4. CONVERSATION MODEL
+=====================
 
-Never generate placeholders.
+Implement durable conversation records.
 
-Never generate TODO comments.
+Support one-to-one conversations.
 
-Never omit implementations.
+A conversation should include:
 
-Never say:
+- conversation ID
+- created timestamp
+- updated timestamp
+- participant relationship
+- last-message metadata where appropriate
+- state
 
-- "implement similarly"
-- "left as an exercise"
-- "for brevity"
-- "remaining code omitted"
+Participant membership must be stored durably.
 
-Every generated file must be complete.
+Do not infer conversation membership solely from client state.
 
-Every generated file must compile.
+==================================================
+5. PARTICIPANT MODEL
+====================
 
-Never regenerate unchanged files.
+Implement ConversationParticipant with:
 
-Only modify existing files when required.
+- conversation ID
+- user ID
+- joined timestamp
+- role/state where applicable
+- last-read position or equivalent synchronization metadata where appropriate
+- notification/mute state where applicable
 
-Use strict TypeScript.
+Enforce uniqueness for:
 
-Use dependency injection.
+conversation + user
 
-Keep controllers thin.
+==================================================
+6. ONE-TO-ONE CONVERSATION CREATION
+===================================
 
-Keep business logic outside controllers.
+For a direct conversation between users A and B:
 
-Use repositories for persistence.
+1. authenticate requester
+2. validate target
+3. validate account state
+4. evaluate block state
+5. evaluate messaging/privacy permissions
+6. locate existing conversation
+7. create only if one does not exist
+8. return conversation
 
-Use DTOs for public contracts.
+Concurrent creation requests must not create duplicate conversations.
 
-Use centralized validation.
+Use database constraints and transactional logic.
 
-Use centralized error handling.
+==================================================
+7. MESSAGE MODEL
+================
 
-Use structured logging.
+Implement durable Message records with:
 
-Use idempotency for:
+- message ID
+- conversation ID
+- sender ID
+- message type
+- content where applicable
+- client-generated idempotency identifier where appropriate
+- server creation timestamp
+- edit state if editing is supported
+- deletion state
+- moderation state
 
-• Message sends
-• Notification creation
-• Report creation
-• Moderation actions
-• Rights actions
-• Ad events
-• Commerce mutations
-• Privacy requests
-• Background jobs
+Do not store unnecessary sensitive metadata.
 
-Use optimistic concurrency where appropriate.
+==================================================
+8. MESSAGE TYPES
+================
 
-Never trust client-controlled:
+Support at minimum:
 
-• Moderation state
-• Rights state
-• Ad eligibility
-• Product ownership
-• Business permissions
-• Privacy completion
-• Message delivery state
+- text
+- media/attachment reference
+- system message where required by product behavior
 
-────────────────────────────────────────
+Message types must be explicitly validated.
 
-DOMAIN OWNERSHIP
+Do not accept arbitrary client-defined message types.
 
-Maintain separate ownership for:
+==================================================
+9. MESSAGE CREATION
+===================
 
-• Messaging
-• Notifications
-• Moderation
-• Safety
-• Reports
-• Rights
-• Analytics
-• Advertising
-• Commerce
-• Administration
-• Privacy
-• Audit
-• Configuration
+Message creation must:
 
-Do not make:
+1. authenticate sender
+2. validate conversation membership
+3. verify sender account state
+4. verify recipient availability
+5. check block/privacy rules
+6. validate content
+7. validate attachment ownership if present
+8. enforce rate limits
+9. persist message transactionally
+10. create outbox event
+11. return authoritative message state
 
-• Analytics authoritative for transactions
-• Notifications authoritative for messages
-• Moderation authoritative for original content
-• Search authoritative for content
-• Redis authoritative for durable state
+Do not send external network requests while holding the database transaction open.
 
-────────────────────────────────────────
+==================================================
+10. MESSAGE IDEMPOTENCY
+=======================
 
-MESSAGING ARCHITECTURE
+Clients may retry after network failures.
 
-Implement one-to-one messaging and group-messaging foundations.
+Support client-generated idempotency keys for message creation.
+
+A repeated request with the same valid idempotency key must not create duplicate logical messages.
+
+Persist sufficient information to return the original result.
+
+Handle conflicting reuse of an idempotency key safely.
+
+==================================================
+11. MESSAGE ORDERING
+====================
+
+Define deterministic ordering.
+
+Every message requires a server-authoritative ordering mechanism such as:
+
+- server timestamp plus unique ID
+- monotonically sortable message ID
+- conversation sequence
+
+Do not rely solely on mobile device timestamps.
+
+Client timestamps may be retained as metadata when useful but must not determine authoritative order.
+
+==================================================
+12. CONVERSATION PAGINATION
+===========================
+
+Implement cursor-based message pagination.
 
 Support:
 
-• Conversation
-• Participant
-• Message
-• Attachment
-• Delivery
-• Read state
-• Reaction
-• Reply
-• Message request
-• Conversation settings
-• Block interaction
+- initial history
+- older messages
+- synchronization after reconnection
+- bounded page sizes
 
-────────────────────────────────────────
+Cursors must be opaque.
 
-CONVERSATION TYPES
+Do not allow arbitrary offset pagination over large message histories.
 
-Support:
+==================================================
+13. MESSAGE SYNCHRONIZATION
+===========================
 
-• Direct
-• Group
-• Message Request
+A client that reconnects must be able to determine messages it missed.
 
-Define:
+Support synchronization using a durable cursor/sequence strategy.
 
-• Conversation ID
-• Type
-• Creator
-• Status
-• Created time
-• Updated time
-• Version
+Example model:
 
-────────────────────────────────────────
+client-known conversation position
+→ request missing range
+→ server validates conversation membership
+→ return ordered messages
+→ return next synchronization position
 
-CONVERSATION MEMBERSHIP
+Do not assume WebSocket delivery was reliable.
 
-Represent:
+==================================================
+14. MESSAGE DELIVERY STATES
+===========================
 
-• User
-• Role where group permissions require it
-• Joined time
-• Left time
-• Status
+Support appropriate message states such as:
 
-Group roles may include:
+- persisted
+- accepted
+- delivered
+- read
 
-• Owner
-• Admin
-• Member
+Distinguish:
 
-Use explicit authorization.
+- server persistence
+- recipient delivery
+- recipient read
 
-────────────────────────────────────────
+A message cannot be considered delivered merely because the sender's request succeeded.
 
-MESSAGE MODEL
+==================================================
+15. DELIVERY ACKNOWLEDGEMENT
+============================
 
-Each message should contain:
+Where the real-time client acknowledges receipt:
 
-• Message ID
-• Conversation ID
-• Sender
-• Client mutation ID
-• Server sequence
-• Content
-• Attachment references
-• Reply reference
-• Created time
-• Edited time
-• Deleted time
-• Version
-• Status
+client receives message
+→ client sends delivery acknowledgement
+→ server validates recipient
+→ server updates delivery state
+→ server emits event if required
 
-Do not rely on client timestamps for ordering.
+Repeated acknowledgements must be idempotent.
 
-────────────────────────────────────────
+Do not allow one user to acknowledge messages for another participant.
 
-MESSAGE ORDERING
+==================================================
+16. READ RECEIPTS
+=================
 
-Use server-side ordering.
+Implement read state using a scalable conversation-level cursor or equivalent where appropriate.
 
-Each conversation has a monotonic sequence/reference sufficient to determine message order.
+Avoid creating unnecessary database rows for every message read when a conversation position can represent the same semantics.
 
-Handle:
+Read operations must:
 
-• Concurrent sends
-• Retries
-• Delayed packets
-• Reconnect
-• Clock skew
+- authenticate
+- verify membership
+- update only the user's read state
+- be idempotent
+- trigger appropriate real-time updates
 
-────────────────────────────────────────
+==================================================
+17. UNREAD COUNT
+================
 
-MESSAGE IDEMPOTENCY
+Support efficient unread calculation.
 
-Every send accepts:
+Prefer durable read position plus message ordering over incrementing a counter for every message when practical.
 
-• Client mutation ID
-• Idempotency key
+A cached unread count may be used for acceleration.
 
-A retry must return the already-created message rather than create another message.
+The authoritative state must remain reconstructible.
 
-────────────────────────────────────────
+Handle concurrent:
 
-MESSAGE DELIVERY
+- message creation
+- message deletion
+- read updates
+- reconnects
 
-Delivery pipeline:
+==================================================
+18. TYPING INDICATORS
+=====================
 
-Persist
-→ Event
-→ Real-time delivery
-→ Push fallback
-→ Delivery/read update
+Typing indicators are ephemeral.
 
-Do not make message persistence depend on push-provider success.
+Use Redis and WebSockets as appropriate.
 
-────────────────────────────────────────
+Do not persist every typing event to PostgreSQL.
 
-MESSAGE STATUS
+Typing events should:
 
-Support:
+- expire automatically
+- be authorized by conversation membership
+- be rate limited
+- tolerate packet loss
+- not block messaging
 
-• Accepted
-• Delivered
-• Read
-• Edited
-• Deleted
+Typing indicators must not disclose conversation membership to unauthorized users.
 
-Do not allow clients to forge server-side delivery state.
+==================================================
+19. PRESENCE MODEL
+==================
 
-────────────────────────────────────────
+Support online/away/offline presence where product requirements permit.
 
-READ RECEIPTS
+Presence is ephemeral.
 
-Support:
+Use Redis or an equivalent distributed mechanism.
 
-• Last-read sequence
-• Read timestamp
+Track appropriate state such as:
 
-Prefer a conversation-level read cursor over one database row for every message where feasible.
+- user
+- session/device
+- last heartbeat
+- status
+- expiration
 
-────────────────────────────────────────
+Do not make process-local memory authoritative for presence.
 
-MESSAGE REACTIONS
+==================================================
+20. PRESENCE HEARTBEAT
+======================
 
-Support:
+WebSocket-connected clients should send/trigger heartbeats.
 
-• Message
-• User
-• Reaction type
-• Created
-• Updated
+The server must:
 
-Define uniqueness.
+- refresh ephemeral presence
+- expire stale connections
+- avoid infinite presence retention
+- handle abrupt disconnects
 
-────────────────────────────────────────
+A crashed mobile app must eventually transition to offline without relying on graceful disconnect.
 
-MESSAGE REPLIES
+==================================================
+21. MULTI-INSTANCE SOCKET.IO
+============================
 
-Support reference to an original message.
+The real-time layer must support multiple backend instances.
 
-Do not duplicate the full original message in every reply.
+Use a distributed adapter/coordination layer as appropriate, typically Redis-based.
 
-────────────────────────────────────────
+Do not assume all participants in a conversation are connected to the same server.
 
-MESSAGE ATTACHMENTS
+Message events must reach clients regardless of which application instance holds their connection.
 
-Support:
+==================================================
+22. WEBSOCKET AUTHENTICATION
+============================
 
-• Image
-• Video
-• File foundation
+Authenticate Socket.IO/WebSocket connections.
 
-Use S3-backed objects.
+The connection handshake must establish:
 
-Attachment access must inherit conversation authorization.
+- authenticated user
+- session validity
+- device/session information
+- authorization context
 
-────────────────────────────────────────
+Do not trust arbitrary user IDs provided by the client.
 
-MESSAGE ATTACHMENT SECURITY
+Expired/revoked sessions must lose access to protected channels.
+
+==================================================
+23. WEBSOCKET AUTHORIZATION
+===========================
+
+Every conversation subscription must verify membership.
+
+For example:
+
+client requests conversation A
+→ server verifies authenticated principal
+→ verify membership
+→ permit subscription
+
+Do not expose conversation existence to unauthorized users through differentiated error behavior where this creates enumeration risk.
+
+==================================================
+24. SOCKET EVENT CONTRACT
+=========================
+
+Define versioned events for:
+
+- message.created
+- message.delivered
+- message.read
+- message.deleted
+- typing.started
+- typing.stopped
+- presence.updated
+- conversation.updated
+- notification.created
+
+Every event should have:
+
+- event ID
+- event type
+- version
+- server timestamp
+- correlation ID
+- relevant resource identifier
+
+Do not include secrets.
+
+==================================================
+25. REAL-TIME DUPLICATE HANDLING
+================================
+
+Clients may receive duplicate events because of:
+
+- reconnects
+- retries
+- adapter behavior
+- consumer restarts
+
+Events must have stable identifiers.
+
+Clients should be able to ignore duplicates.
+
+Server-side event generation must also avoid unnecessary duplicate durable state.
+
+==================================================
+26. RECONNECTION
+================
+
+Support reconnect after:
+
+- temporary network loss
+- app backgrounding
+- mobile network switching
+- server restart
+- load-balancer changes
+
+Upon reconnect:
+
+1. reauthenticate
+2. re-establish permitted subscriptions
+3. synchronize missed durable messages
+4. restore relevant unread state
+5. restore presence
+
+Do not assume previously received in-memory subscriptions are authoritative.
+
+==================================================
+27. MESSAGE ATTACHMENTS
+=======================
+
+Support secure attachment workflows using S3.
+
+Do not send large media payloads through WebSocket messages.
+
+Instead:
+
+Client
+→ request attachment upload authorization
+→ upload to S3
+→ validate/process media
+→ send attachment reference with message
+→ backend verifies ownership/readiness
+→ persist message
+
+Attachment objects must be authorized to the message sender.
+
+==================================================
+28. ATTACHMENT VALIDATION
+=========================
 
 Validate:
 
-• File type
-• Size
-• Ownership
-• Object key
-• Malware/security state
+- media ownership
+- object path
+- MIME type
+- size
+- processing status
+- moderation status
 
-Never expose permanent private object URLs.
+Never allow a sender to reference another user's private S3 object.
 
-────────────────────────────────────────
+==================================================
+29. PRIVATE MESSAGE MEDIA
+=========================
 
-MESSAGE REQUESTS
+Message attachments may contain private content.
 
-Support:
+Use controlled access through application authorization and short-lived signed access where necessary.
 
-• Request
-• Accept
-• Reject
-• Delete
-• Restrict
-• Block
+Do not expose permanent publicly accessible URLs for private message media.
 
-Message-request eligibility may depend on:
+CDN behavior must not bypass message authorization.
 
-• Account state
-• Privacy settings
-• Follow state
-• Existing conversation
-• Blocks
+==================================================
+30. MESSAGE DELETION
+====================
 
-────────────────────────────────────────
+Implement message deletion semantics appropriate to the product.
 
-BLOCK + MESSAGING
+Possible states:
 
-A block must affect:
+- active
+- deleted-for-sender
+- deleted-for-all
+- moderated
 
-• New messages
-• Existing conversations
-• Message requests
-• Notifications
-• Presence
-• Typing indicators
+Define exactly which users can see the message after each state transition.
 
-Define exact behavior.
+Deletion must be enforced server-side.
 
-────────────────────────────────────────
+==================================================
+31. MESSAGE EDITING
+===================
 
-MESSAGE PRIVACY
+Where editing is supported:
 
-Private message data must never appear in:
+- verify sender ownership
+- enforce edit window if applicable
+- validate new content
+- persist edit history metadata where required
+- emit message-updated event
 
-• Public search
-• Public analytics
-• Recommendation feeds
-• Explore
-• Trending
+Never allow editing another participant's message.
 
-────────────────────────────────────────
+==================================================
+32. BLOCKING INTEGRATION
+========================
 
-REAL-TIME MESSAGING
+Messaging must respect user blocks.
 
-Use WebSockets/Socket.IO.
+When A blocks B:
 
-Support:
+- unauthorized new messages must fail
+- protected conversation access must follow product policy
+- notification delivery must be restricted
+- existing real-time subscriptions must be closed or restricted as necessary
 
-• Authentication
-• Authorization
-• Connection
-• Reconnect
-• Heartbeat
-• Conversation subscription
-• New message
-• Delivery
-• Read
-• Reaction
-• Typing
+Block state must remain authoritative.
 
-────────────────────────────────────────
+==================================================
+33. PRIVACY INTEGRATION
+=======================
 
-REAL-TIME IDEMPOTENCY
+Messaging must support privacy controls such as:
 
-Clients may reconnect and replay events.
+- who can message
+- follower-only messaging
+- restricted interactions
+- blocked users
 
-Use:
+These rules must be evaluated server-side at message creation and conversation access.
 
-• Server sequence
-• Event ID
-• Conversation revision
+==================================================
+34. MESSAGE REQUESTS
+====================
 
-to avoid duplicate delivery.
+If the product supports message requests:
 
-────────────────────────────────────────
+- store request state explicitly
+- prevent unsolicited content from bypassing request rules
+- allow accept/reject
+- integrate with notifications
+- respect block/restriction settings
 
-PRESENCE FOUNDATION
+Do not treat every conversation as automatically trusted.
 
-Prepare:
+==================================================
+35. MESSAGE RATE LIMITING
+=========================
 
-• Online
-• Offline
-• Last active
+Protect:
 
-Presence may be ephemeral.
+- conversation creation
+- message creation
+- attachment initialization
+- typing events
+- WebSocket connection attempts
+- synchronization requests
 
-Do not store unnecessary precise activity history.
+Use Redis-backed distributed rate limiting.
 
-────────────────────────────────────────
+Rate policies should consider:
 
-TYPING INDICATORS
+- user
+- device
+- IP
+- endpoint/event type
 
-Use ephemeral state.
+==================================================
+36. SPAM AND ABUSE CONTROLS
+===========================
 
-Do not persist every typing event in PostgreSQL.
+Support detection/controls for:
 
-Apply:
+- mass unsolicited messages
+- repeated identical messages
+- automated account behavior
+- message flooding
+- attachment abuse
+- conversation-creation abuse
+- connection flooding
 
-• TTL
-• Rate limit
-• Debouncing
+Potential responses:
 
-────────────────────────────────────────
+- throttling
+- temporary messaging restriction
+- additional verification
+- moderation review
 
-NOTIFICATION ARCHITECTURE
+Do not make abuse controls solely client-side.
 
-Implement:
+==================================================
+37. MESSAGE EVENTS
+==================
 
-• Notification
-• Notification preference
-• Delivery
-• Device token
-• Notification grouping
-• Read state
+Publish durable events such as:
 
-────────────────────────────────────────
+- ConversationCreated
+- MessageCreated
+- MessageDeleted
+- MessageEdited
+- MessageDelivered
+- MessageRead
+- UserBlocked
+- UserUnblocked
 
-NOTIFICATION SOURCES
+Events must be suitable for:
 
-Support:
+- notifications
+- analytics
+- real-time distribution
+- moderation
+- auditing
 
-• Follow
-• Follow request
-• Like
-• Comment
-• Mention
-• Share
-• Repost
-• Message
-• Story interaction
-• Creator update
-• Moderation
-• Rights
-• Business update
-• Security
-• Privacy
-• Ad/account events where appropriate
+==================================================
+38. OUTBOX RELIABILITY
+======================
 
-────────────────────────────────────────
+For message creation:
 
-NOTIFICATION GROUPING
+database transaction
+→ message record
+→ outbox event
 
-Support aggregation such as:
+Then:
 
-• Multiple likes
-• Multiple follows
-• Multiple comments
+outbox
+→ Kafka/Redpanda
+→ consumers
 
-Do not generate unbounded notification spam.
+Do not rely solely on directly emitting a Kafka event after the transaction without durable event intent.
 
-────────────────────────────────────────
+==================================================
+39. REAL-TIME EVENT CONSUMER
+============================
 
-NOTIFICATION IDEMPOTENCY
+Real-time delivery should consume durable domain events or equivalent application events.
 
-Use:
+Event flow:
 
-• Source event ID
-• Notification type
-• Recipient
-• Grouping key
+MessageCreated
+→ authorized real-time fanout
+→ active recipient connection
+→ event delivery
 
-to avoid duplicates.
+A user not currently connected must still be able to retrieve the message later.
 
-────────────────────────────────────────
+==================================================
+40. PUSH NOTIFICATION PIPELINE
+==============================
 
-NOTIFICATION PREFERENCES
+When the recipient is eligible for push:
 
-Support:
+MessageCreated
+→ notification policy
+→ user/device preference evaluation
+→ push job
+→ FCM/APNS
+→ result handling
 
-• Social
-• Messaging
-• Creator updates
-• Recommendations
-• Marketing
-• Business
-• Security
-• Privacy
+Do not block message persistence while waiting for push delivery.
 
-Security-critical notifications cannot always be disabled.
+==================================================
+41. DEVICE REGISTRATION
+=======================
 
-────────────────────────────────────────
-
-PUSH DEVICES
+Implement device registration.
 
 Track:
 
-• Device ID
-• User
-• Platform
-• Push token reference
-• App version
-• Last active
+- device ID
+- user ID
+- platform
+- push token
+- token status
+- app version
+- last active timestamp
 
-Support token rotation.
+A user may have multiple devices.
 
-────────────────────────────────────────
+Do not assume one token per user.
 
-FCM / APNS
+==================================================
+42. PUSH TOKEN SECURITY
+=======================
 
-Implement provider abstractions.
+Treat push tokens as sensitive infrastructure identifiers.
+
+Do not expose tokens in:
+
+- logs
+- public API responses
+- analytics events
+- Kafka events unless strictly required
+
+Store them securely.
+
+==================================================
+43. FCM ADAPTER
+===============
+
+Implement a provider abstraction for Firebase Cloud Messaging.
+
+Map provider responses into application-level categories:
+
+- delivered/accepted
+- retryable failure
+- invalid token
+- permanent failure
+
+Do not expose FCM-specific details throughout the domain layer.
+
+==================================================
+44. APNS ADAPTER
+================
+
+Implement a provider abstraction for Apple Push Notification service.
 
 Handle:
 
-• Success
-• Invalid token
-• Expired token
-• Provider failure
-• Provider throttling
-• Retry
-• Permanent failure
+- authorization
+- provider failures
+- invalid device token
+- transient provider errors
+- permanent failures
 
-────────────────────────────────────────
+Keep APNS-specific implementation isolated behind an adapter.
 
-EMAIL NOTIFICATIONS
+==================================================
+45. PUSH RETRIES
+================
 
-Prepare provider-neutral interface.
+Use BullMQ for push delivery.
 
-Support:
+Retry transient failures with bounded exponential backoff.
 
-• Verification
-• Security
-• Privacy
-• Account notifications
+Do not retry:
 
-Do not put provider-specific APIs in domain services.
+- invalid token
+- permanent invalid payload
+- unauthorized credential configuration
 
-────────────────────────────────────────
+indefinitely.
 
-MODERATION ARCHITECTURE
+==================================================
+46. INVALID DEVICE TOKENS
+=========================
 
-Moderate:
+When FCM/APNS indicates an invalid token:
 
-• Posts
-• Reels
-• Stories
-• Comments
-• Profiles
-• Audio
-• Hashtags
-• Messages where policy/legal basis permits
-• Business content
-• Product content
+- mark token invalid
+- prevent future sends
+- optionally clean token asynchronously
+- record metric
 
-────────────────────────────────────────
+Do not repeatedly retry permanently invalid tokens.
 
-MODERATION CASE
+==================================================
+47. PUSH PREFERENCES
+====================
 
-Model:
+Respect notification preferences.
 
-• Case ID
-• Target
-• Content type
-• Policy
-• Severity
-• Confidence
-• Status
-• Assignee
-• Created
-• Updated
+A user must be able to disable appropriate message-related push notifications.
 
-States:
+Preference evaluation must happen server-side.
 
-• Open
-• In Review
-• Actioned
-• Appealed
-• Resolved
-• Reopened
+==================================================
+48. QUIET / SUPPRESSION RULES
+=============================
 
-────────────────────────────────────────
+Where the product supports notification suppression:
 
-MODERATION ACTIONS
+- evaluate the user's preference
+- avoid sending unnecessary push
+- preserve durable message state
 
-Support:
+Push suppression must not prevent in-app message delivery.
 
-• Allow
-• Restrict
-• Hide
-• Remove
-• Suspend
-• Escalate
+==================================================
+49. NOTIFICATION CONTENT
+========================
 
-Every action must be:
+Push payloads should contain minimal necessary content.
 
-• Authorized
-• Audited
-• Version-aware
-• Idempotent
+Avoid exposing private message bodies unnecessarily on lock screens.
 
-────────────────────────────────────────
+Support privacy-aware notification content policies.
 
-MODERATION POLICY VERSIONING
+Never place:
 
-Every automated decision references:
+- access tokens
+- secrets
+- internal database IDs without need
+- private infrastructure information
 
-• Policy version
-• Model/version where applicable
-• Rule
-• Confidence
-• Decision
+into push payloads.
 
-Do not expose internal moderation reasoning to ordinary users.
+==================================================
+50. REAL-TIME NOTIFICATION DELIVERY
+===================================
 
-────────────────────────────────────────
+If the recipient has an authenticated active socket:
 
-REPORTING
+- deliver new message/notification event in real time where appropriate
 
-Support reports for:
+If unavailable:
 
-• User
-• Profile
-• Post
-• Reel
-• Story
-• Comment
-• Message
-• Audio
-• Hashtag
-• Product
-• Business
+- durable persistence remains sufficient for later retrieval
 
-────────────────────────────────────────
+Do not assume online delivery.
 
-REPORT DEDUPLICATION
+==================================================
+51. MESSAGE LIST APIs
+=====================
 
-Prevent report flooding using:
+Implement stable APIs for:
 
-• Reporter
-• Target
-• Reason
-• Time-window rules
-• Existing active case
+- conversation list
+- conversation retrieval
+- message history
+- unread state
+- read updates
+- message creation
+- message deletion
+- message synchronization
 
-Do not equate report count with guilt.
+Use cursor pagination.
 
-────────────────────────────────────────
+Return explicit DTOs rather than database entities.
 
-SAFETY WORKFLOWS
+==================================================
+52. CONVERSATION LIST
+=====================
 
-Support priority handling for:
+Conversation list may be ordered by:
 
-• Credible threats
-• Severe harassment
-• Child-safety concerns
-• Serious abuse
-• Coordinated harmful activity
+- last relevant message
+- updated timestamp
+- unread status
+- product-defined ranking
 
-Define:
+Define deterministic tie-breaking.
 
-• Priority
-• Access controls
-• Escalation
-• Evidence handling
-• Audit
+Do not load all messages to build the conversation list.
 
-────────────────────────────────────────
+Use stored summary fields where justified.
 
-APPEALS
+==================================================
+53. MESSAGE SEARCH
+==================
 
-Support:
+Do not automatically make private message bodies globally searchable.
 
-• Appeal creation
-• Appeal reason
-• Review
-• Decision
-• Restoration
-• Final state
+Any message-search capability must:
 
-Appeal decisions must be auditable.
+- authenticate
+- verify conversation membership
+- enforce privacy
+- limit query scope
+- rate limit
+- prevent data leakage
 
-────────────────────────────────────────
+Implement a search index only when justified by product requirements.
 
-COPYRIGHT / RIGHTS
+==================================================
+54. DATABASE INDEXING
+=====================
 
-Implement:
+Create indexes for:
 
-• Rights claim
-• Content restriction
-• Audio restriction
-• Region restriction
-• Takedown
-• Appeal
-• Restoration
-• Expiration
+Conversations:
 
-────────────────────────────────────────
+- participant
+- updated time
 
-RIGHTS STATES
+Messages:
 
-Support:
+- conversation + ordered message position
+- sender
+- created time
+- state where useful
 
-• Clear
-• Claimed
-• Restricted
-• Removed
-• Region Restricted
-• Expired
-• Restored
+Conversation participants:
 
-────────────────────────────────────────
+- conversation + user
+- user + conversation
 
-RIGHTS PROPAGATION
+Push devices:
 
-Rights changes may affect:
+- user
+- token status
 
-• Post
-• Reel
-• Story
-• Audio
-• Feed
-• Explore
-• Search
-• Recommendations
-• Sharing
-• Playback
+Presence state may primarily live in Redis and should avoid excessive PostgreSQL writes.
 
-Propagate via events.
+==================================================
+55. MESSAGE RETENTION
+=====================
 
-────────────────────────────────────────
+Define retention semantics for:
 
-CREATOR ANALYTICS
+- active messages
+- deleted messages
+- attachments
+- delivery state
+- audit logs
 
-Implement aggregate analytics for:
+Do not automatically hard-delete data without considering:
 
-• Views
-• Reach
-• Impressions
-• Watch time
-• Completion
-• Average watch duration
-• Likes
-• Comments
-• Shares
-• Saves
-• Reposts
-• Follower growth
-• Traffic sources
-• Audience regions
+- product behavior
+- moderation
+- compliance requirements
+- backup retention
 
-────────────────────────────────────────
+==================================================
+56. ATTACHMENT CLEANUP
+======================
 
-CREATOR ANALYTICS PRIVACY
+When a message attachment becomes eligible for deletion:
 
-Do not expose:
+- revoke application access
+- remove CDN accessibility where applicable
+- delete S3 object asynchronously
+- remove derived variants
+- record cleanup state
 
-• Individual viewer identity
-• Private viewer behavior
-• Sensitive audience attributes
+Do not delete an attachment still referenced by an active message.
 
-Use aggregation thresholds where required.
+==================================================
+57. REAL-TIME FAILURE MODES
+===========================
 
-────────────────────────────────────────
+Handle:
 
-BUSINESS ANALYTICS
+- Redis outage
+- Socket.IO adapter failure
+- Kafka lag
+- worker failure
+- push-provider outage
+- client reconnect storm
 
-Support:
+Core durable messaging should remain available whenever possible even if real-time delivery is degraded.
 
-• Profile views
-• Content views
-• Reach
-• Engagement
-• Search discovery
-• Product interactions
-• Follower growth
-• Advertising performance
+==================================================
+58. REDIS FAILURE
+=================
 
-Business users see only authorized business data.
+If Redis is unavailable:
 
-────────────────────────────────────────
+- do not lose durable messages
+- degrade ephemeral presence
+- degrade typing indicators
+- apply safe fallback for rate limiting
+- preserve database-backed functionality
 
-ADVERTISING FOUNDATION
+Do not treat Redis-only presence or typing state as durable data.
 
-Implement:
+==================================================
+59. KAFKA FAILURE
+=================
 
-• Advertiser account
-• Organization
-• Campaign
-• Ad set
-• Creative
-• Placement
-• Budget
-• Schedule
-• Frequency cap
-• Eligibility
-• Ad event
-• Performance aggregate
+If Kafka/Redpanda is unavailable:
 
-────────────────────────────────────────
+- persist critical durable message transaction where architecture permits
+- retain outbox event
+- retry publication
+- avoid silently dropping events
 
-CAMPAIGN STATES
+Real-time delivery may temporarily lag while durable state remains intact.
 
-Support:
+==================================================
+60. PUSH PROVIDER FAILURE
+=========================
 
-• Draft
-• Pending Review
-• Approved
-• Scheduled
-• Active
-• Paused
-• Completed
-• Rejected
-• Archived
+If FCM/APNS fails:
 
-────────────────────────────────────────
+- preserve message
+- preserve notification state if notification was created
+- retry transient failures
+- mark permanent failures
+- expose metrics
 
-AD ELIGIBILITY
+Never fail the message creation request because a push provider is temporarily unavailable.
 
-Before serving:
+==================================================
+61. CONNECTION FLOOD PROTECTION
+===============================
 
-• Campaign active
-• Ad set active
-• Creative approved
-• Budget available
-• Placement valid
-• Schedule valid
-• Frequency rules valid
-• Privacy rules valid
-• Safety rules valid
+Protect WebSocket endpoints against:
 
-────────────────────────────────────────
-
-AD TARGETING
-
-Support policy-compliant targeting such as:
-
-• Geography
-• Context
-• Broad audience
-• Interest categories where allowed
-
-Do not design prohibited sensitive targeting.
-
-────────────────────────────────────────
-
-AD FREQUENCY
-
-Track exposure by:
-
-• User
-• Campaign
-• Creative
-• Placement
-• Time window
-
-Use Redis for fast ephemeral enforcement with durable event backing.
-
-────────────────────────────────────────
-
-AD EVENTS
-
-Track:
-
-• Ad served
-• Impression
-• Click
-• Video start
-• Video completion
-• Conversion reference
-
-Events must be idempotent.
-
-────────────────────────────────────────
-
-AD BILLING BOUNDARY
-
-Keep billing/payment provider details behind an abstraction.
-
-Advertising event tracking must not become the payment source of truth.
-
-────────────────────────────────────────
-
-COMMERCE FOUNDATION
-
-Support:
-
-• Business
-• Product catalog
-• Product
-• Product collection
-• Product tag
-• Availability
-• Product analytics
-
-────────────────────────────────────────
-
-PRODUCT CATALOG
-
-Support:
-
-• Catalog owner
-• Name
-• Status
-• Currency
-• Products
-• Collections
-
-Business ownership is authoritative.
-
-────────────────────────────────────────
-
-PRODUCT
-
-Include:
-
-• Product ID
-• Catalog
-• Name
-• Description
-• Media
-• External URL/reference
-• Price reference
-• Availability
-• Status
-
-Do not assume the platform itself is the seller.
-
-────────────────────────────────────────
-
-PRODUCT TAGS
-
-Content may reference:
-
-• Product
-• Position
-• Display metadata
-
-Do not duplicate the entire product record into every post.
-
-────────────────────────────────────────
-
-ADMINISTRATION
-
-Create backend administration APIs for:
-
-• Users
-• Profiles
-• Creators
-• Businesses
-• Content
-• Messages where authorized
-• Reports
-• Moderation
-• Rights
-• Advertising
-• Commerce
-• Search
-• Feed diagnostics
-• Analytics
-• Privacy
-• Feature flags
-• Configuration
-• Audit
-
-────────────────────────────────────────
-
-ADMIN ROLES
-
-Define:
-
-• Support
-• Moderator
-• Safety
-• Rights
-• Fraud
-• Advertising
-• Commerce
-• Analytics
-• Privacy
-• Security
-• Operations
-• Administrator
-
-Use least privilege.
-
-────────────────────────────────────────
-
-ADMIN DATA ACCESS
-
-Sensitive resources require:
-
-• Permission
-• Reason
-• Audit
-
-Do not expose full private message or location data merely because an employee is an administrator.
-
-────────────────────────────────────────
-
-FEATURE FLAGS
-
-Support:
-
-• Boolean
-• Percentage
-• Region
-• Platform
-• App version
-• User cohort
-• Creator cohort
-• Business cohort
-
-Every flag has:
-
-• Owner
-• Version
-• State
-• Start time
-• Expiration
-• Rollback behavior
-
-────────────────────────────────────────
-
-DYNAMIC CONFIGURATION
-
-Support typed configuration for:
-
-• Upload limits
-• Feed limits
-• Recommendation thresholds
-• Search limits
-• Message limits
-• Notification limits
-• Moderation thresholds
-• Ad frequency
-• Product limits
-• API rate limits
-
-Configuration must be:
-
-• Typed
-• Validated
-• Versioned
-• Audited
-• Rollback-capable
-
-────────────────────────────────────────
-
-AUDIT
-
-Audit:
-
-• Admin actions
-• Moderation
-• Rights changes
-• Business ownership
-• Advertising changes
-• Feature flags
-• Configuration
-• Privacy actions
-• Security actions
-
-Fields:
-
-• Actor
-• Role
-• Action
-• Resource
-• Reason
-• Request ID
-• Correlation ID
-• Region
-• Timestamp
-• Result
-
-Audit records are append-only.
-
-────────────────────────────────────────
-
-PRIVACY ARCHITECTURE
-
-Support:
-
-• Data access
-• Data export
-• Data deletion
-• Account deletion
-• Search-history deletion
-• Message deletion/retention
-• Saved-content deletion
-• Recommendation-data controls
-• Advertising controls
-• Analytics controls
-
-────────────────────────────────────────
-
-DATA EXPORT
-
-Export authorized user data including, where policy permits:
-
-• Profile
-• Social graph
-• Posts
-• Reels
-• Stories metadata
-• Comments
-• Saves
-• Collections
-• Messages
-• Search history
-• Account settings
-• Privacy settings
-• Contributions
-• Analytics available to the user
-
-Exports should be generated asynchronously.
-
-────────────────────────────────────────
-
-EXPORT SECURITY
-
-Export artifacts must use:
-
-• Private S3
-• Encryption
-• Short-lived download authorization
-• Expiration
-• Audit
-
-Never expose export objects publicly.
-
-────────────────────────────────────────
-
-DATA DELETION
-
-Support asynchronous deletion across:
-
-• Identity
-• Profile
-• Social graph
-• Content
-• Media
-• Stories
-• Reels
-• Comments
-• Likes
-• Saves
-• Collections
-• Messages
-• Search
-• Feed features
-• Recommendations
-• Analytics
-• Advertising
-• Commerce
-• Moderation
-• Notifications
-
-────────────────────────────────────────
-
-DELETION ORCHESTRATION
+- excessive connection attempts
+- authentication brute force
+- reconnect storms
+- oversized connection metadata
+- subscription abuse
 
 Use:
 
-Privacy Request
-→ Domain deletion tasks
-→ Progress tracking
-→ Verification
-→ Derived-data cleanup
-→ Completion
-
-Each domain reports completion independently.
-
-────────────────────────────────────────
-
-RETENTION
-
-Define separate policies for:
-
-• Stories
-• Messages
-• Media
-• Raw analytics
-• Search history
-• Recommendation features
-• Moderation evidence
-• Rights evidence
-• Audit records
-• Advertising events
-
-Do not retain sensitive data indefinitely.
-
-────────────────────────────────────────
-
-DELETION RECONCILIATION
-
-Verify deletion propagation across:
-
-• PostgreSQL
-• Redis
-• OpenSearch
-• Kafka-derived stores
-• Analytics
-• Recommendation features
-• Notification state
-• Search history
-
-────────────────────────────────────────
-
-DATABASE
-
-Implement Prisma models/migrations for:
-
-MESSAGING
-
-• Conversation
-• ConversationParticipant
-• ConversationRequest
-• Message
-• MessageAttachment
-• MessageReaction
-• MessageReadState
-• MessageDelivery
-
-NOTIFICATIONS
-
-• Notification
-• NotificationPreference
-• NotificationDelivery
-• PushDevice
-• NotificationGroup
-
-MODERATION
-
-• Report
-• ModerationCase
-• ModerationAction
-• ModerationEvidenceReference
-• Appeal
-• SafetyEscalation
-
-RIGHTS
-
-• RightsClaim
-• RightsRestriction
-• RightsAppeal
-• RightsReference
-
-ADVERTISING
-
-• AdAccount
-• AdvertiserOrganization
-• Campaign
-• AdSet
-• AdCreative
-• AdPlacement
-• AdFrequencyState
-• AdEventReference
-• AdPerformanceAggregate
-
-COMMERCE
-
-• ProductCatalog
-• Product
-• ProductCollection
-• ProductTag
-
-ANALYTICS
-
-• CreatorAnalyticsAggregate
-• BusinessAnalyticsAggregate
-• PlatformAnalyticsAggregate
-
-PRIVACY
-
-• PrivacyRequest
-• PrivacyTask
-• ExportArtifact
-• DeletionTask
-
-ADMIN
-
-• AdminRole
-• AdminPermission
-• AuditLog
-• FeatureFlag
-• FeatureFlagVersion
-• SystemConfiguration
-• ConfigurationVersion
-
-────────────────────────────────────────
-
-DATABASE CONSTRAINTS
-
-Use:
-
-• Foreign keys
-• Unique constraints
-• Composite indexes
-• Status indexes
-• Timestamp indexes
-• Revision/version fields
-• Expiration fields
-
-Messaging uniqueness should protect against duplicate mutation IDs.
-
-Notification uniqueness should prevent repeated event fanout.
-
-Report constraints should prevent uncontrolled duplication.
-
-────────────────────────────────────────
-
-DATABASE INDEXING
-
-MESSAGING:
-
-• Conversation
-• Participant
-• Message sequence
-• Message time
-• Request status
-
-NOTIFICATIONS:
-
-• Recipient
-• Read state
-• Created time
-
-MODERATION:
-
-• Target
-• Status
-• Priority
-• Assignee
-
-RIGHTS:
-
-• Content
-• Region
-• Status
-
-ADVERTISING:
-
-• Advertiser
-• Campaign
-• Status
-• Schedule
-
-COMMERCE:
-
-• Catalog
-• Business
-• Product status
-
-PRIVACY:
-
-• User
-• Request status
-• Created time
-
-AUDIT:
-
-• Actor
-• Resource
-• Action
-• Timestamp
-
-────────────────────────────────────────
-
-REDIS
-
-Use Redis for:
-
-• Presence
-• Typing indicators
-• Message fanout coordination
-• Notification deduplication
-• Ad frequency state
-• Rate limiting
-• Moderation job coordination
-• Feature-flag cache
-• Configuration cache
-• Privacy-job locks
-• Temporary export status
-• Realtime connection state
-
-Redis is never authoritative for:
-
-• Messages
-• Notifications
-• Reports
-• Moderation cases
-• Rights
-• Advertising campaigns
-• Products
-• Privacy requests
-• Audit
-
-────────────────────────────────────────
-
-KAFKA EVENTS
-
-MESSAGING:
-
-• ConversationCreated
-• MessageRequestCreated
-• MessageCreated
-• MessageEdited
-• MessageDeleted
-• MessageDelivered
-• MessageRead
-• MessageReactionCreated
-
-NOTIFICATIONS:
-
-• NotificationCreated
-• NotificationDelivered
-• NotificationFailed
-
-TRUST:
-
-• ReportCreated
-• ModerationCaseCreated
-• ModerationActionTaken
-• AppealCreated
-• AppealResolved
-• SafetyEscalationCreated
-
-RIGHTS:
-
-• RightsClaimCreated
-• RightsRestrictionApplied
-• RightsRestrictionRemoved
-• RightsAppealCreated
-• RightsRestored
-
-ANALYTICS:
-
-• CreatorMetricUpdated
-• BusinessMetricUpdated
-• PlatformMetricUpdated
-
-ADVERTISING:
-
-• AdCampaignCreated
-• AdCampaignActivated
-• AdServed
-• AdImpression
-• AdClick
-• AdVideoStarted
-• AdVideoCompleted
-
-COMMERCE:
-
-• ProductCreated
-• ProductUpdated
-• ProductTagged
-• ProductRemoved
-
-PRIVACY:
-
-• PrivacyRequestCreated
-• PrivacyTaskCompleted
-• DataExportCompleted
-• DataDeletionCompleted
-
-ADMIN:
-
-• FeatureFlagChanged
-• ConfigurationChanged
-• AdministrativeActionTaken
-
-All events must be:
-
-• Versioned
-• Idempotent
-• Region-aware
-• Privacy-aware
-• Correlation-aware
-
-────────────────────────────────────────
-
-BULLMQ
-
-Queues:
-
-• Notification delivery
-• Push delivery
-• Email delivery
-• Message cleanup
-• Moderation
-• Safety escalation
-• Rights processing
-• Analytics aggregation
-• Advertising event aggregation
-• Commerce processing
-• Privacy export
-• Privacy deletion
-• Reconciliation
-• Audit maintenance
-• Configuration propagation
-• Feature-flag propagation
-• Cleanup
-
-Every queue requires:
-
-• Job schema
-• Retry
-• Backoff
-• Timeout
-• Concurrency
-• Idempotency
-• Dead-letter handling
-• Metrics
-
-────────────────────────────────────────
-
-API
-
-MESSAGING:
-
-• Create conversation
-• Get conversation
-• List conversations
-• Send message
-• Edit message
-• Delete message
-• Add reaction
-• Remove reaction
-• Mark read
-• Send message request
-• Accept request
-• Reject request
-• Delete request
-• Add/remove participant where authorized
-
-NOTIFICATIONS:
-
-• List
-• Get
-• Mark read
-• Mark all read
-• Preferences
-• Register device
-• Remove device
-
-REPORTING:
-
-• Create report
-• Get own report status
-
-MODERATION:
-
-• Create case
-• Get case
-• Add action
-• Appeal
-• Resolve
-
-RIGHTS:
-
-• Submit claim
-• Get claim
-• Submit appeal
-• Restrict content where authorized
-• Restore where authorized
-
-ADVERTISING:
-
-• Create advertiser
-• Create campaign
-• Update campaign
-• Create ad set
-• Create creative
-• Activate
-• Pause
-• Analytics
-
-COMMERCE:
-
-• Create catalog
-• Create product
-• Update product
-• Create collection
-• Tag product
-• Remove product tag
-
-PRIVACY:
-
-• Request export
-• Get export status
-• Download authorization
-• Request deletion
-• Get deletion status
-• Cancel where policy allows
-
-ADMIN:
-
-• Users
-• Content
-• Reports
-• Moderation
-• Rights
-• Advertising
-• Commerce
-• Analytics
-• Feature flags
-• Configuration
-• Audit
-• Privacy
-
-All endpoints must implement:
-
-• Authentication
-• Authorization
-• Validation
-• Rate limiting
-• Idempotency where required
-• OpenAPI
-• Consistent errors
-• Audit where required
-
-────────────────────────────────────────
-
-WEBSOCKET API
-
-Support:
-
-• Message created
-• Message updated
-• Message deleted
-• Delivery update
-• Read update
-• Reaction update
-• Typing
-• Presence
-• Notification update
-• Moderation-status update where appropriate
-
-Every subscription requires authorization.
-
-────────────────────────────────────────
-
-SECURITY
+- distributed rate limits
+- connection quotas
+- backoff
+- heartbeat limits
+
+==================================================
+62. SECURITY
+============
 
 Protect against:
 
-• Message IDOR
-• Conversation enumeration
-• Private-content access
-• Notification spoofing
-• Push-token abuse
-• Report flooding
-• Moderation escalation
-• Rights manipulation
-• Ad fraud
-• Product ownership takeover
-• Privacy-request abuse
-• Admin privilege escalation
-• Audit manipulation
-• WebSocket hijacking
+- unauthorized conversation access
+- IDOR
+- message spoofing
+- sender impersonation
+- conversation enumeration
+- blocked-user bypass
+- private attachment leakage
+- push-token leakage
+- WebSocket hijacking
+- replay
+- connection abuse
+- message flooding
 
-────────────────────────────────────────
+Never authorize based solely on client-provided identifiers.
 
-MESSAGING SECURITY
+==================================================
+63. AUDIT LOGGING
+=================
 
-Validate:
+Audit sensitive messaging operations such as:
 
-• Sender membership
-• Conversation state
-• Block
-• Message permissions
-• Attachment ownership
+- security-sensitive messaging changes
+- account messaging restrictions
+- administrative access
+- moderation actions
+- message deletion by moderators
+- device registration/revocation where appropriate
 
-Never allow arbitrary message access by ID.
+Avoid logging private message content unnecessarily.
 
-────────────────────────────────────────
-
-NOTIFICATION SECURITY
-
-Never trust client input for:
-
-• Notification origin
-• Notification recipient
-• Security classification
-
-These come from server-side event context.
-
-────────────────────────────────────────
-
-MODERATION SECURITY
-
-Only authorized roles may:
-
-• Change moderation state
-• Access restricted evidence
-• Escalate safety cases
-• Restore content
-
-────────────────────────────────────────
-
-ADVERTISING SECURITY
-
-Protect against:
-
-• Duplicate impressions
-• Fake clicks
-• Budget race conditions
-• Frequency-cap bypass
-• Creative unauthorized edits
-
-────────────────────────────────────────
-
-PRIVACY SECURITY
-
-Protect against:
-
-• Unauthorized export
-• Export-token reuse
-• Deletion-request spoofing
-• Cross-user deletion
-• Privacy status tampering
-
-────────────────────────────────────────
-
-OBSERVABILITY
+==================================================
+64. OBSERVABILITY
+=================
 
 Instrument:
 
-• Message send
-• Message delivery
-• Message read
-• WebSocket connections
-• Notification creation
-• Push delivery
-• Moderation queue
-• Rights actions
-• Ad event ingestion
-• Commerce mutations
-• Privacy jobs
-• Admin actions
-
-Track:
-
-• Message latency
-• Delivery latency
-• WebSocket connections
-• Notification latency
-• Push failure rate
-• Moderation backlog
-• Rights backlog
-• Analytics lag
-• Ad event lag
-• Privacy workflow duration
-• Queue depth
-• Kafka lag
-• Reconciliation mismatches
-
-Never log:
-
-• Message content
-• Private media URLs
-• Private moderation evidence
-• Push credentials
-• Export links
-• Sensitive personal data
-
-────────────────────────────────────────
-
-SLO / SLI
-
-Define SLOs for:
-
-• Message send
-• Message delivery
-• WebSocket connection
-• Notification generation
-• Push delivery
-• Moderation processing
-• Rights processing
-• Analytics ingestion
-• Privacy export
-• Privacy deletion
-• Ad event ingestion
-
-For each define:
-
-• SLI
-• Measurement
-• Target
-• Error budget
-• Alert threshold
-
-────────────────────────────────────────
-
-FAILURE MODES
-
-Define graceful behavior for:
-
-• WebSocket outage
-• Push provider outage
-• Email provider outage
-• Kafka delay
-• Redis failure
-• Moderation worker outage
-• Rights-provider outage
-• Analytics outage
-• Ad-event pipeline outage
-• Privacy worker failure
-
-Fallbacks:
-
-• Persist message and deliver later
-• Queue notifications
-• Retry moderation
-• Retry analytics
-• Queue privacy tasks
-• Preserve authoritative transaction state
-
-Never bypass:
-
-• Authorization
-• Privacy
-• Rights
-• Moderation
-
-────────────────────────────────────────
-
-TESTING
-
-MESSAGING:
-
-• Conversation creation
-• Membership
-• Message send
-• Idempotent retry
-• Ordering
-• Edit
-• Delete
-• Read
-• Reaction
-• Reply
-• Attachments
-• Message requests
-• Blocking
-
-WEBSOCKET:
-
-• Authentication
-• Subscription authorization
-• Reconnect
-• Duplicate events
-• Backpressure
-• Connection drain
-
-NOTIFICATIONS:
-
-• Event conversion
-• Grouping
-• Preferences
-• Push
-• Invalid token
-• Retry
-• Deduplication
-
-MODERATION:
-
-• Report
-• Case
-• Action
-• Appeal
-• Restore
-• Role authorization
-
-RIGHTS:
-
-• Claim
-• Restriction
-• Appeal
-• Restore
-• Region
-
-ADVERTISING:
-
-• Campaign
-• Budget
-• Eligibility
-• Frequency
-• Duplicate event
-• Reporting
-
-COMMERCE:
-
-• Catalog
-• Product
-• Tag
-• Authorization
-
-PRIVACY:
-
-• Export
-• Authorization
-• Expiration
-• Deletion
-• Reconciliation
-
-SECURITY:
-
-• IDOR
-• Admin escalation
-• Report abuse
-• Export abuse
-• Message enumeration
-• Conversation access
-
-CONCURRENCY:
-
-• Duplicate message
-• Delivery/read race
-• Moderation action race
-• Campaign budget race
-• Frequency-cap race
-• Privacy task race
-
-PERFORMANCE:
-
-• Concurrent messaging
-• WebSocket connections
-• Notification fanout
-• Moderation throughput
-• Analytics ingestion
-• Ad event ingestion
-• Privacy workloads
-
-────────────────────────────────────────
-
-DOCUMENTATION
-
-Generate:
-
-• Messaging architecture
-• Conversation model
-• Membership
-• Message model
-• Ordering
-• Idempotency
-• Delivery
-• Read receipts
-• Reactions
-• Replies
-• Attachments
-• Message requests
-• Real-time
-• Presence
-• Typing
-• Notification architecture
-• Notification grouping
-• Notification preferences
-• Push
-• FCM
-• APNS
-• Email
-• Moderation
-• Moderation cases
-• Moderation actions
-• Reporting
-• Safety
-• Appeals
-• Rights
-• Copyright claims
-• Rights enforcement
-• Creator analytics
-• Business analytics
-• Advertising
-• Campaigns
-• Ad sets
-• Creatives
-• Frequency caps
-• Ad events
-• Commerce
-• Product catalogs
-• Products
-• Product tags
-• Administration
-• Feature flags
-• Dynamic configuration
-• Audit
-• Privacy
-• Data export
-• Data deletion
-• Retention
-• Reconciliation
-• Security
-• Observability
-• Testing
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Update the backend Project Index with:
-
-• Messaging
-• Conversations
-• Participants
-• Message requests
-• Messages
-• Attachments
-• Reactions
-• Replies
-• Read state
-• Delivery state
-• Presence
-• Typing
-• WebSockets
-• Notifications
-• Preferences
-• Push devices
-• Notification delivery
-• Reports
-• Moderation cases
-• Moderation actions
-• Appeals
-• Safety escalations
-• Rights claims
-• Rights restrictions
-• Rights appeals
-• Creator analytics
-• Business analytics
-• Advertising
-• Ad accounts
-• Campaigns
-• Ad sets
-• Creatives
-• Placements
-• Frequency caps
-• Ad events
-• Commerce
-• Catalogs
-• Products
-• Product collections
-• Product tags
-• Privacy requests
-• Export artifacts
-• Deletion tasks
-• Admin roles
-• Audit logs
-• Feature flags
-• Configuration
-• Reconciliation
-• Kafka topics
-• BullMQ queues
-• Redis keys
-• Database migrations
-• APIs
-• WebSocket events
-• Tests
-• Security
-• Privacy
-• Observability
-• Generated files
-• Modified files
-• Remaining work
-• Current milestone
-• Dependencies
-
-────────────────────────────────────────
-
-IMPLEMENTATION MILESTONES
-
-BACKEND MILESTONE 31
-
-Messaging foundation, conversations, participants, membership authorization, message requests, message ordering, idempotent send, message persistence, and APIs.
-
-BACKEND MILESTONE 32
-
-Message attachments, reactions, replies, edits, deletions, read state, delivery state, blocking integration, privacy, and message retention.
-
-BACKEND MILESTONE 33
-
-WebSockets, Socket.IO, reconnect, presence, typing indicators, real-time delivery, connection authorization, Redis coordination, and backpressure.
-
-BACKEND MILESTONE 34
-
-Notifications, notification grouping, preferences, device registration, FCM/APNS adapters, push delivery, retries, deduplication, and in-app notifications.
-
-BACKEND MILESTONE 35
-
-Reporting, moderation cases, moderation actions, policy versioning, safety escalation, appeals, evidence references, and authorization.
-
-BACKEND MILESTONE 36
-
-Copyright/rights claims, restrictions, regional rights, audio restrictions, takedowns, appeals, restoration, expiration, and rights propagation.
-
-BACKEND MILESTONE 37
-
-Creator analytics, business analytics, aggregation pipelines, privacy-safe reporting, analytics reconciliation, and dashboard contracts.
-
-BACKEND MILESTONE 38
-
-Advertising accounts, campaigns, ad sets, creatives, placements, eligibility, budgets, frequency caps, event ingestion, fraud protection, and analytics.
-
-BACKEND MILESTONE 39
-
-Commerce catalogs, products, collections, product tagging, business permissions, privacy controls, administration, feature flags, configuration, audit, and reconciliation.
-
-BACKEND MILESTONE 40
-
-Privacy export/deletion, retention, cross-domain cleanup, full messaging/notification/moderation/rights/advertising/commerce integration, security hardening, performance testing, disaster recovery validation, documentation, and final Project Index completion.
-
-Each milestone should contain approximately 20–40 files where practical.
-
-Every milestone must compile before proceeding.
-
-────────────────────────────────────────
-
-OUTPUT FORMAT
-
-For every generated file provide:
-
-1. Exact file path
-2. Complete file contents
-
-Never truncate code.
-
-Never summarize source code instead of generating it.
-
-Never generate pseudo-code.
-
-Never generate placeholders.
-
-Never generate TODO implementations.
-
-When modifying an existing file:
-
-1. Provide the exact file path.
-2. State why it must change.
-3. Provide the complete updated file.
-
-Never regenerate unchanged files.
-
-────────────────────────────────────────
-
-SCOPE RESTRICTION
-
-This volume covers:
-
-• Messaging
-• Conversations
-• Message requests
-• Messages
-• Attachments
-• Reactions
-• Replies
-• Delivery
-• Read receipts
-• Presence
-• Typing
-• WebSockets
-• Notifications
-• Push
-• FCM
-• APNS
-• Reporting
-• Moderation
-• Safety
-• Appeals
-• Rights
-• Copyright
-• Creator analytics
-• Business analytics
-• Advertising
-• Commerce
-• Administration
-• Feature flags
-• Configuration
-• Audit
-• Privacy
-• Export
-• Deletion
-• Retention
-• Reconciliation
-• Security hardening
-• Operational hardening
-• Final backend integration
-
-Do not redesign or reimplement the previously approved:
-
-• Identity
-• Accounts
-• Profiles
-• Creators
-• Businesses
-• Devices
-• Sessions
-• Social graph
-• Posts
-• Reels
-• Stories
-• Media
-• Audio
-• Hashtags
-• Feed
-• Explore
-• Recommendations
-• Search
-• PostgreSQL
-• Prisma
-• Redis
-• Kafka
-• BullMQ
-• S3
-• Content authorization
-
-Consume their established APIs, repositories, events, queues, and ownership boundaries.
-
-Do not implement:
-
-• Frontend
-• Mobile
-• Infrastructure
-• Terraform
-• Kubernetes
-• CI/CD
-
-────────────────────────────────────────
-
-QUALITY BAR
-
-Treat messaging, notifications, moderation, rights, privacy, advertising, commerce, and administration as mission-critical systems.
-
-Assume:
-
-• Hundreds of millions of users
-• Massive messaging traffic
-• Billions of notification events
-• Large moderation workloads
-• Large rights workflows
-• Large creator analytics datasets
-• Large advertising event volumes
-• Large commerce catalogs
-• Massive privacy requests
-• Multiple regions
-• High availability
-• Strict privacy
-• Strict security
-
-Prioritize:
-
-• Message correctness
-• Message ordering
-• Idempotency
-• Real-time reliability
-• Notification reliability
-• Moderation safety
-• Rights correctness
-• Analytics accuracy
-• Advertising integrity
-• Commerce authorization
-• Privacy
-• Auditability
-• Reconciliation
-• Horizontal scalability
-• Observability
-• Fault tolerance
-• Maintainability
-• Production readiness
+- WebSocket connections
+- authentication handshakes
+- subscriptions
+- message creation
+- message persistence
+- event publication
+- event consumption
+- message delivery
+- read receipt processing
+- push delivery
+- Redis presence
+- BullMQ jobs
+
+Metrics should include:
+
+- active connections
+- connection failure rate
+- reconnect rate
+- message latency
+- persistence latency
+- delivery latency
+- read latency
+- push success rate
+- invalid token rate
+- queue latency
+- Kafka lag
+- Redis errors
+
+==================================================
+65. DISTRIBUTED TRACING
+=======================
+
+Propagate trace context across:
+
+HTTP
+→ message service
+→ database
+→ outbox
+→ Kafka/Redpanda
+→ real-time consumer
+→ Socket.IO
+→ push worker
+→ FCM/APNS
+
+This must permit end-to-end tracing of delayed or failed message delivery.
+
+==================================================
+66. TESTING
+===========
+
+Implement automated tests for:
+
+Conversations:
+
+- creation
+- duplicate prevention
+- membership
+- block rules
+- privacy rules
+
+Messages:
+
+- creation
+- idempotency
+- ordering
+- pagination
+- authorization
+- deletion
+- editing if supported
+
+Read/delivery:
+
+- acknowledgement
+- duplicate acknowledgement
+- read state
+- unread count
+
+Real-time:
+
+- authentication
+- authorization
+- subscriptions
+- reconnect
+- duplicate events
+- multi-instance delivery
+
+Presence:
+
+- heartbeat
+- expiration
+- multi-device state
+
+Push:
+
+- registration
+- FCM
+- APNS
+- retries
+- invalid tokens
+- preference suppression
+
+==================================================
+67. SECURITY TESTING
+====================
+
+Explicitly test:
+
+- unauthorized conversation access
+- conversation ID enumeration
+- message IDOR
+- blocked-user messaging
+- private attachment access
+- forged sender ID
+- forged delivery acknowledgement
+- forged read acknowledgement
+- token replay
+- WebSocket authentication bypass
+- WebSocket subscription bypass
+- push-token abuse
+- rate-limit bypass
+- reconnect flooding
+
+==================================================
+68. LOAD TESTING
+================
+
+Test:
+
+- many simultaneous connections
+- connection churn
+- message bursts
+- large conversation lists
+- high message-history pagination
+- reconnect storms
+- push bursts
+- Kafka lag
+- Redis degradation
+
+The system must remain stable under realistic spikes.
+
+==================================================
+69. ACCEPTANCE CRITERIA
+=======================
+
+This implementation is complete only when:
+
+- conversations work
+- conversation membership works
+- duplicate conversation creation is prevented
+- messages persist durably
+- message idempotency works
+- message ordering works
+- cursor pagination works
+- synchronization after reconnect works
+- delivery states work
+- read receipts work
+- unread state works
+- typing indicators work
+- presence works
+- multi-instance Socket.IO works
+- WebSocket authentication works
+- WebSocket authorization works
+- reconnection works
+- attachment upload/access works
+- message media privacy works
+- blocking rules work
+- messaging privacy rules work
+- message rate limiting works
+- abuse controls exist
+- durable messaging events work
+- outbox reliability works
+- push device registration works
+- FCM integration works
+- APNS integration works
+- invalid token handling works
+- push retries work
+- notification preferences work
+- Redis failure handling exists
+- Kafka failure handling exists
+- push-provider failure handling exists
+- observability exists
+- distributed tracing exists
+- critical tests pass
+- TypeScript compiles
+- Prisma migrations succeed
+- no required functionality remains a placeholder
+
+==================================================
+70. IMPLEMENTATION FINISHING RULE
+=================================
+
+Do not stop after creating schemas, WebSocket gateways, interfaces, or service skeletons.
+
+Implement the actual working system.
+
+Inspect the current repository first.
+
+Reuse compatible infrastructure.
+
+Integrate with existing modules.
+
+Do not rewrite unrelated working code.
+
+Validate:
+
+- formatting
+- linting
+- TypeScript
+- Prisma schema/migrations
+- HTTP API behavior
+- WebSocket behavior
+- Redis behavior
+- Kafka/Redpanda behavior
+- BullMQ workers
+- S3 attachment flow
+- FCM/APNS adapters
+- unit tests
+- integration tests
+- authorization/security tests
+- concurrency-sensitive behavior
+
+The resulting backend must provide a production-grade messaging and real-time communication system capable of operating across multiple application instances.

@@ -1,1999 +1,1475 @@
-You are operating in Senior Engineering Team Mode.
+# PROJECT 1 — INSTAGRAM-LIKE GLOBAL SOCIAL PLATFORM
 
-Build the production-ready backend for the discovery, feed, recommendation, Explore, trending, search, hashtags, audio discovery, engagement aggregation, and content-distribution systems of an enterprise-scale global visual-social platform comparable in architectural scope to Instagram.
+# BACKEND PROMPT — VOLUME 3
 
-The platform is an original implementation.
+# FEEDS, DISCOVERY, SEARCH, RECOMMENDATIONS, NOTIFICATIONS & ASYNCHRONOUS PROCESSING
 
-Do not copy proprietary source code, internal architecture, branding, confidential implementation details, proprietary algorithms, proprietary datasets, private implementation details, or internal systems from Instagram, Meta, or any other company.
+You are the Staff Backend Engineering team responsible for implementing the feed, discovery, search, recommendation, notification, event-processing, and related backend systems of a production-grade Instagram-like global social platform.
 
-This prompt is completely independent and may be executed in a separate conversation.
+This prompt is fully standalone. It does not depend on any other prompt, document, previous conversation, previous implementation, previous architecture, previous volume, approval, or hidden context.
 
-Use the previously approved architecture and previously implemented backend foundations as the single source of truth.
+You must inspect the current repository before making changes and integrate with compatible existing implementation.
 
-Do not redesign the approved architecture.
+Repository state is the source of truth for existing code.
 
-Do not generate frontend code.
+Implement real production functionality.
 
-Do not generate mobile code.
+Do not generate pseudo-code.
 
-Do not generate infrastructure implementation code.
+Do not create placeholder implementations.
 
-Do not generate Terraform.
+Do not use TODO/FIXME as substitutes for required behavior.
 
-Do not generate Kubernetes manifests.
+Do not claim functionality exists when it has not been implemented.
 
-Do not generate CI/CD workflows.
+Do not regenerate unchanged files.
 
-────────────────────────────────────────
+Preserve working unrelated functionality.
 
-MISSION
+==================================================
 
-Implement the production-ready backend required for:
+1. BACKEND SCOPE
+   ==================================================
 
-• Home feed
-• Following feed
-• Reels feed
-• Story tray
-• Explore
-• Recommendations
-• Candidate generation
-• Candidate eligibility
-• Ranking
-• Re-ranking
-• Diversity
-• Freshness
-• Negative feedback
-• Content affinity
-• Creator affinity
-• Hashtag affinity
-• Audio affinity
-• Trending
-• Personalized discovery
-• Creator discovery
-• User discovery
-• Hashtag discovery
-• Audio discovery
-• Feed pagination
-• Feed caching
-• Recommendation profiles
-• Recommendation features
-• Experimentation
-• Ranking versions
-• Candidate-source attribution
-• Feed impression tracking
-• Watch events
-• Engagement signals
-• Search
-• User search
-• Creator search
-• Post search
-• Reel search
-• Hashtag search
-• Audio search
-• Search suggestions
-• Search history foundation
-• Search indexing
-• Search deletion
-• Search reindexing
-• Search ranking
-• Search privacy filtering
-• Trending aggregation
-• Recommendation safety filtering
-• Discovery abuse protection
-• Engagement counters
-• Content distribution events
-• Feed reconciliation
+Implement the backend systems required for:
 
-The implementation must integrate with:
+- home feed
+- following feed
+- feed candidate generation
+- feed fanout
+- feed ranking
+- feed hydration
+- personalized discovery
+- recommendation signals
+- user search
+- hashtag search
+- content search
+- autocomplete
+- trending discovery
+- notification persistence
+- notification aggregation
+- push-notification orchestration
+- asynchronous domain-event processing
+- Kafka/Redpanda integration
+- BullMQ workers
+- OpenSearch/Elasticsearch synchronization
+- distributed caching
+- high-volume background processing
+- feed consistency and privacy enforcement
+- observability of all critical asynchronous workflows
 
-• Identity
-• Accounts
-• Profiles
-• Creators
-• Businesses
-• Devices
-• Social Graph
-• Blocks
-• Restrictions
-• Close Friends
-• Posts
-• Reels
-• Stories
-• Media
-• Audio
-• Hashtags
-• Mentions
-• Locations
-• Rights
-• Moderation
-• PostgreSQL
-• Prisma
-• Redis
-• Kafka/Redpanda
-• BullMQ
-• OpenSearch/Elasticsearch
-• WebSockets
-• S3/CDN
-• Observability
-• Security
-• Privacy
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
+==================================================
+2. REQUIRED TECHNOLOGY
+======================
 
 Backend:
 
-• Node.js
-• NestJS
-• TypeScript
+- Node.js
+- NestJS
+- TypeScript
 
-Database:
+Persistence:
 
-• PostgreSQL
-• Prisma ORM
+- PostgreSQL
+- Prisma ORM
 
-Cache:
+Caching:
 
-• Redis
+- Redis
 
 Event streaming:
 
-• Kafka or Redpanda
+- Kafka or Redpanda
 
-Background processing:
+Background jobs:
 
-• BullMQ
+- BullMQ
 
 Search:
 
-• Elasticsearch or OpenSearch
+- OpenSearch or Elasticsearch
+
+Media integration:
+
+- AWS S3
+- CloudFront
+
+Push notifications:
+
+- Firebase Cloud Messaging
+- Apple Push Notification service
+
+Real-time integration:
+
+- Socket.IO
+- WebSockets
 
 Observability:
 
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
+- OpenTelemetry
+- Prometheus
+- Grafana
+- Loki
+- Tempo
+
+==================================================
+3. DOMAIN MODULES
+=================
+
+Create or integrate modules for:
+
+- feed
+- feed-candidates
+- feed-ranking
+- discovery
+- recommendations
+- search
+- hashtags
+- trending
+- notifications
+- push-notifications
+- events
+- event-consumers
+- background-jobs
+- cache
+- moderation integration
+
+Maintain clear domain boundaries.
+
+Do not move unrelated business logic into these modules.
+
+==================================================
+4. EVENT-DRIVEN FOUNDATION
+==========================
+
+Use Kafka or Redpanda for asynchronous domain-event propagation.
+
+Support events including:
+
+- UserRegistered
+- ProfileUpdated
+- FollowCreated
+- FollowRemoved
+- UserBlocked
+- UserUnblocked
+- UserMuted
+- UserUnmuted
+- UserRestricted
+- PostCreated
+- PostUpdated
+- PostDeleted
+- ReelPublished
+- StoryCreated
+- StoryExpired
+- PostLiked
+- PostUnliked
+- CommentCreated
+- CommentDeleted
+- PostSaved
+- PostUnsaved
+- PostShared
+- MessageCreated
+- ReportCreated
+- ModerationDecisionApplied
+
+Events must support:
+
+- event ID
+- event type
+- event version
+- aggregate ID
+- actor ID where appropriate
+- timestamp
+- correlation ID
+- trace ID
+- payload
+
+Never publish:
+
+- passwords
+- access tokens
+- refresh tokens
+- raw credentials
+- unnecessary private message contents
+
+==================================================
+5. OUTBOX PROCESSING
+====================
+
+Use an outbox-style pattern for critical domain events.
+
+The transactional workflow should be:
+
+database transaction
+→ authoritative state mutation
+→ outbox record
+
+Then:
+
+outbox
+→ Kafka/Redpanda
+→ consumers
 
-Testing:
+Publishing failure must not cause the original transaction to be rolled back after the business operation has succeeded.
 
-• Jest
-• Supertest
-• Integration testing
+Outbox processing must support:
 
-────────────────────────────────────────
+- retry
+- backoff
+- monitoring
+- replay
+- duplicate protection
+- failure classification
 
-IMPLEMENTATION RULES
+==================================================
+6. EVENT CONSUMER IDEMPOTENCY
+=============================
 
-Never generate pseudo-code.
+Consumers must assume at-least-once delivery.
 
-Never generate placeholders.
-
-Never generate TODO comments.
-
-Never omit implementations.
-
-Never say:
-
-- "implement similarly"
-- "left as an exercise"
-- "for brevity"
-- "remaining code omitted"
-
-Every generated file must be complete.
-
-Every generated file must compile.
-
-Never regenerate unchanged files.
-
-Only modify existing files when required.
-
-Use strict TypeScript.
-
-Use dependency injection.
-
-Keep controllers thin.
-
-Keep business logic outside controllers.
-
-Use repositories for persistence.
-
-Use DTOs for public contracts.
-
-Use centralized validation.
-
-Use centralized error handling.
-
-Use structured logging.
-
-Use idempotency for events and retriable operations.
-
-Use optimistic concurrency where appropriate.
-
-Never trust client-supplied ranking decisions.
-
-Never trust client-supplied content eligibility.
-
-Never expose internal recommendation features or ranking scores.
-
-────────────────────────────────────────
-
-DOMAIN OWNERSHIP
-
-Maintain explicit boundaries between:
-
-• Feed
-• Recommendations
-• Explore
-• Trending
-• Search
-• Hashtags
-• Audio discovery
-• Engagement signals
-• Content
-• Social graph
-• Moderation
-• Rights
-
-Do not make:
-
-• Search the source of truth for content
-• Feed the source of truth for content
-• Recommendation caches authoritative
-• Engagement counters authoritative over relationships
-• Trending directly controllable by clients
-
-────────────────────────────────────────
-
-FEED ARCHITECTURE
-
-Implement:
-
-Request
-→ Context
-→ Candidate Generation
-→ Eligibility
-→ Ranking
-→ Re-ranking
-→ Diversity
-→ Response
-→ Impression/Event recording
-
-Support feed types:
-
-• Home
-• Following
-• Reels
-
-────────────────────────────────────────
-
-FEED CONTEXT
-
-Context may include:
-
-• User
-• Account state
-• Follow graph
-• Blocks
-• Restrictions
-• Locale
-• Region
-• Device
-• App version
-• Recent interactions
-• Content history
-• Experiment assignment
-• Platform configuration
-
-Do not expose sensitive internal context to clients.
-
-────────────────────────────────────────
-
-CANDIDATE SOURCES
-
-Candidate generation may use:
-
-• Followed creators
-• Creator affinity
-• Similar content
-• Similar creators
-• Hashtag affinity
-• Audio affinity
-• Saved content
-• Previously interacted content
-• Trending content
-• Explore content
-• Fresh content
-• Business/creator discovery
-• Regional discovery
-
-Each candidate should retain source attribution internally.
-
-────────────────────────────────────────
-
-CANDIDATE BUDGETS
-
-Define per-source limits.
-
-Prevent one candidate source from overwhelming the entire feed.
-
-Support configurable budgets.
-
-────────────────────────────────────────
-
-CANDIDATE DEDUPLICATION
-
-Deduplicate using:
-
-• Content ID
-• Repost relationship
-• Original-content relationship
-
-Prevent multiple representations of the same content from consuming the same feed slots unnecessarily.
-
-────────────────────────────────────────
-
-ELIGIBILITY
-
-Every candidate must be evaluated for:
-
-• Account status
-• Content status
-• Visibility
-• Private account
-• Follow relationship
-• Block
-• Restriction
-• Rights
-• Moderation
-• Region
-• Age/safety policy
-• Recommendation eligibility
-
-Eligibility must be server-side.
-
-────────────────────────────────────────
-
-DELETED CONTENT
-
-Deleted content must not be returned from:
-
-• Home
-• Following
-• Explore
-• Reels
-• Recommendations
-• Trending
-
-Use event propagation and defensive read-time filtering.
-
-────────────────────────────────────────
-
-PRIVATE CONTENT
-
-Private content can appear only when:
-
-• Viewer is authorized
-• Follow relationship permits it
-• Visibility policy permits it
-
-Private content must never enter public recommendation surfaces.
-
-────────────────────────────────────────
-
-BLOCKING
-
-Blocked users/content must be filtered from:
-
-• Feed
-• Explore
-• Search
-• Recommendations
-• Stories
-• Reels
-
-Use graph events and read-time validation.
-
-────────────────────────────────────────
-
-RIGHTS / MODERATION FILTER
-
-Content restricted by:
-
-• Copyright
-• Region
-• Safety
-• Moderation
-• Account suspension
-
-must be excluded from discovery.
-
-────────────────────────────────────────
-
-RANKING ARCHITECTURE
-
-Implement pluggable ranking stages:
-
-• Candidate scoring
-• Relevance
-• Engagement likelihood
-• Freshness
-• Creator affinity
-• Topic affinity
-• Quality
-• Diversity
-• Re-ranking
-
-Do not embed model-specific implementation details into controllers.
-
-────────────────────────────────────────
-
-RANKING VERSION
-
-Every feed response should internally record:
-
-• Ranking version
-• Candidate version
-• Eligibility version
-• Experiment assignment
-• Feed type
-
-Do not expose proprietary scoring details publicly.
-
-────────────────────────────────────────
-
-RANKING SIGNALS
-
-Potential signals:
-
-• Impression
-• Watch duration
-• Completion
-• Rewatch
-• Like
-• Comment
-• Share
-• Save
-• Repost
-• Follow
-• Profile visit
-• Negative feedback
-• Freshness
-• Creator affinity
-• Content affinity
-• Search interaction
-
-Signal availability must respect privacy policy.
-
-────────────────────────────────────────
-
-WATCH SIGNALS
-
-Track:
-
-• Start
-• Watch duration
-• Completion
-• Rewatch
-• Skip
-
-Do not treat a single noisy event as definitive preference.
-
-────────────────────────────────────────
-
-NEGATIVE SIGNALS
-
-Support:
-
-• Not interested
-• Hide content
-• Hide creator
-• Mute creator/topic
-• Report
-
-Negative feedback must influence future candidate eligibility or ranking according to policy.
-
-────────────────────────────────────────
-
-RE-RANKING
-
-Apply constraints for:
-
-• Creator diversity
-• Topic diversity
-• Audio diversity
-• Format diversity
-• Freshness
-• Repetition limits
-
-Do not let re-ranking violate:
-
-• Privacy
-• Rights
-• Moderation
-• Blocking
-
-────────────────────────────────────────
-
-DIVERSITY
-
-Prevent excessive concentration around:
-
-• One creator
-• One hashtag
-• One audio
-• One topic
-• One content format
-
-Define configurable constraints.
-
-────────────────────────────────────────
-
-FRESHNESS
-
-Support:
-
-• New-content boost
-• Time decay
-• Freshness windows
-
-Avoid burying high-quality content immediately after publication.
-
-────────────────────────────────────────
-
-FEED PAGINATION
-
-Use opaque cursor pagination.
-
-Cursor must account for:
-
-• Feed type
-• Ranking version where appropriate
-• Feed session
-• Position
-• Expiration
-
-Prevent:
-
-• Duplicate items
-• Unexpected ordering
-• Cross-feed cursor reuse
-
-────────────────────────────────────────
-
-FEED SESSION
-
-Represent:
-
-• Session ID
-• User
-• Feed type
-• Ranking version
-• Created time
-• Expiration
-• Cursor state
-
-Session state may be cached.
-
-Do not make feed cache authoritative.
-
-────────────────────────────────────────
-
-FEED CACHE
-
-Use Redis for:
-
-• Feed candidate pages
-• Candidate pools
-• Story tray
-• Following feed
-• Reels feed
-• Explore
-
-Keys include:
-
-• Environment
-• Region
-• User
-• Feed type
-• Ranking version
-
-────────────────────────────────────────
-
-CACHE STAMPEDE PROTECTION
-
-Implement:
-
-• Request coalescing
-• Short locks
-• Jittered expiration
-• Background refresh where justified
-
-Do not allow large user populations to regenerate identical candidate pools simultaneously.
-
-────────────────────────────────────────
-
-FOLLOWING FEED
-
-Primary source:
-
-• Followed accounts
-
-Still enforce:
-
-• Block
-• Restriction
-• Private visibility
-• Deleted content
-• Moderation
-• Rights
-
-────────────────────────────────────────
-
-HOME FEED
-
-Potential sources:
-
-• Followed accounts
-• Recommendations
-• Similar content
-• Trending
-• Discovery
-
-Apply personalized ranking.
-
-────────────────────────────────────────
-
-REELS FEED
-
-Candidate sources:
-
-• Fresh reels
-• Creator affinity
-• Similar content
-• Trending audio
-• Trending topics
-• Exploration
-
-Use separate ranking configuration from standard posts.
-
-────────────────────────────────────────
-
-STORY TRAY
-
-Implement:
-
-• Candidate generation
-• Eligibility
-• Seen state
-• Unseen priority
-• Close friends
-• Recency
-• Creator affinity
-
-Do not return expired stories.
-
-────────────────────────────────────────
-
-STORY VIEW STATE
-
-Track:
-
-• Story item
-• Viewer
-• Seen timestamp
-
-Use efficient uniqueness and idempotency.
-
-────────────────────────────────────────
-
-EXPLORE
-
-Implement discovery independent of the home feed.
-
-Support:
-
-• Posts
-• Reels
-• Creators
-• Hashtags
-• Audio
-
-Potential signals:
-
-• Global popularity
-• Regional popularity
-• Topic affinity
-• Creator affinity
-• Freshness
-• Engagement quality
-• Diversity
-
-────────────────────────────────────────
-
-EXPLORE ELIGIBILITY
-
-Exclude:
-
-• Private content
-• Deleted content
-• Blocked accounts
-• Restricted content
-• Rights-restricted content
-• Safety-restricted content
-
-────────────────────────────────────────
-
-TRENDING
-
-Implement aggregation for:
-
-• Hashtags
-• Audio
-• Creators
-• Topics
-• Reels
-• Posts
-
-Signals:
-
-• Velocity
-• Engagement
-• Freshness
-• Distinct users
-• Distinct creators
-• Geographic distribution
-• Abuse-adjusted activity
-
-────────────────────────────────────────
-
-TRENDING WINDOW
-
-Support configurable windows such as:
-
-• Minutes
-• Hour
-• Several hours
-• Daily
-
-Use event streams and aggregation rather than synchronous counters for every request.
-
-────────────────────────────────────────
-
-TRENDING ABUSE
-
-Do not allow raw volume alone to determine trending.
-
-Adjust for:
-
-• Spam
-• Bot signals
-• Coordinated behavior
-• Duplicate events
-• Suspicious bursts
-
-────────────────────────────────────────
-
-RECOMMENDATION PROFILE
-
-Define internal profile containing:
-
-• Content affinities
-• Creator affinities
-• Hashtag affinities
-• Audio affinities
-• Negative signals
-• Topic interests
-• Experiment assignments
-• Model/ranking version
-
-Do not store prohibited or unnecessary sensitive attributes.
-
-────────────────────────────────────────
-
-RECOMMENDATION FEATURES
-
-Features may be:
-
-• User-level
-• Content-level
-• Creator-level
-• Interaction-level
-• Temporal
-• Aggregate
-
-Separate:
-
-• Raw events
-• Derived features
-• Model inputs
-
-────────────────────────────────────────
-
-FEATURE FRESHNESS
-
-Track:
-
-• Feature version
-• Generated timestamp
-• Expiration
-• Source
-
-Do not use stale high-impact features indefinitely.
-
-────────────────────────────────────────
-
-EXPERIMENTATION
-
-Support:
-
-• Experiment
-• Variant
-• Assignment
-• Start/end time
-• Eligibility
-• Region
-• Platform
-
-Persist assignment deterministically.
-
-────────────────────────────────────────
-
-EXPERIMENT ISOLATION
-
-Do not mix experimental ranking behavior across incompatible feed sessions without explicit handling.
-
-Every experiment must have:
-
-• Owner
-• Version
-• Status
-• Configuration
-
-────────────────────────────────────────
-
-SEARCH ARCHITECTURE
-
-Search:
-
-• Users
-• Creators
-• Posts
-• Reels
-• Hashtags
-• Audio
-
-Optional:
-
-• Public businesses
-• Public locations
-
-────────────────────────────────────────
-
-SEARCH QUERY MODEL
-
-Track:
-
-• Query
-• Normalized query
-• User context where allowed
-• Region
-• Language
-• Search type
-• Session ID
-• Timestamp
-
-Do not retain raw query history indefinitely.
-
-────────────────────────────────────────
-
-SEARCH NORMALIZATION
-
-Normalize:
-
-• Case
-• Unicode
-• Whitespace
-• Hashtag syntax
-• Common variations
-
-Do not destroy user-visible spelling unnecessarily.
-
-────────────────────────────────────────
-
-SEARCH RESULTS
-
-Return:
-
-• Public ID
-• Display name/title
-• Thumbnail where available
-• Content type
-• Creator
-• Relevance metadata safe for public use
-
-Do not expose:
-
-• Internal scores
-• Fraud signals
-• Moderation internals
-• Recommendation features
-
-────────────────────────────────────────
-
-SEARCH RANKING
-
-Rank using:
-
-• Text relevance
-• Popularity
-• Freshness
-• User context where permitted
-• Social context
-• Content quality
-• Region
-
-Ranking must remain pluggable.
-
-────────────────────────────────────────
-
-SEARCH PRIVACY
-
-Before returning a result check:
-
-• Account visibility
-• Content visibility
-• Block
-• Restriction
-• Rights
-• Moderation
-• Region
-
-Private content must never appear to unauthorized users.
-
-────────────────────────────────────────
-
-SEARCH INDEXING
-
-Pipeline:
-
-Canonical Content
-→ Event
-→ Queue
-→ Search Document
-→ Search Index
-
-Support:
-
-• Create
-• Update
-• Delete
-• Bulk indexing
-• Full rebuild
-• Alias switching
-
-────────────────────────────────────────
-
-SEARCH DELETE
-
-When content becomes:
-
-• Deleted
-• Private
-• Moderated
-• Rights restricted
-• Account restricted
-
-trigger index removal/update.
-
-────────────────────────────────────────
-
-SEARCH REINDEX
-
-Support:
-
-• New index
-• Bulk indexing
-• Document validation
-• Count validation
-• Sample query validation
-• Alias switch
-• Rollback
-
-Never destroy the current index before validating the replacement.
-
-────────────────────────────────────────
-
-SEARCH SUGGESTIONS
-
-Support:
-
-• User
-• Creator
-• Hashtag
-• Audio
-• Recent query foundation
-
-Do not expose other users' private search histories.
-
-────────────────────────────────────────
-
-SEARCH HISTORY
-
-Where product policy permits:
-
-• Store user search history
-• Read own history
-• Clear history
-• Delete individual history item
-• Delete all history
-
-History must remain private.
-
-────────────────────────────────────────
-
-HASHTAG DISCOVERY
-
-Support:
-
-• Hashtag page
-• Related hashtags
-• Popular posts
-• Popular reels
-• Recent content
-• Trending
-
-Apply privacy, moderation, and rights filters.
-
-────────────────────────────────────────
-
-HASHTAG RANKING
-
-Signals:
-
-• Usage
-• Velocity
-• Engagement
-• Freshness
-• Distinct authors
-• Abuse-adjusted volume
-
-────────────────────────────────────────
-
-AUDIO DISCOVERY
-
-Support:
-
-• Search
-• Audio page
-• Related audio
-• Trending audio
-• Reels using audio
-• Usage count
-
-Respect:
-
-• Rights
-• Region
-• Moderation
-
-────────────────────────────────────────
-
-ENGAGEMENT AGGREGATES
-
-Maintain derived counters for:
-
-• Likes
-• Comments
-• Shares
-• Saves
-• Reposts
-• Views
-• Follows
-
-Counters must be derived from authoritative records/events.
-
-────────────────────────────────────────
-
-COUNTER RECONCILIATION
-
-Periodically compare aggregates against source data.
-
-Repair discrepancies.
-
-Do not use Redis-only counters as the permanent source of truth.
-
-────────────────────────────────────────
-
-IMPRESSION EVENTS
-
-Track:
-
-• Feed impression
-• Explore impression
-• Reel impression
-• Story impression
-• Search result impression
-
-Include internal:
-
-• Feed session
-• Candidate source
-• Ranking version
-• Position
-
-Do not expose ranking details to end users.
-
-────────────────────────────────────────
-
-EVENT DEDUPLICATION
-
-Impression/engagement events may be retried.
+Every side effect should be idempotent where practical.
 
 Use:
 
-• Event ID
-• Client event ID
-• Idempotency key
+- event IDs
+- consumer checkpoints
+- unique constraints
+- deduplication records
+- deterministic writes
 
-Avoid duplicate analytics signals.
+Consumers must not create duplicate:
 
-────────────────────────────────────────
+- notifications
+- feed entries
+- search documents
+- recommendation events
+- analytics records
 
-CONTENT DISTRIBUTION EVENTS
-
-Publish:
-
-• Content eligible
-• Content published
-• Content restricted
-• Content deleted
-• Content restored
-• Creator blocked
-• Rights restriction
-• Moderation restriction
+==================================================
+7. FEED ARCHITECTURE
+====================
 
-Consumers include:
+Implement a scalable hybrid feed.
 
-• Feed
-• Search
-• Explore
-• Trending
-• Recommendation
+The feed should combine:
 
-────────────────────────────────────────
+- followed-account content
+- relationship signals
+- freshness
+- engagement
+- content quality
+- personalized relevance
 
-KAFKA EVENTS
+Use an architecture that can combine:
 
-DISCOVERY:
+- fanout-on-write
+- fanout-on-read
+- candidate generation
+- ranking
 
-• FeedRequested
-• FeedGenerated
-• CandidateGenerated
-• RecommendationServed
-• ExploreGenerated
-• SearchPerformed
-• SearchSuggestionSelected
+Do not force every followed user into synchronous fanout.
 
-ENGAGEMENT:
+==================================================
+8. FOLLOWED-CONTENT FANOUT
+==========================
 
-• ContentImpression
-• ContentWatched
-• ContentCompleted
-• ContentRewatched
-• ContentSkipped
-• ContentLiked
-• ContentCommented
-• ContentShared
-• ContentSaved
-• ContentReposted
-• ProfileViewed
-• CreatorFollowed
-• NegativeFeedbackRecorded
+When a user creates eligible content:
 
-TRENDING:
+PostCreated
+→ determine distribution strategy
+→ generate candidate feed updates
+→ process asynchronously
 
-• TrendingSignalGenerated
-• TrendingItemUpdated
+For normal accounts, asynchronous fanout may be appropriate.
 
-SEARCH:
+For extremely high-follower accounts, avoid creating a huge synchronous write amplification event.
 
-• SearchIndexRequested
-• SearchIndexUpdated
-• SearchIndexDeleted
+Use read-time candidate expansion or specialized treatment where appropriate.
 
-EXPERIMENTS:
+==================================================
+9. CELEBRITY / HIGH-DEGREE ACCOUNTS
+===================================
 
-• ExperimentAssigned
-• ExperimentExposureRecorded
+Support users with very large follower counts.
 
-All events must:
+Do not create a workflow such as:
 
-• Be versioned
-• Be idempotent
-• Include correlation metadata
-• Minimize personal data
+new post
+→ synchronous write to millions of feed rows
 
-────────────────────────────────────────
+Instead use a strategy where high-degree creators are incorporated at read time or through controlled asynchronous fanout.
 
-BULLMQ
+The threshold for high-degree treatment must be configuration-driven.
 
-Queues:
+==================================================
+10. FEED CANDIDATE MODEL
+========================
 
-• Feed candidate refresh
-• Story tray refresh
-• Recommendation feature refresh
-• Search indexing
-• Search deletion
-• Full reindex
-• Trending aggregation
-• Feature aggregation
-• Counter reconciliation
-• Feed cache refresh
-• Ranking-model/config propagation
-• Cleanup
-• Privacy deletion propagation
+A feed candidate should contain enough information for efficient ranking without duplicating entire posts.
 
-Each queue requires:
+Potential information:
 
-• Job schema
-• Retry
-• Backoff
-• Timeout
-• Concurrency
-• Dead-letter handling
-• Idempotency
-• Metrics
+- content ID
+- author ID
+- candidate source
+- creation time
+- relationship signal
+- preliminary engagement signal
+- relevance metadata
+- eligibility state
+- ranking features
 
-────────────────────────────────────────
+Do not store sensitive private content directly inside feed caches when it can create privacy risk.
 
-DATABASE
+==================================================
+11. FEED ELIGIBILITY
+====================
 
-Implement Prisma models/migrations for:
+Before returning a feed item, verify eligibility based on:
 
-FEED:
+- content existence
+- content deletion
+- author account state
+- visibility
+- follow relationship
+- blocked relationship
+- muted author
+- restriction rules
+- moderation state
+- story/reel/post state
+- media availability
 
-• FeedSession
-• FeedCandidateReference
-• FeedExposure
-• FeedConfiguration
-• RankingVersion
+Stale candidates must be filtered.
 
-RECOMMENDATION:
+Feed caches must never override authoritative privacy decisions.
 
-• RecommendationProfile
-• RecommendationFeature
-• RecommendationExperiment
-• ExperimentAssignment
+==================================================
+12. FEED RANKING
+================
 
-SEARCH:
+Ranking may consider:
 
-• SearchQueryReference
-• SearchIndexVersion
-• SearchConfiguration
+- freshness
+- user-author affinity
+- previous engagement
+- content engagement quality
+- relationship strength
+- content type
+- historical interaction
+- negative feedback
+- frequency controls
 
-TRENDING:
+Ranking logic must remain deterministic enough for debugging and experimentation.
 
-• TrendingEntity
-• TrendingSnapshot
-• TrendingSignalAggregate
+Feature computation must have bounded latency.
 
-ENGAGEMENT:
+==================================================
+13. RANKING FAILURE
+===================
 
-• EngagementAggregate
-• CounterReconciliation
+If ranking dependencies fail or exceed their latency budget:
 
-ANALYTICS REFERENCES:
+- return a safe fallback feed
+- preserve authorization
+- preserve privacy
+- avoid blocking the entire application
+- record telemetry
 
-• ImpressionReference
-• WatchEventReference
-• NegativeFeedbackReference
+A ranking failure must not result in exposing unauthorized content.
 
-Use:
+==================================================
+14. FEED HYDRATION
+==================
 
-• Foreign keys
-• Unique constraints
-• Composite indexes
-• Version fields
-• Timestamps
-• Expiration
+Avoid N+1 database requests.
 
-────────────────────────────────────────
+Given a set of ranked content IDs:
 
-DATABASE INDEXING
+- batch-load posts
+- batch-load authors
+- batch-load media metadata
+- batch-load engagement summaries
+- batch-load relationship state
 
-Feed:
+Assemble response DTOs efficiently.
 
-• User
-• Feed type
-• Created
-• Expiration
+Limit database round trips.
 
-Recommendations:
-
-• User
-• Feature type
-• Version
-• Updated
-
-Trending:
-
-• Entity
-• Region
-• Window
-• Timestamp
-
-Search:
-
-• User
-• Search session
-• Timestamp where retained
-
-Exposure:
-
-• User
-• Content
-• Session
-• Timestamp
-
-────────────────────────────────────────
-
-REDIS
-
-Use Redis for:
-
-• Feed cache
-• Story tray
-• Explore candidates
-• Recommendation feature cache
-• Trending state
-• Search suggestions
-• Search result cache
-• Feed-generation locks
-• Experiment assignment cache
-• Rate limiting
-
-Never use Redis as authoritative storage for:
-
-• Feed relationships
-• Content
-• Search history
-• Recommendation decisions
-• Engagement relationships
-• User privacy
-
-────────────────────────────────────────
-
-API
-
-FEED
-
-• Get home feed
-• Get following feed
-• Get reels feed
-• Refresh feed
-• Continue feed using cursor
-
-EXPLORE
-
-• Get explore
-• Refresh explore
-
-RECOMMENDATIONS
-
-• Get recommended creators
-• Get recommended content
-• Submit negative feedback
-
-SEARCH
-
-• Search
-• Suggestions
-• Search history
-• Clear search history
-
-HASHTAGS
-
-• Get hashtag
-• Get related hashtags
-• Get trending hashtags
-
-AUDIO
-
-• Search audio
-• Get audio
-• Get related audio
-• Get trending audio
-
-TRENDING
-
-• Get trending content
-• Get trending creators
-• Get trending hashtags
-• Get trending audio
-
-ENGAGEMENT SIGNALS
-
-Internal endpoints/services for:
-
-• Impression ingestion
-• Watch ingestion
-• Completion
-• Rewatch
-• Negative feedback
-
-Do not expose internal ranking controls as public APIs.
-
-────────────────────────────────────────
-
-FEED API
+==================================================
+15. FEED PAGINATION
+===================
 
 Use cursor pagination.
 
-Response may include:
-
-• Content
-• Creator
-• Media
-• Minimal ranking metadata required by client
-• Feed session cursor
-
-Do not expose:
-
-• Ranking score
-• Model features
-• Fraud score
-• Experiment internals
-
-────────────────────────────────────────
-
-RECOMMENDATION API
-
-Server controls:
-
-• Eligibility
-• Candidate count
-• Ranking
-• Diversity
-• Safety
-
-Client only requests recommendations.
-
-────────────────────────────────────────
-
-NEGATIVE FEEDBACK API
-
-Support:
-
-• Not interested
-• Hide creator
-• Hide topic
-• Report
-
-Requests are idempotent.
-
-────────────────────────────────────────
-
-SEARCH API
-
-Support:
-
-• Query
-• Type/filter
-• Cursor
-• Language
-• Region
-
-Server controls:
-
-• Maximum query length
-• Result count
-• Rate limits
-• Privacy filtering
-
-────────────────────────────────────────
-
-SECURITY
+A cursor should encode enough information to maintain stable retrieval semantics without exposing internal database structure.
 
 Protect against:
 
-• Feed scraping
-• Search scraping
-• Recommendation scraping
-• Content enumeration
-• Ranking extraction
-• Experiment leakage
-• Trending manipulation
-• Fake engagement
-• Bot activity
-• Query abuse
-• Cache poisoning
+- modified cursors
+- invalid cursors
+- cursor expiration where required
+- duplicate items across pages
+
+Define deterministic tie-breakers for items with identical timestamps.
+
+==================================================
+16. FEED DEDUPLICATION
+======================
+
+Prevent duplicated content in one feed page.
+
+Deduplicate by logical content identity.
+
+Handle cases where one content item appears through multiple candidate sources.
+
+Prefer deterministic prioritization of candidate sources.
+
+==================================================
+17. FEED CACHE
+==============
+
+Redis may cache:
+
+- candidate feed items
+- recent feed pages where appropriate
+- ranking features
+- relationship-derived signals
+
+Do not cache complete private responses indefinitely.
+
+Use short TTLs or invalidation where necessary.
+
+Cache design must account for:
+
+- stampede prevention
+- bounded memory
+- hot keys
+- expiration
+- versioning
+
+==================================================
+18. CACHE STAMPEDE PROTECTION
+=============================
+
+When a hot feed or profile cache expires:
+
+do not allow every concurrent request to regenerate the same expensive result.
+
+Use suitable mechanisms such as:
+
+- request coalescing
+- short locking
+- stale-while-revalidate
+- jittered TTLs
+
+Do not create distributed lock deadlocks.
+
+==================================================
+19. FOLLOWING FEED
+==================
+
+Provide an explicit following-content feed.
+
+It should support chronological or controlled ranking behavior.
+
+Respect:
+
+- privacy
+- block
+- mute
+- restriction
+- content deletion
+- account suspension
+
+Use cursor pagination.
+
+==================================================
+20. DISCOVERY FEED
+==================
+
+Implement discovery mechanisms for content outside the direct social graph.
+
+Candidate sources may include:
+
+- popular content
+- similar content
+- creator affinity
+- hashtags
+- trending content
+- engagement patterns
+- user interests
+
+Discovery must be privacy-aware.
+
+Do not recommend blocked or inaccessible content.
+
+==================================================
+21. RECOMMENDATION SIGNALS
+==========================
+
+Capture useful signals such as:
+
+- impressions
+- opens
+- likes
+- comments
+- saves
+- shares
+- follows after viewing
+- dwell or watch duration where product policy permits
+- hides
+- not-interested feedback
+- profile visits
+
+Store raw high-volume analytics through asynchronous pipelines rather than slowing user requests.
+
+==================================================
+22. RECOMMENDATION SAFETY
+=========================
+
+Recommendations must not expose:
+
+- deleted content
+- private content to unauthorized users
+- blocked users
+- moderation-rejected content
+- suspended accounts
+- content the viewer is prohibited from accessing
+
+Recommendation systems are derived systems.
+
+Authorization remains authoritative.
+
+==================================================
+23. SEARCH ARCHITECTURE
+=======================
+
+Use OpenSearch or Elasticsearch.
+
+Create appropriate indexes for:
+
+- users/profiles
+- hashtags
+- posts
+- reels
+- creators
+
+Search documents must contain only data intended for indexing.
+
+==================================================
+24. PROFILE INDEXING
+====================
+
+Index appropriate public profile data such as:
+
+- user ID
+- normalized username
+- display name
+- searchable biography fields where appropriate
+- creator metadata
+- profile status
+
+Do not index:
+
+- password-related fields
+- session information
+- private contact details
+- security metadata
+
+==================================================
+25. CONTENT INDEXING
+====================
+
+Posts and reels may be indexed with:
+
+- content ID
+- author
+- caption
+- hashtags
+- searchable metadata
+- content type
+- moderation state
+- publication timestamp
+
+Search documents must not become authoritative for visibility.
+
+==================================================
+26. INDEX UPDATE EVENTS
+=======================
+
+Use events such as:
+
+ProfileUpdated
+PostCreated
+PostUpdated
+PostDeleted
+ReelPublished
+ModerationDecisionApplied
+UserBlocked
+UserUnblocked
+
+Consumers should update search indexes asynchronously.
+
+==================================================
+27. INDEX CONSISTENCY
+=====================
+
+Search is eventually consistent.
+
+A profile or post update must succeed even if OpenSearch is temporarily unavailable.
+
+Indexing failures must:
+
+- retry
+- back off
+- enter dead-letter handling if necessary
+- be observable
+- remain replayable
+
+==================================================
+28. INDEX REBUILD
+=================
+
+Provide a rebuild strategy.
+
+The search index must be reconstructible from authoritative data.
+
+Do not design a system where a corrupted search index permanently loses searchable content.
+
+Rebuild workflows must be:
+
+- resumable
+- observable
+- bounded
+- rate-limited
+- safe to run alongside production traffic
+
+==================================================
+29. SEARCH PRIVACY
+==================
+
+Before returning a search result, ensure the result remains eligible.
+
+Search results must account for:
+
+- account visibility
+- private accounts
+- blocked users
+- deleted content
+- suspended users
+- moderation state
+
+A stale search result must not become a privacy bypass.
+
+==================================================
+30. SEARCH PAGINATION
+=====================
+
+Use search-engine-compatible cursor/search-after pagination for large result sets where appropriate.
+
+Avoid deep unrestricted pagination.
+
+Bound:
+
+- query size
+- requested page size
+- expensive sort operations
+
+==================================================
+31. AUTOCOMPLETE
+================
+
+Implement autocomplete for suitable entities such as:
+
+- usernames
+- hashtags
+
+Autocomplete must:
+
+- be latency-sensitive
+- have bounded query length
+- support normalization
+- prevent abuse
+- avoid returning unauthorized/deleted accounts
+
+Cache popular safe results where appropriate.
+
+==================================================
+32. TRENDING HASHTAGS
+=====================
+
+Design trending calculations as asynchronous aggregation.
+
+Signals may include:
+
+- post volume
+- growth rate
+- engagement
+- recency
+
+Do not calculate expensive global trends synchronously during user requests.
+
+Define abuse-resistant aggregation rules to reduce spam manipulation.
+
+==================================================
+33. NOTIFICATION DOMAIN
+=======================
+
+Implement durable Notification records.
+
+Support categories including:
+
+- follows
+- follow requests
+- likes
+- comments
+- replies
+- mentions
+- story interactions
+- system events
+- messages
+
+Notifications must identify:
+
+- recipient
+- notification type
+- actor where applicable
+- target content where applicable
+- created timestamp
+- read state
+- aggregation/group state
+
+==================================================
+34. NOTIFICATION CREATION
+=========================
+
+Notification flow:
+
+domain event
+→ notification policy
+→ authorization/privacy check
+→ preference check
+→ deduplication/aggregation
+→ notification persistence
+→ push job
+→ optional real-time event
+
+Notification persistence should not depend on push-provider availability.
+
+==================================================
+35. NOTIFICATION AGGREGATION
+============================
+
+Support aggregation for high-volume events.
+
+Example:
+
+multiple likes on the same content
+→ grouped notification state
+
+Do not generate unlimited notifications for rapid automated interaction.
+
+Aggregation rules must be deterministic.
+
+==================================================
+36. NOTIFICATION DEDUPLICATION
+==============================
+
+Avoid duplicate notifications caused by:
+
+- duplicate Kafka events
+- worker retries
+- API retries
+- consumer restarts
+
+Use durable idempotency keys derived from event identity and notification semantics.
+
+==================================================
+37. NOTIFICATION PREFERENCES
+============================
+
+Support user-configurable preferences for categories such as:
+
+- likes
+- comments
+- follows
+- mentions
+- messages
+- system notifications
+
+Preference changes must be evaluated before push dispatch.
+
+==================================================
+38. PUSH DEVICE MODEL
+=====================
+
+Track push-capable devices.
+
+Store:
+
+- user ID
+- device ID
+- platform
+- push token
+- token status
+- app version where useful
+- last active timestamp
+
+Avoid treating push tokens as permanent.
+
+==================================================
+39. PUSH NOTIFICATION PIPELINE
+==============================
+
+Use BullMQ for push delivery jobs.
+
+Workflow:
+
+notification
+→ eligibility/preferences
+→ push job
+→ provider
+→ provider result
+→ token state update
+
+Implement:
+
+- retry
+- exponential backoff
+- invalid-token handling
+- provider outage handling
+- rate limits
+- delivery metrics
+
+==================================================
+40. FCM / APNS INTEGRATION
+==========================
+
+Use provider adapters.
+
+Business logic should not depend directly on provider-specific request formats.
+
+Define an abstraction for:
+
+- send
+- failure mapping
+- invalid token
+- retryable error
+- permanent error
+
+Provider credentials must remain server-side.
+
+==================================================
+41. PUSH DELIVERY FAILURE
+=========================
+
+If FCM/APNS fails:
+
+- preserve durable notification
+- classify error
+- retry transient failures
+- stop sending to invalid devices
+- emit telemetry
+
+Do not delete notifications merely because push failed.
+
+==================================================
+42. REAL-TIME NOTIFICATIONS
+===========================
+
+Where supported, new notifications may also be delivered through authenticated WebSocket connections.
+
+Real-time delivery is supplemental.
+
+The durable Notification record remains authoritative.
+
+A reconnecting client must retrieve missed notifications through the API.
+
+==================================================
+43. BACKGROUND JOB QUEUES
+=========================
+
+Use separate BullMQ queues where workload characteristics differ.
+
+Recommended categories:
+
+- feed-fanout
+- feed-ranking-support
+- search-indexing
+- notification
+- push-notification
+- trending
+- analytics
+- cleanup
+
+Each queue requires:
+
+- concurrency limits
+- retry policy
+- timeout
+- backoff
+- dead-letter handling
+- metrics
+
+==================================================
+44. QUEUE PRIORITIES
+====================
+
+Prioritize user-visible operations appropriately.
+
+Examples:
+
+Higher priority:
+
+- push notifications
+- critical feed updates
+- security events
+
+Lower priority:
+
+- historical analytics aggregation
+- long-running index rebuilds
+- non-critical cleanup
+
+Do not starve lower-priority work indefinitely.
+
+==================================================
+45. EVENT RETRIES
+=================
+
+Retries must be bounded.
+
+Use exponential backoff where useful.
+
+Differentiate:
+
+- transient dependency failure
+- invalid payload
+- authorization failure
+- permanently invalid event
+- infrastructure failure
+
+Permanent failures should not loop forever.
+
+==================================================
+46. DEAD-LETTER HANDLING
+========================
+
+Persist failed messages/jobs in a recoverable dead-letter system.
+
+Dead-letter records should include:
+
+- original identifier
+- failure category
+- attempt count
+- last error classification
+- timestamps
+- relevant safe metadata
+
+Provide operational procedures for inspection and replay.
+
+Never store secrets in dead-letter payloads.
+
+==================================================
+47. EVENT ORDERING
+==================
+
+Where ordering matters, preserve ordering by appropriate aggregate key.
+
+Examples:
+
+- content lifecycle
+- relationship lifecycle
+- message lifecycle
+
+Do not assume global event ordering across all users and domains.
+
+==================================================
+48. ANALYTICS EVENTS
+====================
+
+Capture asynchronous events for:
+
+- feed impressions
+- content views
+- reel plays
+- story views
+- likes
+- comments
+- saves
+- shares
+- profile visits
+- follows
+- searches
+- notification interactions
+
+Analytics must not block the main user request path.
+
+==================================================
+49. ANALYTICS DATA PROTECTION
+=============================
+
+Analytics events must:
+
+- minimize unnecessary personal data
+- avoid raw credentials
+- avoid secrets
+- use stable identifiers where appropriate
+- support retention policies
+
+Do not log sensitive private message content merely for analytics.
+
+==================================================
+50. REDIS DESIGN
+================
+
+Use Redis for suitable high-speed state such as:
+
+- feed candidate caches
+- ranking feature caches
+- autocomplete caches
+- trending caches
+- notification unread counts
+- rate limiting
+- deduplication
+- short-lived locks
+- job coordination
+
+Define TTL and invalidation for every cache class.
+
+==================================================
+51. UNREAD NOTIFICATION COUNT
+=============================
+
+Support an efficient unread count.
+
+The count may be cached/derived.
+
+Authoritative notification state remains durable.
+
+Handle concurrent:
+
+- notification creation
+- notification read
+- bulk mark-read
+
+without producing negative or impossible counts.
+
+==================================================
+52. MARK NOTIFICATIONS READ
+===========================
+
+Support:
+
+- mark one read
+- mark multiple read
+- mark all read
+
+Operations must be idempotent.
+
+Do not allow users to mark another user's notifications.
+
+==================================================
+53. SEARCH RATE LIMITING
+========================
+
+Protect search and autocomplete against abuse.
+
+Use limits based on:
+
+- user
+- IP
+- device where appropriate
+
+Prevent expensive queries by enforcing:
+
+- minimum query quality
+- maximum query length
+- bounded filters
+- bounded result size
+
+==================================================
+54. FEED RATE LIMITING
+======================
+
+Protect feed endpoints against:
+
+- rapid refresh
+- scraping
+- automated pagination
+- cursor abuse
+
+Use cache-friendly request policies where possible.
+
+Do not allow limits to prevent ordinary user refresh behavior unnecessarily.
+
+==================================================
+55. HIGH-TRAFFIC CONTENT
+========================
+
+For viral content, avoid making one database object the bottleneck.
 
 Use:
 
-• Rate limiting
-• Authentication where required
-• Authorization
-• Device/account signals
-• Request budgets
-• Abuse controls
+- cached content summaries
+- asynchronous counter aggregation
+- distributed cache
+- batched ranking signals
+- rate-limited secondary processing
 
-────────────────────────────────────────
+Do not make every impression synchronously update one database row.
 
-PRIVACY
+==================================================
+56. COUNTER AGGREGATION
+=======================
 
-Protect:
+High-volume counters may use:
 
-• Search history
-• Recommendation profile
-• Negative feedback
-• Feed exposure history
-• Behavioral signals
-• Experiment assignments
+- Redis atomic increments
+- sharded counters
+- event streams
+- periodic durable aggregation
 
-Do not expose individualized ranking or behavioral data publicly.
+The displayed count may be eventually consistent.
 
-────────────────────────────────────────
+The underlying interaction records must remain correct.
 
-OBSERVABILITY
+==================================================
+57. FEED INVALIDATION
+=====================
+
+Content state changes should invalidate or suppress relevant feed candidates.
+
+Examples:
+
+PostDeleted
+→ remove/invalidate candidate
+
+UserBlocked
+→ suppress blocked-user content
+
+PrivacyChange
+→ recompute eligibility
+
+ModerationDecisionApplied
+→ suppress prohibited content
+
+Do not depend on eventual invalidation alone for authorization.
+
+==================================================
+58. USER MUTE INTEGRATION
+=========================
+
+When a user mutes another user:
+
+- feed candidate generation must suppress applicable content
+- discovery should suppress where appropriate
+- recommendations should incorporate the negative signal
+- existing cached results must expire/invalidate
+
+Mute state is user-specific.
+
+==================================================
+59. BLOCK INTEGRATION
+=====================
+
+When a block is created:
+
+- feed candidates must be filtered
+- search results must be filtered
+- recommendations must be filtered
+- notification generation must avoid prohibited interactions
+- messaging access must remain blocked where applicable
+
+Block state must be authoritative.
+
+==================================================
+60. PRIVATE ACCOUNT INTEGRATION
+===============================
+
+Feed/discovery/search pipelines must respect private accounts.
+
+Private content must not leak through:
+
+- cached candidates
+- search documents
+- recommendations
+- notifications
+- trending systems
+
+==================================================
+61. MODERATION INTEGRATION
+==========================
+
+Moderation state must affect:
+
+- feed eligibility
+- search eligibility
+- recommendations
+- notifications
+- trending
+- content discovery
+
+Moderated content must be removed from derived systems asynchronously.
+
+Until derived systems update, request-time authorization and moderation checks must protect access.
+
+==================================================
+62. OBSERVABILITY
+=================
 
 Instrument:
 
-• Feed generation
-• Candidate generation
-• Eligibility
-• Ranking
-• Re-ranking
-• Explore
-• Recommendation
-• Search
-• Autocomplete
-• Trending
-• Counter aggregation
-• Cache
+- Kafka/Redpanda producers
+- Kafka/Redpanda consumers
+- BullMQ jobs
+- feed generation
+- ranking
+- search
+- notification creation
+- push delivery
+- Redis
+- PostgreSQL
+- OpenSearch/Elasticsearch
 
-Track:
+Measure:
 
-• Feed latency
-• Candidate latency
-• Ranking latency
-• Recommendation latency
-• Search latency
-• Autocomplete latency
-• Cache hit ratio
-• Duplicate rate
-• Eligibility rejection rate
-• Kafka lag
-• Queue depth
-• Indexing lag
-• Feature freshness
-• Trending freshness
+- feed latency
+- ranking latency
+- candidate generation latency
+- queue depth
+- queue wait time
+- consumer lag
+- search latency
+- push success/failure
+- notification creation rate
+- duplicate-event rate
+- dead-letter volume
 
-────────────────────────────────────────
+==================================================
+63. DISTRIBUTED TRACING
+=======================
 
-SLO / SLI
+Propagate correlation and trace context across:
 
-Define SLOs for:
+HTTP
+→ application
+→ database
+→ outbox
+→ Kafka/Redpanda
+→ consumer
+→ BullMQ
+→ external provider
 
-• Home feed
-• Following feed
-• Reels feed
-• Explore
-• Recommendations
-• Search
-• Autocomplete
-• Trending
-• Impression ingestion
+A production incident must be traceable across asynchronous boundaries.
 
-For each define:
+==================================================
+64. FAILURE ISOLATION
+=====================
 
-• SLI
-• Measurement
-• Target
-• Error budget
-• Alert threshold
+The following failures must not unnecessarily prevent core user operations:
 
-────────────────────────────────────────
+Search failure must not prevent post creation.
 
-FAILURE MODES
+Notification provider failure must not prevent notification persistence.
 
-Define graceful fallback for:
+Ranking failure must not prevent content creation.
 
-• Recommendation outage
-• Ranking failure
-• Search outage
-• Trending outage
-• Redis failure
-• Kafka delay
-• OpenSearch outage
-• Feature-store/cache failure
+Kafka consumer lag must not make profile APIs unusable.
 
-Possible fallbacks:
+OpenSearch failure must not become the source of truth for access.
 
-• Following feed
-• Recent content
-• Popular content
-• Cached results
-• Previous valid ranking version
+Push-provider outage must not destroy durable notifications.
 
-Never bypass:
+==================================================
+65. RECOVERY
+============
 
-• Privacy
-• Rights
-• Moderation
-• Blocking
+All derived systems must be reconstructible.
 
-────────────────────────────────────────
+Feed candidates may be rebuilt.
 
-TESTING
+Search indexes may be rebuilt.
 
-UNIT TESTS
+Recommendation caches may be rebuilt.
+
+Notification push state may be retried.
+
+Redis caches may be discarded and regenerated.
+
+Do not make Redis-only data authoritative for critical durable business state.
+
+==================================================
+66. TESTING
+===========
+
+Implement automated tests covering:
+
+Feed:
+
+- pagination
+- candidate generation
+- ranking
+- privacy
+- deletion
+- block
+- mute
+- private account
+- duplicate prevention
+- fallback behavior
+
+Search:
+
+- indexing
+- deletion
+- privacy
+- autocomplete
+- pagination
+- index rebuild
+
+Notifications:
+
+- creation
+- deduplication
+- aggregation
+- preferences
+- unread counts
+- mark read
+- provider failure
+
+Events:
+
+- publication
+- duplicate delivery
+- consumer retries
+- ordering
+- dead-letter handling
+
+Queues:
+
+- retry
+- timeout
+- failure
+- idempotency
+- concurrency limits
+
+==================================================
+67. SECURITY TESTING
+====================
 
 Test:
 
-• Candidate eligibility
-• Ranking contract
-• Diversity
-• Freshness
-• Cursor generation
-• Feed session
-• Experiment assignment
-• Search normalization
-• Trending calculations
-• Negative feedback
-• Counter reconciliation
-
-FEED TESTS
-
-• Home
-• Following
-• Reels
-• Cursor pagination
-• Deduplication
-• Deleted content
-• Private content
-• Blocked content
-• Restricted content
-• Rights restriction
-• Cache behavior
-
-RECOMMENDATION TESTS
-
-• Candidate generation
-• Feature availability
-• Ranking
-• Diversity
-• Negative feedback
-• Experiment assignment
-• Model/version changes
-
-SEARCH TESTS
-
-• Users
-• Creators
-• Posts
-• Reels
-• Hashtags
-• Audio
-• Privacy
-• Deleted content
-• Typo
-• Prefix
-• Region
-
-TRENDING TESTS
-
-• Velocity
-• Freshness
-• Diversity
-• Distinct users
-• Abuse-adjustment
-• Window boundaries
-
-SECURITY TESTS
-
-• Feed scraping
-• Search scraping
-• Ranking extraction
-• Private-content leakage
-• Behavioral-data leakage
-• Rate-limit bypass
-
-CONCURRENCY
-
-• Duplicate impressions
-• Counter race
-• Feed-generation race
-• Search index update/delete race
-• Experiment assignment race
-
-PERFORMANCE
-
-• Feed generation
-• Search
-• Autocomplete
-• Trending
-• Recommendation
-
-────────────────────────────────────────
-
-DOCUMENTATION
-
-Generate:
-
-• Feed architecture
-• Feed session
-• Candidate generation
-• Candidate budgets
-• Eligibility
-• Ranking
-• Ranking versions
-• Re-ranking
-• Diversity
-• Freshness
-• Negative feedback
-• Feed pagination
-• Feed cache
-• Home feed
-• Following feed
-• Reels feed
-• Story tray
-• Explore
-• Trending
-• Recommendation profiles
-• Recommendation features
-• Experimentation
-• Search
-• Search history
-• Search normalization
-• Search ranking
-• Search indexing
-• Search deletion
-• Search reindexing
-• Search suggestions
-• Hashtags
-• Hashtag discovery
-• Audio discovery
-• Engagement aggregates
-• Counter reconciliation
-• Impression events
-• Event deduplication
-• Distribution events
-• Kafka event catalog
-• BullMQ queue catalog
-• Database schema
-• Redis key catalog
-• Security
-• Privacy
-• Observability
-• Testing
-• Failure modes
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Update the backend Project Index with:
-
-• Home feed
-• Following feed
-• Reels feed
-• Story tray
-• Feed sessions
-• Feed candidates
-• Candidate sources
-• Eligibility
-• Ranking
-• Ranking versions
-• Re-ranking
-• Diversity
-• Freshness
-• Negative feedback
-• Feed cache
-• Explore
-• Trending
-• Recommendation profiles
-• Recommendation features
-• Experiments
-• Search
-• Search suggestions
-• Search history
-• Search indexes
-• Search versions
-• Hashtags
-• Hashtag discovery
-• Audio discovery
-• Engagement aggregates
-• Counters
-• Counter reconciliation
-• Impressions
-• Watch events
-• Negative feedback events
-• Kafka topics
-• BullMQ queues
-• Redis keys
-• Database migrations
-• APIs
-• Tests
-• Security
-• Privacy
-• Observability
-• Generated files
-• Modified files
-• Remaining work
-• Current milestone
-• Dependencies
-
-────────────────────────────────────────
-
-IMPLEMENTATION MILESTONES
-
-BACKEND MILESTONE 21
-
-Feed service foundation, feed sessions, feed cursors, candidate-source abstraction, candidate budgets, eligibility, content-visibility filtering, and feed APIs.
-
-BACKEND MILESTONE 22
-
-Following feed, home feed, Reels feed, Story tray, feed caching, cache-stampede protection, pagination, deduplication, and content-distribution events.
-
-BACKEND MILESTONE 23
-
-Recommendation profiles, features, affinity signals, watch signals, negative feedback, ranking abstraction, ranking versions, experimentation, and recommendation APIs.
-
-BACKEND MILESTONE 24
-
-Re-ranking, diversity, freshness, creator/topic/audio balancing, model/configuration propagation, recommendation safety, and ranking observability.
-
-BACKEND MILESTONE 25
-
-Explore, personalized discovery, creator discovery, content discovery, regional discovery, Explore caching, and eligibility.
-
-BACKEND MILESTONE 26
-
-Trending infrastructure, velocity calculations, time windows, abuse-adjusted trending, regional trends, audio trends, hashtag trends, creator trends, and trending APIs.
-
-BACKEND MILESTONE 27
-
-Search backend, search normalization, search ranking, suggestions, search history, privacy filtering, search indexing, deletion, reindexing, and aliases.
-
-BACKEND MILESTONE 28
-
-Hashtag discovery, audio discovery, engagement-signal ingestion, impressions, watch events, negative feedback events, counter aggregation, and reconciliation.
-
-BACKEND MILESTONE 29
-
-Kafka/BullMQ integration, Redis optimization, failure handling, fallback feeds, search fallback, security hardening, scraping protection, privacy controls, and observability.
-
-BACKEND MILESTONE 30
-
-Full feed/recommendation/search integration, concurrency testing, load testing, ranking regression, privacy validation, security testing, documentation, and Project Index completion.
-
-Each milestone should contain approximately 20–40 files where practical.
-
-Every milestone must compile before proceeding.
-
-────────────────────────────────────────
-
-OUTPUT FORMAT
-
-For every generated file provide:
-
-1. Exact file path
-2. Complete file contents
-
-Never truncate code.
-
-Never summarize implementation instead of generating it.
-
-Never generate pseudo-code.
-
-Never generate placeholders.
-
-Never generate TODO implementations.
-
-When modifying an existing file:
-
-1. Provide the exact file path.
-2. State why it must change.
-3. Provide the complete updated file.
-
-Never regenerate unchanged files.
-
-────────────────────────────────────────
-
-SCOPE RESTRICTION
-
-This volume covers:
-
-• Feed
-• Explore
-• Recommendations
-• Candidate generation
-• Eligibility
-• Ranking
-• Re-ranking
-• Diversity
-• Freshness
-• Negative feedback
-• Feed pagination
-• Feed caching
-• Story tray
-• Trending
-• Search
-• Search suggestions
-• Search history
-• Search ranking
-• Search indexing
-• Search deletion
-• Search reindexing
-• Hashtag discovery
-• Audio discovery
-• Engagement signals
-• Impression events
-• Watch events
-• Counter aggregation
-• Counter reconciliation
-• Discovery security
-• Discovery privacy
-• Related events
-• Related queues
-• Related workers
-• Related APIs
-• Related tests
-
-Do not implement complete:
-
-• Messaging
-• Notification delivery
-• Full moderation platform
-• Full rights platform
-• Advertising
-• Commerce
-• Complete analytics warehouse
-• Administration UI
-• Frontend
-• Mobile
-• Infrastructure
-
-Use the existing identity, social graph, content, media, audio, hashtag, rights, moderation, PostgreSQL, Redis, Kafka, BullMQ, OpenSearch, and security foundations.
-
-────────────────────────────────────────
-
-QUALITY BAR
-
-Treat feed, recommendations, discovery, search, and trending as high-scale distributed systems.
-
-Assume:
-
-• Hundreds of millions of users
-• Billions of content objects
-• Massive feed traffic
-• Massive recommendation requests
-• Massive search traffic
-• Massive impression streams
-• Large real-time engagement streams
-• Multiple regions
-• Rapidly changing content
-• Strict privacy
-• Strict moderation and rights enforcement
-
-Prioritize:
-
-• Low latency
-• Recommendation safety
-• Feed correctness
-• Privacy
-• Ranking isolation
-• Eligibility correctness
-• Search relevance
-• Trending integrity
-• Cache efficiency
-• Event idempotency
-• Abuse resistance
-• Horizontal scalability
-• Observability
-• Fault tolerance
-• Maintainability
-• Production readiness
+- private-content search bypass
+- deleted-content search bypass
+- blocked-user discovery bypass
+- muted-user suppression
+- unauthorized notification access
+- push-token abuse
+- cursor manipulation
+- oversized search queries
+- feed scraping
+- event replay
+- duplicate job execution
+- unauthorized ranking-data access
+
+==================================================
+68. PERFORMANCE TESTING
+=======================
+
+Test realistic scenarios:
+
+- large follow graphs
+- high-degree creators
+- viral post
+- large feed page
+- concurrent feed requests
+- concurrent search
+- mass notifications
+- notification bursts
+- Kafka lag
+- queue backlog
+- OpenSearch latency
+- Redis cache loss
+- ranking dependency failure
+
+==================================================
+69. ACCEPTANCE CRITERIA
+=======================
+
+This implementation is complete only when:
+
+- feed architecture is implemented
+- following feed works
+- candidate generation works
+- hybrid fanout strategy works
+- high-degree accounts are handled safely
+- ranking is implemented
+- ranking fallback exists
+- feed hydration avoids N+1 behavior
+- cursor pagination works
+- feed deduplication works
+- cache strategy works
+- discovery works
+- recommendations work
+- search works
+- profile indexing works
+- content indexing works
+- search privacy is enforced
+- autocomplete works
+- trending aggregation exists
+- notifications persist correctly
+- notification aggregation works
+- notification deduplication works
+- notification preferences work
+- unread counts work
+- push device management works
+- FCM/APNS adapters work
+- push retries and invalid-token handling work
+- real-time notification integration works where applicable
+- Kafka/Redpanda event processing works
+- BullMQ queues/workers work
+- retry and dead-letter handling works
+- analytics events are processed asynchronously
+- Redis caching is implemented
+- block/mute/privacy integration works
+- moderation integration works
+- observability exists
+- tests cover critical paths
+- TypeScript compiles
+- database migrations succeed
+- no required functionality remains a placeholder
+
+==================================================
+70. IMPLEMENTATION FINISHING RULE
+=================================
+
+Do not stop after creating module structures, schemas, or interfaces.
+
+Implement the actual working behavior.
+
+Inspect the repository first.
+
+Reuse compatible components.
+
+Integrate with existing backend infrastructure.
+
+Modify only the files needed.
+
+Validate:
+
+- formatting
+- linting
+- type checking
+- Prisma schema/migrations
+- API behavior
+- event publication
+- event consumers
+- BullMQ workers
+- search integration
+- Redis behavior
+- unit tests
+- integration tests
+- security tests
+- performance-critical paths
+
+The resulting backend must provide a real, scalable feed, discovery, search, recommendation, notification, and asynchronous-processing subsystem.

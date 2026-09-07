@@ -1,5416 +1,1411 @@
-You are operating in Senior Engineering Team Mode.
+# PROJECT 1 — INSTAGRAM-LIKE GLOBAL SOCIAL PLATFORM
 
-The Master Prompt, Architecture Volume 1, Architecture Volume 2, and Backend Volume 1 have already been completed.
+# BACKEND PROMPT — VOLUME 2
 
-Backend Volume 1 established the backend foundation, including:
+# CONTENT, MEDIA, POSTS, STORIES, REELS & ENGAGEMENT
 
-- NestJS application architecture
-- configuration
-- request context
-- structured errors
-- validation
-- PostgreSQL/Prisma foundation
-- Redis foundation
-- transactional outbox
-- Kafka/Redpanda integration foundation
-- BullMQ foundation
-- health checks
-- authentication
-- accounts
-- sessions
-- devices
-- profiles
-- creator/professional profile foundations
-- follow relationships
-- follow requests
-- blocks
-- restrictions
-- close friends
-- authorization foundation
-- privacy foundation
-- API documentation
-- initial tests
+You are the Staff Backend Engineering team responsible for implementing the content and media backend of a production-grade Instagram-like global social platform.
 
-This volume continues directly from that implementation.
+This prompt is fully standalone. It does not depend on any other prompt, document, previous conversation, previous implementation, previous architecture, previous volume, approval, or hidden context.
 
-Do not restart the backend.
+You must inspect the current repository before making changes and integrate with compatible existing implementation.
 
-Do not replace working architecture.
+Repository state is the source of truth for code that already exists.
+
+Implement real production functionality.
+
+Do not generate pseudo-code.
+
+Do not create placeholder implementations.
+
+Do not use TODO/FIXME as substitutes for required behavior.
+
+Do not claim functionality is complete when it is not implemented.
 
 Do not regenerate unchanged files.
 
-Do not introduce an incompatible domain model.
-
-Use the approved architecture as the source of truth.
-
-==================================================
-BACKEND VOLUME 2 SCOPE
-======================
-
-Implement the complete media and content foundation:
-
-1. Media upload architecture
-2. Upload sessions
-3. Multipart/resumable upload support
-4. S3 integration
-5. Media metadata
-6. Image processing
-7. Video processing
-8. FFmpeg workers
-9. Thumbnail generation
-10. HLS generation
-11. Media variants
-12. Media security
-13. Posts
-14. Carousels
-15. Drafts
-16. Captions
-17. Mentions
-18. Hashtags
-19. Locations
-20. Post visibility
-21. Publication workflow
-22. Post scheduling
-23. Post editing
-24. Post deletion
-25. Post restoration
-26. Stories
-27. Story media
-28. Story viewers
-29. Story replies
-30. Story reactions
-31. Story expiration
-32. Story highlights
-33. Reels
-34. Reel media
-35. Reel audio references
-36. Reel publication
-37. Media/content moderation states
-38. Rights-related content state integration
-39. Content lifecycle events
-40. Media/content background jobs
-41. APIs
-42. Security
-43. Privacy
-44. Observability
-45. Automated tests
-
-==================================================
-IMPLEMENTATION RULES
-====================
-
-Production-grade implementation only.
-
-Never generate:
-
-- pseudo-code
-- placeholders
-- TODOs
-- incomplete implementations
-- fake production APIs
-- fake media processing
-- fake upload completion
-- fake S3 behavior
-- fake FFmpeg processing
-
-Every generated file must compile.
-
-Every changed database model must have a valid Prisma migration.
-
-Every state transition must be validated.
-
-Every content mutation must enforce authorization.
-
-Every media access path must enforce privacy.
-
-Every asynchronous operation must be retry-safe.
-
-Never regenerate unchanged files.
-
-==================================================
-CONTENT/MEDIA ARCHITECTURE
-==========================
-
-The core flow is:
-
-Client
-→ API
-→ Upload Session
-→ S3
-→ Processing Queue
-→ Media Processor
-→ Derived Media
-→ Database State Update
-→ Event
-→ CDN delivery
-
-For publishing:
-
-Client
-→ Content Draft
-→ Media Validation
-→ Content Validation
-→ Publication Transaction
-→ Event
-→ Feed/Search/Recommendation consumers later
-
-Do not make feed/search/recommendation implementation part of this volume.
+Preserve existing working functionality unless modification is required for this scope.
 
 ==================================================
 
-1. MEDIA DOMAIN FOUNDATION
+1. BACKEND SCOPE
    ==================================================
 
-Create the media domain/application/infrastructure structure.
+Implement the backend systems required for:
 
-Media responsibilities include:
-
-- upload authorization
-- upload sessions
-- object references
-- media metadata
-- processing state
-- variants
+- media upload authorization
+- media lifecycle management
+- image processing
+- video processing
 - thumbnails
-- video derivatives
-- HLS
-- media deletion
-- media restoration
-- secure access
-
-Do not mix media infrastructure logic directly into post business logic.
-
-==================================================
-2. MEDIA ENTITY
-===============
-
-Define and implement the media model required by the architecture.
-
-Support fields conceptually including:
-
-- ID
-- owner
-- storage location
-- media type
-- MIME type
-- size
-- checksum
-- width
-- height
-- duration
-- orientation where needed
-- status
-- processing state
-- visibility/access metadata
-- createdAt
-- updatedAt
-- deletedAt where required
-
-Use the approved database design.
-
-==================================================
-3. UPLOAD SESSION
-=================
-
-Implement upload sessions.
-
-A session must support:
-
-- initialization
-- ownership
-- expected file type
-- expected size
-- upload state
-- expiration
-- completion
-- cancellation
-- failure
-
-Validate ownership on every operation.
-
-==================================================
-4. DIRECT S3 UPLOAD
-===================
-
-Implement secure S3 upload initialization.
-
-Where the architecture specifies presigned upload:
-
-1. authenticate user;
-2. validate requested media;
-3. create upload session;
-4. generate authorized upload information;
-5. return only safe client-facing information.
-
-Never return AWS credentials.
-
-==================================================
-5. MULTIPART/RESUMABLE UPLOAD
-=============================
-
-Support multipart/resumable upload where required.
-
-Implement:
-
-- initiate
-- upload parts
-- complete
-- abort
-- expiration
-
-Do not allow a user to complete another user's upload session.
-
-==================================================
-6. UPLOAD VALIDATION
-====================
-
-Validate:
-
-- MIME type
-- extension
-- size
-- media category
-- expected dimensions where appropriate
-
-Never rely solely on client-provided MIME type.
-
-Where feasible, verify actual file characteristics during processing.
-
-==================================================
-7. UPLOAD LIMITS
-================
-
-Use configurable limits for:
-
-- image size
-- video size
-- carousel item count
-- upload duration
-- request frequency
-
-Do not hard-code arbitrary production limits directly into domain logic.
-
-==================================================
-8. MEDIA CHECKSUM
-=================
-
-Support checksums where useful for:
-
-- integrity
-- duplicate detection
-- upload verification
-
-Do not assume client-provided hashes are trustworthy without server verification when integrity matters.
-
-==================================================
-9. MEDIA PROCESSING STATE
-=========================
-
-Define clear states such as:
-
-- initialized
-- uploading
-- uploaded
-- validating
-- processing
-- ready
-- failed
-- cancelled
-- deleted
-
-State transitions must be explicit.
-
-==================================================
-10. PROCESSING JOB
-==================
-
-Create media-processing BullMQ jobs.
-
-Payload must identify:
-
-- media ID
-- processing type
-- required parameters
-- attempt/context information
-
-Do not put enormous binary payloads into queue messages.
-
-Store media in S3.
-
-==================================================
-11. IMAGE PROCESSING
-====================
-
-Implement image processing for:
-
-- dimensions
-- orientation
-- resizing
-- optimized variants
-- thumbnails
-- metadata sanitization where appropriate
-
-The processor must be isolated from untrusted input.
-
-==================================================
-12. IMAGE VARIANTS
-==================
-
-Support appropriate variants such as:
-
-- thumbnail
-- small
-- medium
-- large
-- original/approved source where permitted
-
-Do not generate arbitrary unlimited variants.
-
-==================================================
-13. VIDEO PROCESSING
-====================
-
-Implement:
-
-- validation
-- metadata extraction
-- thumbnail extraction
-- transcoding
-- variants
-- processing-state tracking
-
-Use FFmpeg through a secure adapter.
-
-==================================================
-14. FFMPEG INTEGRATION
-======================
-
-Never directly assemble shell commands from user-controlled strings.
-
-Use safe argument arrays/process APIs.
-
-Validate:
-
-- input path
-- output path
-- codecs
-- resource limits
-
-==================================================
-15. VIDEO VARIANTS
-==================
-
-Support backend-defined:
-
-- resolutions
-- bitrate variants
-- codecs where required
-
-Do not create unsupported combinations.
-
-==================================================
-16. HLS
-=======
-
-Implement HLS generation for supported video workflows.
-
-Track:
-
-- manifest
-- segments
-- variants
-- processing state
-
-Store generated artifacts securely.
-
-==================================================
-17. THUMBNAILS
-==============
-
-Generate thumbnails for:
-
-- video
-- reels
-- supported images
-
-Ensure thumbnails respect content visibility and deletion state.
-
-==================================================
-18. MEDIA METADATA
-==================
-
-Store only metadata required by the product.
-
-Avoid preserving unnecessary sensitive EXIF/location information.
-
-Sanitize metadata as required.
-
-==================================================
-19. MEDIA SECURITY
-==================
-
-Implement protections against:
-
-- malicious uploads
-- oversized files
-- malformed media
-- path traversal
-- executable content
-- content-type spoofing
-
-Storage paths must be generated by the system.
-
-Never derive filesystem/object keys directly from unsanitized user input.
-
-==================================================
-20. PRIVATE MEDIA ACCESS
-========================
-
-Private media must not be publicly accessible.
-
-Use the architecture-approved mechanism:
-
-- presigned URLs
-- signed CloudFront access
-- signed cookies
-- authorization gateway
-
-Every protected media request must respect:
-
-- account privacy
-- content visibility
-- block
-- restriction
-- rights
-- moderation
-
-==================================================
-21. MEDIA DELETION
-==================
-
-Implement secure deletion workflow.
-
-A deleted media object must eventually remove or invalidate:
-
-- database metadata
-- derived variants
-- thumbnails
-- HLS artifacts
-- search references where applicable
-- caches
-- CDN accessibility where required
-
-==================================================
-22. MEDIA RESTORATION
-=====================
-
-Where the architecture supports restoration:
-
-- restore metadata
-- restore eligibility
-- regenerate missing derivatives if required
-- republish appropriate derived state through events
-
-==================================================
-23. CONTENT DOMAIN
-==================
-
-Create content domain/application/infrastructure structures.
-
-Support:
-
+- media variants
 - posts
-- carousels
-- drafts
+- multi-media posts
 - captions
 - mentions
 - hashtags
-- locations
-- visibility
-- publication
-- scheduling
-- editing
-- deletion
-- restoration
-
-==================================================
-24. POST ENTITY
-===============
-
-Implement the Post aggregate according to Architecture Volume 2.
-
-The post must support:
-
-- owner
-- caption
-- visibility
-- status
-- publication timestamp
-- media references
-- location
-- metadata
-- comments configuration where supported
-
-Do not place unrelated engagement data inside the Post aggregate.
-
-==================================================
-25. POST MEDIA
-==============
-
-Associate posts with media using explicit relationships.
-
-Support:
-
-- ordering
-- carousel membership
-- media role
-- primary media
-- accessibility metadata where applicable
-
-==================================================
-26. POST CREATION
-=================
-
-Implement post creation.
-
-Validate:
-
-- ownership of media
-- media readiness
-- visibility
-- caption
-- mentions
-- hashtags
-- location
-- audience
-
-The post must not reference media the user is not authorized to use.
-
-==================================================
-27. CAROUSEL
-============
-
-Implement carousel behavior.
-
-Support:
-
-- multiple media items
-- ordering
-- constraints
-- media validation
-- publication
-
-Use transactional guarantees to prevent partially published carousels.
-
-==================================================
-28. DRAFTS
-==========
-
-Implement drafts.
-
-Support:
-
-- create
-- update
-- retrieve
-- delete
-- convert draft to publication
-
-Drafts must remain private to their owner.
-
-==================================================
-29. DRAFT MEDIA
-===============
-
-A draft may reference uploaded media.
-
-Ensure:
-
-- media ownership
-- lifecycle
-- abandoned-upload cleanup
-- deletion
-
-==================================================
-30. CAPTIONS
-============
-
-Support:
-
-- plain text
-- hashtags
-- mentions
-- length validation
-- parsing
-
-Do not store client-generated HTML as trusted content.
-
-==================================================
-31. HASHTAGS
-============
-
-Implement normalized hashtag references.
-
-Support:
-
-- extraction
-- normalization
-- association with posts
-- duplicate prevention
-
-Do not build hashtag search/trending in this volume.
-
-Create events needed for later discovery systems.
-
-==================================================
-32. MENTIONS
-============
-
-Implement mention references.
-
-Validate mentioned users.
-
-Handle:
-
-- user deletion
-- username changes
-- private profiles
-- blocked users
-
-The mention relationship must remain consistent with privacy and authorization rules.
-
-==================================================
-33. LOCATIONS
-=============
-
-Implement location references as defined by the architecture.
-
-Do not create a mapping provider integration unless required by the approved architecture.
-
-Do not store precise location data unnecessarily.
-
-==================================================
-34. VISIBILITY
-==============
-
-Support content visibility:
-
-- public
-- followers
-- close friends where applicable
-- private-owner state
-
-Visibility must be evaluated by reusable policy logic.
-
-==================================================
-35. CONTENT STATE
-=================
-
-Define states such as:
-
-- draft
-- processing
-- scheduled
-- published
-- restricted
-- removed
-- deleted
-- restored
-
-State transitions must be guarded.
-
-==================================================
-36. PUBLICATION
-===============
-
-Publishing must verify:
-
-- authenticated owner
-- content validity
-- media readiness
-- visibility
-- moderation requirements
-- rights requirements where applicable
-
-Do not publish partially processed media.
-
-==================================================
-37. SCHEDULED PUBLICATION
-=========================
-
-Implement scheduling.
-
-Support:
-
-- schedule creation
-- server-time validation
-- cancellation
-- rescheduling
-- execution worker
-- failure
-- retry
-
-Use BullMQ for scheduled execution.
-
-==================================================
-38. PUBLICATION JOB
-===================
-
-Scheduled publishing jobs must be idempotent.
-
-Running a scheduled publish job twice must not create duplicate posts.
-
-==================================================
-39. POST EDITING
-================
-
-Support editing allowed post metadata.
-
-Do not permit changing immutable fields after publication unless architecture explicitly allows it.
-
-Examples:
-
-May be editable:
-
-- caption
-- location
-- certain visibility settings
-
-Architecture must define what is immutable.
-
-==================================================
-40. POST DELETION
-=================
-
-Implement deletion.
-
-Support:
-
-- owner authorization
-- state transition
-- deletion timestamp
-- event publication
-- asynchronous derived-state cleanup
-
-==================================================
-41. POST RESTORATION
-====================
-
-Where restoration is permitted:
-
-- validate state
-- validate authorization
-- restore
-- republish appropriate events
-
-==================================================
-42. STORIES
-===========
-
-Implement the Story domain.
-
-Support:
-
-- create
-- publish
-- visibility
-- media
-- viewers
+- post visibility
+- post updates
+- post deletion
+- stories
+- story expiration
+- story viewers
+- reels / short-form video
+- likes
+- comments
 - replies
-- reactions
-- expiration
-- highlights
+- saves
+- shares
+- engagement counters
+- moderation integration
+- search integration
+- event propagation
+
+The implementation must be secure, scalable, asynchronous where appropriate, and resilient to failure.
 
 ==================================================
-43. STORY ENTITY
-================
-
-Implement:
-
-- owner
-- media
-- publication
-- expiration
-- visibility
-- status
-
-Stories are ephemeral content.
-
-Do not retain active-state assumptions indefinitely.
-
-==================================================
-44. STORY EXPIRATION
-====================
-
-Implement expiration via:
-
-- expiration timestamp
-- BullMQ scheduled/cleanup job
-- state transition
-- derived cleanup events
-
-Do not depend only on a user opening the story to detect expiration.
-
-==================================================
-45. STORY VIEWER
-================
-
-Implement story-view recording.
-
-Ensure:
-
-- authorized viewing
-- duplicate prevention
-- privacy
-- block/restriction handling
-
-Viewer counts may be eventually consistent.
-
-==================================================
-46. STORY REACTIONS
-===================
-
-Implement supported story reactions.
-
-Ensure:
-
-- authorization
-- duplicate protection
-- privacy
-- notification event generation
-
-==================================================
-47. STORY REPLIES
-=================
-
-Implement story replies.
-
-Respect:
-
-- story owner settings
-- messaging permissions
-- blocks
-- restrictions
-
-Do not duplicate messaging-domain logic.
-
-Generate appropriate integration events for messaging/notifications.
-
-==================================================
-48. HIGHLIGHTS
-==============
-
-Implement:
-
-- Highlight
-- HighlightItem
-
-Support:
-
-- create
-- rename
-- add story
-- remove story
-- delete
-- reorder where supported
-
-Highlights may reference stories beyond their active expiration lifecycle according to product rules.
-
-==================================================
-49. HIGHLIGHT AUTHORIZATION
-===========================
-
-Only the profile owner or authorized professional account can modify highlights.
-
-==================================================
-50. REELS
-=========
-
-Implement the Reel domain.
-
-A reel should integrate with:
-
-- media
-- captions
-- mentions
-- hashtags
-- audio
-- visibility
-- publication
-- moderation
-- rights
-
-Do not implement recommendation ranking in this volume.
-
-==================================================
-51. REEL ENTITY
-===============
-
-Implement required reel fields:
-
-- owner
-- media
-- caption
-- visibility
-- publication state
-- audio reference
-- duration/metadata
-- processing state
-
-==================================================
-52. REEL CREATION
-=================
-
-Validate:
-
-- media readiness
-- video compatibility
-- ownership
-- visibility
-- caption
-- audio where supported
-
-==================================================
-53. REEL PROCESSING
-===================
-
-Integrate with media processing state.
-
-Do not allow publication before required derivatives are ready.
-
-==================================================
-54. AUDIO REFERENCES
-====================
-
-Create the internal relationship to reusable audio.
-
-Do not build a complete music/audio catalog in this volume.
-
-Provide the contract required by later audio discovery features.
-
-==================================================
-55. CONTENT MODERATION STATE
-============================
-
-Support content states from moderation systems such as:
-
-- normal
-- under_review
-- restricted
-- removed
-
-The exact moderation decision remains owned by the moderation domain.
-
-Content must react to the decision.
-
-==================================================
-56. RIGHTS STATE
-================
-
-Support rights-related states such as:
-
-- clear
-- restricted
-- takedown_pending
-- takedown
-- restoration_pending
-
-Do not implement the complete rights-management domain yet.
-
-Integrate through explicit interfaces/events.
-
-==================================================
-57. CONTENT EVENTS
-==================
-
-Publish events such as:
-
-- MediaUploaded
-- MediaProcessingStarted
-- MediaProcessingCompleted
-- MediaProcessingFailed
-- MediaDeleted
-- PostCreated
-- PostPublished
-- PostUpdated
-- PostDeleted
-- PostRestored
-- StoryPublished
-- StoryViewed
-- StoryReplied
-- StoryReacted
-- StoryExpired
-- HighlightCreated
-- HighlightUpdated
-- HighlightDeleted
-- ReelCreated
-- ReelPublished
-- ReelUpdated
-- ReelDeleted
-- ContentVisibilityChanged
-
-Use the approved event envelope.
-
-==================================================
-58. EVENT IDEMPOTENCY
-=====================
-
-Every downstream consumer must be able to safely process duplicates.
-
-Do not assume exactly-once delivery.
-
-==================================================
-59. CONTENT CLEANUP
-===================
-
-Implement cleanup jobs for:
-
-- abandoned uploads
-- expired stories
-- failed processing artifacts
-- temporary media
-- orphan media
-- obsolete variants
-
-Cleanup must be idempotent.
-
-==================================================
-60. ORPHAN DETECTION
-====================
-
-Create jobs that detect media objects that have no valid referencing content.
-
-Do not immediately delete newly uploaded files merely because they are not referenced yet.
-
-Use age/status thresholds.
-
-==================================================
-61. API ENDPOINTS
-=================
-
-Implement REST APIs for:
-
-MEDIA:
-
-- upload session creation
-- upload completion
-- upload cancellation
-- media status
-- media access metadata where required
-
-POSTS:
-
-- create
-- retrieve
-- update
-- delete
-- restore
-- schedule
-- cancel schedule
-
-DRAFTS:
-
-- create
-- list
-- retrieve
-- update
-- delete
-
-STORIES:
-
-- create
-- retrieve
-- publish
-- view
-- reply
-- react
-- delete
-
-HIGHLIGHTS:
-
-- create
-- update
-- add/remove story
-- delete
-
-REELS:
-
-- create
-- retrieve
-- update
-- publish
-- delete
-
-Use the exact resource structure established by the architecture.
-
-==================================================
-62. API AUTHORIZATION
-=====================
-
-Every content endpoint must evaluate:
-
-- authentication
-- ownership
-- privacy
-- block
-- restriction
-- account state
-- content state
-- moderation state
-- rights state
-
-==================================================
-63. CONTENT RETRIEVAL
-=====================
-
-When retrieving content, do not return:
-
-- deleted content
-- blocked content
-- unauthorized private content
-- restricted content the requester cannot access
-- unavailable media
-
-unless a specific administrative workflow authorizes it.
-
-==================================================
-64. CONTENT UPDATE
-==================
-
-Prevent unauthorized updates.
-
-Validate optimistic concurrency where required.
-
-Avoid lost updates.
-
-==================================================
-65. MEDIA ACCESS API
-====================
-
-The media-access layer must not become an authorization bypass.
-
-An S3 key or CDN URL must never be treated as sufficient authorization.
-
-==================================================
-66. RATE LIMITING
-=================
-
-Apply appropriate limits to:
-
-- upload initialization
-- upload completion
-- post creation
-- story creation
-- reel creation
-- comment-related operations when later added
-- media-processing requests
-- scheduling operations
-
-==================================================
-67. SECURITY
-============
-
-Test against:
-
-- path traversal
-- malicious media
-- MIME spoofing
-- oversized payloads
-- unauthorized media access
-- unauthorized post mutation
-- private content access
-- blocked-user bypass
-- direct S3 access
-- signed URL misuse
-- duplicate publication
-- duplicate scheduling
-
-==================================================
-68. PRIVACY
-===========
-
-Private drafts must never become public.
-
-Close-friends stories must never be accessible to unauthorized users.
-
-Private account content must not be retrievable through direct identifiers.
-
-Deleted content must eventually disappear from derived systems through events.
-
-==================================================
-69. OBSERVABILITY
-=================
-
-Instrument:
-
-- upload initiation
-- upload completion
-- media processing
-- publication
-- scheduling
-- story views
-- story expiration
-- reel processing
-- deletion
-- restoration
-- cleanup
-
-Track:
-
-- latency
-- failure rate
-- queue depth
-- processing duration
-- upload failures
-- publication failures
-
-==================================================
-70. MEDIA PROCESSING METRICS
-============================
-
-Expose:
-
-- media jobs started
-- completed
-- failed
-- retries
-- processing duration
-- queue backlog
-- per-media-type processing time
-
-==================================================
-71. STORAGE METRICS
-===================
-
-Monitor:
-
-- upload volume
-- object count
-- storage size
-- failed uploads
-- incomplete multipart uploads
-- cleanup volume
-
-==================================================
-72. TESTING
-===========
-
-Implement unit tests for:
-
-- media state transitions
-- upload validation
-- privacy
-- visibility
-- publication rules
-- scheduling
-- story expiration
-- highlight ownership
-- reel rules
-
-Integration tests for:
-
-- PostgreSQL
-- Prisma
-- S3 adapter
-- Redis
-- BullMQ
-- outbox
-- media processing adapters
-
-E2E/API tests for:
-
-- upload
-- post creation
-- carousel
-- draft
-- publish
-- edit
-- delete
-- restore
-- story
-- story view
-- story reply
-- story reaction
-- highlight
-- reel
-
-==================================================
-73. MEDIA TESTING
-=================
-
-Use controlled test files representing:
-
-- valid image
-- invalid image
-- valid video
-- unsupported video
-- oversized media
-- malformed media
-- corrupted media
-
-Do not place large binaries in Git unnecessarily.
-
-==================================================
-74. PROCESSING FAILURE TESTS
-============================
-
-Simulate:
-
-- processor crash
-- FFmpeg failure
-- S3 failure
-- timeout
-- queue retry
-- duplicate job
-
-Verify safe recovery.
-
-==================================================
-75. CONTENT CONCURRENCY
-=======================
-
-Test concurrent:
-
-- edit
-- delete
-- publish
-- schedule
-- cancel schedule
-
-Verify invalid state transitions are rejected.
-
-==================================================
-76. MEDIA IDEMPOTENCY
-=====================
-
-Repeated processing jobs must not create uncontrolled duplicate derivatives.
-
-Use deterministic variant/object-key strategy where appropriate.
-
-==================================================
-77. PUBLICATION IDEMPOTENCY
-===========================
-
-Repeated publish requests must not create duplicate content.
-
-Use request-level idempotency keys where required.
-
-==================================================
-78. SCHEDULED PUBLICATION IDEMPOTENCY
-=====================================
-
-A scheduling worker retry must create exactly one logical publication.
-
-==================================================
-79. STORY EXPIRATION IDEMPOTENCY
-================================
-
-Multiple expiration jobs must produce one final expiration state.
-
-==================================================
-80. DOCUMENTATION
-=================
-
-Update:
-
-- backend module map
-- media architecture
-- upload flow
-- S3 integration
-- processing pipeline
-- content lifecycle
-- story lifecycle
-- reel lifecycle
-- API documentation
-- event catalog
-- queue catalog
-- security model
-- privacy model
-- local development instructions
-- testing instructions
-
-==================================================
-81. MIGRATION DISCIPLINE
-========================
-
-All database changes must be implemented with Prisma migrations.
-
-Do not modify migration history destructively.
-
-==================================================
-82. DEPENDENCY BOUNDARIES
-=========================
-
-Do not allow:
-
-Post domain
-→ direct AWS SDK calls.
-
-Use:
-
-Post application/domain
-→ Media interface
-→ Media infrastructure adapter
-
-Similarly:
-
-Content
-→ Search interface later
-
-Content
-→ Feed event later
-
-Content
-→ Notification event later
-
-Do not directly import future implementation modules.
-
-==================================================
-83. FUTURE INTEGRATION CONTRACTS
-================================
-
-Provide stable integration contracts/events for:
-
-- feed
-- search
-- recommendations
-- notifications
-- moderation
-- rights
-- analytics
-
-Do not implement those systems here.
-
-==================================================
-84. NO FEED IMPLEMENTATION
-==========================
-
-Do not implement:
-
-- feed ranking
-- recommendation ranking
-- Explore
-- trending
-- personalized feed generation
-
-This volume only produces the content/events required by those systems later.
-
-==================================================
-85. NO SEARCH IMPLEMENTATION
-============================
-
-Do not implement OpenSearch query behavior or search APIs here.
-
-Only publish the content/indexing events and interfaces needed later.
-
-==================================================
-86. NO FRONTEND
-===============
-
-Do not implement:
-
-- Next.js
-- React
-- UI
-- browser upload components
-
-Expose backend contracts only.
-
-==================================================
-87. NO MOBILE
-=============
-
-Do not implement:
-
-- React Native
-- Expo
-- native camera
-- native media picker
-
-==================================================
-88. NO INFRASTRUCTURE
-=====================
-
-Do not implement:
-
-- Terraform
-- Kubernetes
-- Helm
-- AWS account provisioning
-- CI/CD
-
-Infrastructure integrations must remain inside appropriate adapters/configuration.
-
-==================================================
-89. IMPLEMENTATION DISCIPLINE
-=============================
-
-Before every change:
-
-1. Inspect current repository.
-2. Inspect Backend Volume 1 implementation.
-3. Identify reusable abstractions.
-4. Verify Architecture Volume 2 contract.
-5. Implement only required changes.
-6. Add migrations.
-7. Add tests.
-8. Validate.
-9. Fix failures.
-10. Continue.
-
-Never regenerate unchanged files.
-
-==================================================
-90. VALIDATION
-==============
-
-Run:
-
-- formatter
-- lint
-- typecheck
-- unit tests
-- integration tests
-- API/E2E tests
-- backend build
-
-Where supported also validate:
-
-- Prisma schema
-- migrations
-- event schemas
-- queue configuration
-
-==================================================
-FINAL ACCEPTANCE CRITERIA
-=========================
-
-Backend Volume 2 is complete when:
-
-MEDIA
-
-- upload sessions work;
-- secure direct uploads work;
-- multipart/resumable uploads work where required;
-- S3 integration works;
-- media metadata is stored;
-- image processing works;
-- video processing works;
-- FFmpeg integration works;
-- thumbnails work;
-- HLS works where required;
-- media variants work;
-- processing states work;
-- failed processing can retry;
-- cleanup works;
-- private media is protected.
-
-CONTENT
-
-- posts work;
-- carousels work;
-- drafts work;
-- captions work;
-- hashtags work;
-- mentions work;
-- locations work;
-- visibility works;
-- scheduling works;
-- publishing works;
-- editing works;
-- deletion works;
-- restoration works.
-
-STORIES
-
-- stories work;
-- expiration works;
-- viewers work;
-- reactions work;
-- replies work;
-- highlights work.
-
-REELS
-
-- reels work;
-- reel media works;
-- reel processing works;
-- audio references work;
-- reel publication works.
-
-SECURITY
-
-- media authorization works;
-- private content is protected;
-- malicious media is rejected safely;
-- direct storage access does not bypass authorization;
-- duplicate publishing is prevented.
-
-EVENTS
-
-- content events are published;
-- media events are published;
-- outbox is used;
-- consumers can later process events idempotently.
-
-QUEUES
-
-- media jobs work;
-- scheduled publication works;
-- expiration jobs work;
-- cleanup jobs work;
-- retry policies work.
-
-TESTING
-
-- unit tests exist;
-- integration tests exist;
-- API/E2E tests exist;
-- failure paths are tested;
-- concurrency is tested;
-- idempotency is tested.
-
-OBSERVABILITY
-
-- processing metrics exist;
-- publication metrics exist;
-- queue metrics exist;
-- failures are observable;
-- traces/logs are privacy-safe.
-
-==================================================
-FINAL RULE
-==========
-
-Do not implement discovery, feed ranking, search, recommendations, notifications, messaging, advertising, commerce, or infrastructure in this volume.
-
-The output of Backend Volume 2 must be a stable, production-grade content and media foundation consumed by later backend volumes.
-
-BEGIN WITH:
-
-1. INSPECT THE EXISTING BACKEND REPOSITORY.
-2. VERIFY BACKEND VOLUME 1 CONTRACTS.
-3. IMPLEMENT THE MEDIA/UPLOAD FOUNDATION.
-4. IMPLEMENT POSTS, CAROUSELS, DRAFTS, STORIES, HIGHLIGHTS, AND REEL
-
-You are operating in Senior Engineering Team Mode.
-
-The Master Prompt, Architecture Volume 1, Architecture Volume 2, and Backend Volume 1 have already been completed.
-
-Backend Volume 1 established the backend foundation, including:
-
-- NestJS application architecture
-- configuration
-- request context
-- structured errors
-- validation
-- PostgreSQL/Prisma foundation
-- Redis foundation
-- transactional outbox
-- Kafka/Redpanda integration foundation
-- BullMQ foundation
-- health checks
-- authentication
-- accounts
-- sessions
-- devices
-- profiles
-- creator/professional profile foundations
-- follow relationships
-- follow requests
-- blocks
-- restrictions
-- close friends
-- authorization foundation
-- privacy foundation
-- API documentation
-- initial tests
-
-This volume continues directly from that implementation.
-
-Do not restart the backend.
-
-Do not replace working architecture.
-
-Do not regenerate unchanged files.
-
-Do not introduce an incompatible domain model.
-
-Use the approved architecture as the source of truth.
-
-==================================================
-BACKEND VOLUME 2 SCOPE
+2. REQUIRED TECHNOLOGY
 ======================
-
-Implement the complete media and content foundation:
-
-1. Media upload architecture
-2. Upload sessions
-3. Multipart/resumable upload support
-4. S3 integration
-5. Media metadata
-6. Image processing
-7. Video processing
-8. FFmpeg workers
-9. Thumbnail generation
-10. HLS generation
-11. Media variants
-12. Media security
-13. Posts
-14. Carousels
-15. Drafts
-16. Captions
-17. Mentions
-18. Hashtags
-19. Locations
-20. Post visibility
-21. Publication workflow
-22. Post scheduling
-23. Post editing
-24. Post deletion
-25. Post restoration
-26. Stories
-27. Story media
-28. Story viewers
-29. Story replies
-30. Story reactions
-31. Story expiration
-32. Story highlights
-33. Reels
-34. Reel media
-35. Reel audio references
-36. Reel publication
-37. Media/content moderation states
-38. Rights-related content state integration
-39. Content lifecycle events
-40. Media/content background jobs
-41. APIs
-42. Security
-43. Privacy
-44. Observability
-45. Automated tests
-
-==================================================
-IMPLEMENTATION RULES
-====================
-
-Production-grade implementation only.
-
-Never generate:
-
-- pseudo-code
-- placeholders
-- TODOs
-- incomplete implementations
-- fake production APIs
-- fake media processing
-- fake upload completion
-- fake S3 behavior
-- fake FFmpeg processing
-
-Every generated file must compile.
-
-Every changed database model must have a valid Prisma migration.
-
-Every state transition must be validated.
-
-Every content mutation must enforce authorization.
-
-Every media access path must enforce privacy.
-
-Every asynchronous operation must be retry-safe.
-
-Never regenerate unchanged files.
-
-==================================================
-CONTENT/MEDIA ARCHITECTURE
-==========================
-
-The core flow is:
-
-Client
-→ API
-→ Upload Session
-→ S3
-→ Processing Queue
-→ Media Processor
-→ Derived Media
-→ Database State Update
-→ Event
-→ CDN delivery
-
-For publishing:
-
-Client
-→ Content Draft
-→ Media Validation
-→ Content Validation
-→ Publication Transaction
-→ Event
-→ Feed/Search/Recommendation consumers later
-
-Do not make feed/search/recommendation implementation part of this volume.
-
-==================================================
-
-1. MEDIA DOMAIN FOUNDATION
-   ==================================================
-
-Create the media domain/application/infrastructure structure.
-
-Media responsibilities include:
-
-- upload authorization
-- upload sessions
-- object references
-- media metadata
-- processing state
-- variants
-- thumbnails
-- video derivatives
-- HLS
-- media deletion
-- media restoration
-- secure access
-
-Do not mix media infrastructure logic directly into post business logic.
-
-==================================================
-2. MEDIA ENTITY
-===============
-
-Define and implement the media model required by the architecture.
-
-Support fields conceptually including:
-
-- ID
-- owner
-- storage location
-- media type
-- MIME type
-- size
-- checksum
-- width
-- height
-- duration
-- orientation where needed
-- status
-- processing state
-- visibility/access metadata
-- createdAt
-- updatedAt
-- deletedAt where required
-
-Use the approved database design.
-
-==================================================
-3. UPLOAD SESSION
-=================
-
-Implement upload sessions.
-
-A session must support:
-
-- initialization
-- ownership
-- expected file type
-- expected size
-- upload state
-- expiration
-- completion
-- cancellation
-- failure
-
-Validate ownership on every operation.
-
-==================================================
-4. DIRECT S3 UPLOAD
-===================
-
-Implement secure S3 upload initialization.
-
-Where the architecture specifies presigned upload:
-
-1. authenticate user;
-2. validate requested media;
-3. create upload session;
-4. generate authorized upload information;
-5. return only safe client-facing information.
-
-Never return AWS credentials.
-
-==================================================
-5. MULTIPART/RESUMABLE UPLOAD
-=============================
-
-Support multipart/resumable upload where required.
-
-Implement:
-
-- initiate
-- upload parts
-- complete
-- abort
-- expiration
-
-Do not allow a user to complete another user's upload session.
-
-==================================================
-6. UPLOAD VALIDATION
-====================
-
-Validate:
-
-- MIME type
-- extension
-- size
-- media category
-- expected dimensions where appropriate
-
-Never rely solely on client-provided MIME type.
-
-Where feasible, verify actual file characteristics during processing.
-
-==================================================
-7. UPLOAD LIMITS
-================
-
-Use configurable limits for:
-
-- image size
-- video size
-- carousel item count
-- upload duration
-- request frequency
-
-Do not hard-code arbitrary production limits directly into domain logic.
-
-==================================================
-8. MEDIA CHECKSUM
-=================
-
-Support checksums where useful for:
-
-- integrity
-- duplicate detection
-- upload verification
-
-Do not assume client-provided hashes are trustworthy without server verification when integrity matters.
-
-==================================================
-9. MEDIA PROCESSING STATE
-=========================
-
-Define clear states such as:
-
-- initialized
-- uploading
-- uploaded
-- validating
-- processing
-- ready
-- failed
-- cancelled
-- deleted
-
-State transitions must be explicit.
-
-==================================================
-10. PROCESSING JOB
-==================
-
-Create media-processing BullMQ jobs.
-
-Payload must identify:
-
-- media ID
-- processing type
-- required parameters
-- attempt/context information
-
-Do not put enormous binary payloads into queue messages.
-
-Store media in S3.
-
-==================================================
-11. IMAGE PROCESSING
-====================
-
-Implement image processing for:
-
-- dimensions
-- orientation
-- resizing
-- optimized variants
-- thumbnails
-- metadata sanitization where appropriate
-
-The processor must be isolated from untrusted input.
-
-==================================================
-12. IMAGE VARIANTS
-==================
-
-Support appropriate variants such as:
-
-- thumbnail
-- small
-- medium
-- large
-- original/approved source where permitted
-
-Do not generate arbitrary unlimited variants.
-
-==================================================
-13. VIDEO PROCESSING
-====================
-
-Implement:
-
-- validation
-- metadata extraction
-- thumbnail extraction
-- transcoding
-- variants
-- processing-state tracking
-
-Use FFmpeg through a secure adapter.
-
-==================================================
-14. FFMPEG INTEGRATION
-======================
-
-Never directly assemble shell commands from user-controlled strings.
-
-Use safe argument arrays/process APIs.
-
-Validate:
-
-- input path
-- output path
-- codecs
-- resource limits
-
-==================================================
-15. VIDEO VARIANTS
-==================
-
-Support backend-defined:
-
-- resolutions
-- bitrate variants
-- codecs where required
-
-Do not create unsupported combinations.
-
-==================================================
-16. HLS
-=======
-
-Implement HLS generation for supported video workflows.
-
-Track:
-
-- manifest
-- segments
-- variants
-- processing state
-
-Store generated artifacts securely.
-
-==================================================
-17. THUMBNAILS
-==============
-
-Generate thumbnails for:
-
-- video
-- reels
-- supported images
-
-Ensure thumbnails respect content visibility and deletion state.
-
-==================================================
-18. MEDIA METADATA
-==================
-
-Store only metadata required by the product.
-
-Avoid preserving unnecessary sensitive EXIF/location information.
-
-Sanitize metadata as required.
-
-==================================================
-19. MEDIA SECURITY
-==================
-
-Implement protections against:
-
-- malicious uploads
-- oversized files
-- malformed media
-- path traversal
-- executable content
-- content-type spoofing
-
-Storage paths must be generated by the system.
-
-Never derive filesystem/object keys directly from unsanitized user input.
-
-==================================================
-20. PRIVATE MEDIA ACCESS
-========================
-
-Private media must not be publicly accessible.
-
-Use the architecture-approved mechanism:
-
-- presigned URLs
-- signed CloudFront access
-- signed cookies
-- authorization gateway
-
-Every protected media request must respect:
-
-- account privacy
-- content visibility
-- block
-- restriction
-- rights
-- moderation
-
-==================================================
-21. MEDIA DELETION
-==================
-
-Implement secure deletion workflow.
-
-A deleted media object must eventually remove or invalidate:
-
-- database metadata
-- derived variants
-- thumbnails
-- HLS artifacts
-- search references where applicable
-- caches
-- CDN accessibility where required
-
-==================================================
-22. MEDIA RESTORATION
-=====================
-
-Where the architecture supports restoration:
-
-- restore metadata
-- restore eligibility
-- regenerate missing derivatives if required
-- republish appropriate derived state through events
-
-==================================================
-23. CONTENT DOMAIN
-==================
-
-Create content domain/application/infrastructure structures.
-
-Support:
-
-- posts
-- carousels
-- drafts
-- captions
-- mentions
-- hashtags
-- locations
-- visibility
-- publication
-- scheduling
-- editing
-- deletion
-- restoration
-
-==================================================
-24. POST ENTITY
-===============
-
-Implement the Post aggregate according to Architecture Volume 2.
-
-The post must support:
-
-- owner
-- caption
-- visibility
-- status
-- publication timestamp
-- media references
-- location
-- metadata
-- comments configuration where supported
-
-Do not place unrelated engagement data inside the Post aggregate.
-
-==================================================
-25. POST MEDIA
-==============
-
-Associate posts with media using explicit relationships.
-
-Support:
-
-- ordering
-- carousel membership
-- media role
-- primary media
-- accessibility metadata where applicable
-
-==================================================
-26. POST CREATION
-=================
-
-Implement post creation.
-
-Validate:
-
-- ownership of media
-- media readiness
-- visibility
-- caption
-- mentions
-- hashtags
-- location
-- audience
-
-The post must not reference media the user is not authorized to use.
-
-==================================================
-27. CAROUSEL
-============
-
-Implement carousel behavior.
-
-Support:
-
-- multiple media items
-- ordering
-- constraints
-- media validation
-- publication
-
-Use transactional guarantees to prevent partially published carousels.
-
-==================================================
-28. DRAFTS
-==========
-
-Implement drafts.
-
-Support:
-
-- create
-- update
-- retrieve
-- delete
-- convert draft to publication
-
-Drafts must remain private to their owner.
-
-==================================================
-29. DRAFT MEDIA
-===============
-
-A draft may reference uploaded media.
-
-Ensure:
-
-- media ownership
-- lifecycle
-- abandoned-upload cleanup
-- deletion
-
-==================================================
-30. CAPTIONS
-============
-
-Support:
-
-- plain text
-- hashtags
-- mentions
-- length validation
-- parsing
-
-Do not store client-generated HTML as trusted content.
-
-==================================================
-31. HASHTAGS
-============
-
-Implement normalized hashtag references.
-
-Support:
-
-- extraction
-- normalization
-- association with posts
-- duplicate prevention
-
-Do not build hashtag search/trending in this volume.
-
-Create events needed for later discovery systems.
-
-==================================================
-32. MENTIONS
-============
-
-Implement mention references.
-
-Validate mentioned users.
-
-Handle:
-
-- user deletion
-- username changes
-- private profiles
-- blocked users
-
-The mention relationship must remain consistent with privacy and authorization rules.
-
-==================================================
-33. LOCATIONS
-=============
-
-Implement location references as defined by the architecture.
-
-Do not create a mapping provider integration unless required by the approved architecture.
-
-Do not store precise location data unnecessarily.
-
-==================================================
-34. VISIBILITY
-==============
-
-Support content visibility:
-
-- public
-- followers
-- close friends where applicable
-- private-owner state
-
-Visibility must be evaluated by reusable policy logic.
-
-==================================================
-35. CONTENT STATE
-=================
-
-Define states such as:
-
-- draft
-- processing
-- scheduled
-- published
-- restricted
-- removed
-- deleted
-- restored
-
-State transitions must be guarded.
-
-==================================================
-36. PUBLICATION
-===============
-
-Publishing must verify:
-
-- authenticated owner
-- content validity
-- media readiness
-- visibility
-- moderation requirements
-- rights requirements where applicable
-
-Do not publish partially processed media.
-
-==================================================
-37. SCHEDULED PUBLICATION
-=========================
-
-Implement scheduling.
-
-Support:
-
-- schedule creation
-- server-time validation
-- cancellation
-- rescheduling
-- execution worker
-- failure
-- retry
-
-Use BullMQ for scheduled execution.
-
-==================================================
-38. PUBLICATION JOB
-===================
-
-Scheduled publishing jobs must be idempotent.
-
-Running a scheduled publish job twice must not create duplicate posts.
-
-==================================================
-39. POST EDITING
-================
-
-Support editing allowed post metadata.
-
-Do not permit changing immutable fields after publication unless architecture explicitly allows it.
-
-Examples:
-
-May be editable:
-
-- caption
-- location
-- certain visibility settings
-
-Architecture must define what is immutable.
-
-==================================================
-40. POST DELETION
-=================
-
-Implement deletion.
-
-Support:
-
-- owner authorization
-- state transition
-- deletion timestamp
-- event publication
-- asynchronous derived-state cleanup
-
-==================================================
-41. POST RESTORATION
-====================
-
-Where restoration is permitted:
-
-- validate state
-- validate authorization
-- restore
-- republish appropriate events
-
-==================================================
-42. STORIES
-===========
-
-Implement the Story domain.
-
-Support:
-
-- create
-- publish
-- visibility
-- media
-- viewers
-- replies
-- reactions
-- expiration
-- highlights
-
-==================================================
-43. STORY ENTITY
-================
-
-Implement:
-
-- owner
-- media
-- publication
-- expiration
-- visibility
-- status
-
-Stories are ephemeral content.
-
-Do not retain active-state assumptions indefinitely.
-
-==================================================
-44. STORY EXPIRATION
-====================
-
-Implement expiration via:
-
-- expiration timestamp
-- BullMQ scheduled/cleanup job
-- state transition
-- derived cleanup events
-
-Do not depend only on a user opening the story to detect expiration.
-
-==================================================
-45. STORY VIEWER
-================
-
-Implement story-view recording.
-
-Ensure:
-
-- authorized viewing
-- duplicate prevention
-- privacy
-- block/restriction handling
-
-Viewer counts may be eventually consistent.
-
-==================================================
-46. STORY REACTIONS
-===================
-
-Implement supported story reactions.
-
-Ensure:
-
-- authorization
-- duplicate protection
-- privacy
-- notification event generation
-
-==================================================
-47. STORY REPLIES
-=================
-
-Implement story replies.
-
-Respect:
-
-- story owner settings
-- messaging permissions
-- blocks
-- restrictions
-
-Do not duplicate messaging-domain logic.
-
-Generate appropriate integration events for messaging/notifications.
-
-==================================================
-48. HIGHLIGHTS
-==============
-
-Implement:
-
-- Highlight
-- HighlightItem
-
-Support:
-
-- create
-- rename
-- add story
-- remove story
-- delete
-- reorder where supported
-
-Highlights may reference stories beyond their active expiration lifecycle according to product rules.
-
-==================================================
-49. HIGHLIGHT AUTHORIZATION
-===========================
-
-Only the profile owner or authorized professional account can modify highlights.
-
-==================================================
-50. REELS
-=========
-
-Implement the Reel domain.
-
-A reel should integrate with:
-
-- media
-- captions
-- mentions
-- hashtags
-- audio
-- visibility
-- publication
-- moderation
-- rights
-
-Do not implement recommendation ranking in this volume.
-
-==================================================
-51. REEL ENTITY
-===============
-
-Implement required reel fields:
-
-- owner
-- media
-- caption
-- visibility
-- publication state
-- audio reference
-- duration/metadata
-- processing state
-
-==================================================
-52. REEL CREATION
-=================
-
-Validate:
-
-- media readiness
-- video compatibility
-- ownership
-- visibility
-- caption
-- audio where supported
-
-==================================================
-53. REEL PROCESSING
-===================
-
-Integrate with media processing state.
-
-Do not allow publication before required derivatives are ready.
-
-==================================================
-54. AUDIO REFERENCES
-====================
-
-Create the internal relationship to reusable audio.
-
-Do not build a complete music/audio catalog in this volume.
-
-Provide the contract required by later audio discovery features.
-
-==================================================
-55. CONTENT MODERATION STATE
-============================
-
-Support content states from moderation systems such as:
-
-- normal
-- under_review
-- restricted
-- removed
-
-The exact moderation decision remains owned by the moderation domain.
-
-Content must react to the decision.
-
-==================================================
-56. RIGHTS STATE
-================
-
-Support rights-related states such as:
-
-- clear
-- restricted
-- takedown_pending
-- takedown
-- restoration_pending
-
-Do not implement the complete rights-management domain yet.
-
-Integrate through explicit interfaces/events.
-
-==================================================
-57. CONTENT EVENTS
-==================
-
-Publish events such as:
-
-- MediaUploaded
-- MediaProcessingStarted
-- MediaProcessingCompleted
-- MediaProcessingFailed
-- MediaDeleted
-- PostCreated
-- PostPublished
-- PostUpdated
-- PostDeleted
-- PostRestored
-- StoryPublished
-- StoryViewed
-- StoryReplied
-- StoryReacted
-- StoryExpired
-- HighlightCreated
-- HighlightUpdated
-- HighlightDeleted
-- ReelCreated
-- ReelPublished
-- ReelUpdated
-- ReelDeleted
-- ContentVisibilityChanged
-
-Use the approved event envelope.
-
-==================================================
-58. EVENT IDEMPOTENCY
-=====================
-
-Every downstream consumer must be able to safely process duplicates.
-
-Do not assume exactly-once delivery.
-
-==================================================
-59. CONTENT CLEANUP
-===================
-
-Implement cleanup jobs for:
-
-- abandoned uploads
-- expired stories
-- failed processing artifacts
-- temporary media
-- orphan media
-- obsolete variants
-
-Cleanup must be idempotent.
-
-==================================================
-60. ORPHAN DETECTION
-====================
-
-Create jobs that detect media objects that have no valid referencing content.
-
-Do not immediately delete newly uploaded files merely because they are not referenced yet.
-
-Use age/status thresholds.
-
-==================================================
-61. API ENDPOINTS
-=================
-
-Implement REST APIs for:
-
-MEDIA:
-
-- upload session creation
-- upload completion
-- upload cancellation
-- media status
-- media access metadata where required
-
-POSTS:
-
-- create
-- retrieve
-- update
-- delete
-- restore
-- schedule
-- cancel schedule
-
-DRAFTS:
-
-- create
-- list
-- retrieve
-- update
-- delete
-
-STORIES:
-
-- create
-- retrieve
-- publish
-- view
-- reply
-- react
-- delete
-
-HIGHLIGHTS:
-
-- create
-- update
-- add/remove story
-- delete
-
-REELS:
-
-- create
-- retrieve
-- update
-- publish
-- delete
-
-Use the exact resource structure established by the architecture.
-
-==================================================
-62. API AUTHORIZATION
-=====================
-
-Every content endpoint must evaluate:
-
-- authentication
-- ownership
-- privacy
-- block
-- restriction
-- account state
-- content state
-- moderation state
-- rights state
-
-==================================================
-63. CONTENT RETRIEVAL
-=====================
-
-When retrieving content, do not return:
-
-- deleted content
-- blocked content
-- unauthorized private content
-- restricted content the requester cannot access
-- unavailable media
-
-unless a specific administrative workflow authorizes it.
-
-==================================================
-64. CONTENT UPDATE
-==================
-
-Prevent unauthorized updates.
-
-Validate optimistic concurrency where required.
-
-Avoid lost updates.
-
-==================================================
-65. MEDIA ACCESS API
-====================
-
-The media-access layer must not become an authorization bypass.
-
-An S3 key or CDN URL must never be treated as sufficient authorization.
-
-==================================================
-66. RATE LIMITING
-=================
-
-Apply appropriate limits to:
-
-- upload initialization
-- upload completion
-- post creation
-- story creation
-- reel creation
-- comment-related operations when later added
-- media-processing requests
-- scheduling operations
-
-==================================================
-67. SECURITY
-============
-
-Test against:
-
-- path traversal
-- malicious media
-- MIME spoofing
-- oversized payloads
-- unauthorized media access
-- unauthorized post mutation
-- private content access
-- blocked-user bypass
-- direct S3 access
-- signed URL misuse
-- duplicate publication
-- duplicate scheduling
-
-==================================================
-68. PRIVACY
-===========
-
-Private drafts must never become public.
-
-Close-friends stories must never be accessible to unauthorized users.
-
-Private account content must not be retrievable through direct identifiers.
-
-Deleted content must eventually disappear from derived systems through events.
-
-==================================================
-69. OBSERVABILITY
-=================
-
-Instrument:
-
-- upload initiation
-- upload completion
-- media processing
-- publication
-- scheduling
-- story views
-- story expiration
-- reel processing
-- deletion
-- restoration
-- cleanup
-
-Track:
-
-- latency
-- failure rate
-- queue depth
-- processing duration
-- upload failures
-- publication failures
-
-==================================================
-70. MEDIA PROCESSING METRICS
-============================
-
-Expose:
-
-- media jobs started
-- completed
-- failed
-- retries
-- processing duration
-- queue backlog
-- per-media-type processing time
-
-==================================================
-71. STORAGE METRICS
-===================
-
-Monitor:
-
-- upload volume
-- object count
-- storage size
-- failed uploads
-- incomplete multipart uploads
-- cleanup volume
-
-==================================================
-72. TESTING
-===========
-
-Implement unit tests for:
-
-- media state transitions
-- upload validation
-- privacy
-- visibility
-- publication rules
-- scheduling
-- story expiration
-- highlight ownership
-- reel rules
-
-Integration tests for:
-
-- PostgreSQL
-- Prisma
-- S3 adapter
-- Redis
-- BullMQ
-- outbox
-- media processing adapters
-
-E2E/API tests for:
-
-- upload
-- post creation
-- carousel
-- draft
-- publish
-- edit
-- delete
-- restore
-- story
-- story view
-- story reply
-- story reaction
-- highlight
-- reel
-
-==================================================
-73. MEDIA TESTING
-=================
-
-Use controlled test files representing:
-
-- valid image
-- invalid image
-- valid video
-- unsupported video
-- oversized media
-- malformed media
-- corrupted media
-
-Do not place large binaries in Git unnecessarily.
-
-==================================================
-74. PROCESSING FAILURE TESTS
-============================
-
-Simulate:
-
-- processor crash
-- FFmpeg failure
-- S3 failure
-- timeout
-- queue retry
-- duplicate job
-
-Verify safe recovery.
-
-==================================================
-75. CONTENT CONCURRENCY
-=======================
-
-Test concurrent:
-
-- edit
-- delete
-- publish
-- schedule
-- cancel schedule
-
-Verify invalid state transitions are rejected.
-
-==================================================
-76. MEDIA IDEMPOTENCY
-=====================
-
-Repeated processing jobs must not create uncontrolled duplicate derivatives.
-
-Use deterministic variant/object-key strategy where appropriate.
-
-==================================================
-77. PUBLICATION IDEMPOTENCY
-===========================
-
-Repeated publish requests must not create duplicate content.
-
-Use request-level idempotency keys where required.
-
-==================================================
-78. SCHEDULED PUBLICATION IDEMPOTENCY
-=====================================
-
-A scheduling worker retry must create exactly one logical publication.
-
-==================================================
-79. STORY EXPIRATION IDEMPOTENCY
-================================
-
-Multiple expiration jobs must produce one final expiration state.
-
-==================================================
-80. DOCUMENTATION
-=================
-
-Update:
-
-- backend module map
-- media architecture
-- upload flow
-- S3 integration
-- processing pipeline
-- content lifecycle
-- story lifecycle
-- reel lifecycle
-- API documentation
-- event catalog
-- queue catalog
-- security model
-- privacy model
-- local development instructions
-- testing instructions
-
-==================================================
-81. MIGRATION DISCIPLINE
-========================
-
-All database changes must be implemented with Prisma migrations.
-
-Do not modify migration history destructively.
-
-==================================================
-82. DEPENDENCY BOUNDARIES
-=========================
-
-Do not allow:
-
-Post domain
-→ direct AWS SDK calls.
-
-Use:
-
-Post application/domain
-→ Media interface
-→ Media infrastructure adapter
-
-Similarly:
-
-Content
-→ Search interface later
-
-Content
-→ Feed event later
-
-Content
-→ Notification event later
-
-Do not directly import future implementation modules.
-
-==================================================
-83. FUTURE INTEGRATION CONTRACTS
-================================
-
-Provide stable integration contracts/events for:
-
-- feed
-- search
-- recommendations
-- notifications
-- moderation
-- rights
-- analytics
-
-Do not implement those systems here.
-
-==================================================
-84. NO FEED IMPLEMENTATION
-==========================
-
-Do not implement:
-
-- feed ranking
-- recommendation ranking
-- Explore
-- trending
-- personalized feed generation
-
-This volume only produces the content/events required by those systems later.
-
-==================================================
-85. NO SEARCH IMPLEMENTATION
-============================
-
-Do not implement OpenSearch query behavior or search APIs here.
-
-Only publish the content/indexing events and interfaces needed later.
-
-==================================================
-86. NO FRONTEND
-===============
-
-Do not implement:
-
-- Next.js
-- React
-- UI
-- browser upload components
-
-Expose backend contracts only.
-
-==================================================
-87. NO MOBILE
-=============
-
-Do not implement:
-
-- React Native
-- Expo
-- native camera
-- native media picker
-
-==================================================
-88. NO INFRASTRUCTURE
-=====================
-
-Do not implement:
-
-- Terraform
-- Kubernetes
-- Helm
-- AWS account provisioning
-- CI/CD
-
-Infrastructure integrations must remain inside appropriate adapters/configuration.
-
-==================================================
-89. IMPLEMENTATION DISCIPLINE
-=============================
-
-Before every change:
-
-1. Inspect current repository.
-2. Inspect Backend Volume 1 implementation.
-3. Identify reusable abstractions.
-4. Verify Architecture Volume 2 contract.
-5. Implement only required changes.
-6. Add migrations.
-7. Add tests.
-8. Validate.
-9. Fix failures.
-10. Continue.
-
-Never regenerate unchanged files.
-
-==================================================
-90. VALIDATION
-==============
-
-Run:
-
-- formatter
-- lint
-- typecheck
-- unit tests
-- integration tests
-- API/E2E tests
-- backend build
-
-Where supported also validate:
-
-- Prisma schema
-- migrations
-- event schemas
-- queue configuration
-
-==================================================
-FINAL ACCEPTANCE CRITERIA
-=========================
-
-Backend Volume 2 is complete when:
-
-MEDIA
-
-- upload sessions work;
-- secure direct uploads work;
-- multipart/resumable uploads work where required;
-- S3 integration works;
-- media metadata is stored;
-- image processing works;
-- video processing works;
-- FFmpeg integration works;
-- thumbnails work;
-- HLS works where required;
-- media variants work;
-- processing states work;
-- failed processing can retry;
-- cleanup works;
-- private media is protected.
-
-CONTENT
-
-- posts work;
-- carousels work;
-- drafts work;
-- captions work;
-- hashtags work;
-- mentions work;
-- locations work;
-- visibility works;
-- scheduling works;
-- publishing works;
-- editing works;
-- deletion works;
-- restoration works.
-
-STORIES
-
-- stories work;
-- expiration works;
-- viewers work;
-- reactions work;
-- replies work;
-- highlights work.
-
-REELS
-
-- reels work;
-- reel media works;
-- reel processing works;
-- audio references work;
-- reel publication works.
-
-SECURITY
-
-- media authorization works;
-- private content is protected;
-- malicious media is rejected safely;
-- direct storage access does not bypass authorization;
-- duplicate publishing is prevented.
-
-EVENTS
-
-- content events are published;
-- media events are published;
-- outbox is used;
-- consumers can later process events idempotently.
-
-QUEUES
-
-- media jobs work;
-- scheduled publication works;
-- expiration jobs work;
-- cleanup jobs work;
-- retry policies work.
-
-TESTING
-
-- unit tests exist;
-- integration tests exist;
-- API/E2E tests exist;
-- failure paths are tested;
-- concurrency is tested;
-- idempotency is tested.
-
-OBSERVABILITY
-
-- processing metrics exist;
-- publication metrics exist;
-- queue metrics exist;
-- failures are observable;
-- traces/logs are privacy-safe.
-
-==================================================
-FINAL RULE
-==========
-
-Do not implement discovery, feed ranking, search, recommendations, notifications, messaging, advertising, commerce, or infrastructure in this volume.
-
-The output of Backend Volume 2 must be a stable, production-grade content and media foundation consumed by later backend volumes.
-
-BEGIN WITH:
-
-1. INSPECT THE EXISTING BACKEND REPOSITORY.
-2. VERIFY BACKEND VOLUME 1 CONTRACTS.
-3. IMPLEMENT THE MEDIA/UPLOAD FOUNDATION.
-4. IMPLEMENT POSTS, CAROUSELS, DRAFTS, STORIES, HIGHLIGHTS, AND REEL
-
-You are operating in Senior Engineering Team Mode.
-
-Build the production-ready backend for the core visual-social content and media platform of an enterprise-scale global application comparable in architectural scope to Instagram.
-
-The platform is an original implementation.
-
-Do not copy proprietary source code, internal architecture, branding, confidential implementation details, proprietary algorithms, proprietary datasets, or private implementation details from Instagram, Meta, or any other company.
-
-This prompt is completely independent and may be executed in a separate conversation.
-
-Use the previously approved architecture and backend foundation as the single source of truth.
-
-Do not redesign the approved architecture.
-
-Do not generate frontend code.
-
-Do not generate mobile code.
-
-Do not generate infrastructure implementation code.
-
-Do not generate Terraform.
-
-Do not generate Kubernetes manifests.
-
-Do not generate CI/CD workflows.
-
-────────────────────────────────────────
-
-MISSION
-
-Implement the production-ready backend domains for:
-
-• Media assets
-• Media uploads
-• Multipart/resumable uploads
-• Image processing
-• Video processing
-• Media validation
-• Media moderation integration
-• Media rights state
-• Posts
-• Post media
-• Carousels
-• Drafts
-• Stories
-• Story items
-• Story viewers
-• Story replies
-• Story reactions
-• Story highlights
-• Reels
-• Captions
-• Hashtags
-• Mentions
-• Audio
-• Music
-• Location tagging
-• Content visibility
-• Content lifecycle
-• Content versioning
-• Publication
-• Scheduled publication foundation
-• Content deletion
-• Content archival
-• Content restoration
-• Content access authorization
-
-The implementation must integrate with the existing:
-
-• Identity
-• Accounts
-• Profiles
-• Creators
-• Businesses
-• Devices
-• Sessions
-• Social graph
-• Blocks
-• Restrictions
-• Close friends
-• PostgreSQL
-• Prisma
-• Redis
-• Kafka/Redpanda
-• BullMQ
-• WebSockets
-• S3 abstraction
-• Observability
-• Security
-• Privacy
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
 
 Backend:
 
-• Node.js
-• NestJS
-• TypeScript
+- Node.js
+- NestJS
+- TypeScript
 
-Database:
+Persistence:
 
-• PostgreSQL
-• Prisma ORM
+- PostgreSQL
+- Prisma ORM
 
-Cache:
+Caching and coordination:
 
-• Redis
+- Redis
 
-Event streaming:
+Events:
 
-• Kafka or Redpanda
+- Kafka or Redpanda
 
-Background processing:
+Background jobs:
 
-• BullMQ
+- BullMQ
 
-Object storage:
+Storage:
 
-• AWS S3
+- AWS S3
 
 CDN:
 
-• CloudFront
+- AWS CloudFront
 
 Media:
 
-• FFmpeg
-• Image processing abstraction
-• Video transcoding
-• HLS
-• Adaptive delivery
+- FFmpeg
 
-Real-time:
+Search:
 
-• WebSockets
-• Socket.IO
+- OpenSearch or Elasticsearch
+
+Real-time integration:
+
+- Socket.IO
+- WebSockets
 
 Observability:
 
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
+- OpenTelemetry
+- Prometheus
+- Grafana
+- Loki
+- Tempo
 
-Testing:
+==================================================
+3. DOMAIN MODULES
+=================
 
-• Jest
-• Supertest
-• Integration testing tools
+Create or integrate modules for:
 
-────────────────────────────────────────
+- media
+- media-processing
+- posts
+- stories
+- reels
+- comments
+- likes
+- saves
+- shares
+- hashtags
+- mentions
+- content-visibility
+- engagement
+- moderation integration
+- search integration
+- events
+- background jobs
 
-IMPLEMENTATION RULES
+Keep responsibilities separated.
 
-Never generate pseudo-code.
+Controllers must remain thin.
 
-Never generate placeholders.
+Business rules belong in application/domain layers.
 
-Never generate TODO comments.
+Persistence must be isolated through repositories or equivalent abstractions.
 
-Never omit implementations.
+==================================================
+4. MEDIA ASSET MODEL
+====================
 
-Never say:
+Create a durable MediaAsset model representing an uploaded media object.
 
-- "implement similarly"
-- "left as an exercise"
-- "for brevity"
-- "remaining code omitted"
+It should support:
 
-Every generated file must be complete.
+- media ID
+- owner/user ID
+- media type
+- MIME type
+- original filename where appropriate
+- object key
+- size
+- checksum where practical
+- width
+- height
+- duration
+- processing state
+- moderation state
+- created timestamp
+- updated timestamp
+- deletion timestamp where applicable
 
-Every generated file must compile.
+Do not expose internal S3 object keys unnecessarily through public APIs.
 
-Never regenerate unchanged files.
+==================================================
+5. MEDIA VARIANT MODEL
+======================
 
-Only modify existing files when required.
+Create a MediaVariant model representing generated versions.
 
-Use strict TypeScript.
+Support fields appropriate for:
 
-Use dependency injection.
+- thumbnail
+- preview
+- feed image
+- full image
+- video resolution
+- bitrate
+- format
+- codec
+- width
+- height
+- duration
+- file size
+- object key
+- processing status
 
-Keep controllers thin.
+A media asset may contain multiple variants.
 
-Keep business logic outside controllers.
+==================================================
+6. MEDIA LIFECYCLE
+==================
 
-Use repositories for persistence.
+Implement explicit media states.
 
-Use DTOs for external contracts.
+At minimum:
 
-Use centralized validation.
+- initialized
+- uploading
+- uploaded
+- validating
+- processing
+- moderating
+- ready
+- rejected
+- failed
+- deleted
 
-Use centralized error handling.
+State transitions must be validated.
 
-Use structured logging.
+Do not permit a rejected or deleted asset to be used for publication.
 
-Use idempotency for uploads, publication, jobs, and retriable mutations.
+==================================================
+7. UPLOAD AUTHORIZATION
+=======================
 
-Use optimistic concurrency where appropriate.
+Implement secure upload-session creation.
 
-Never trust client-supplied ownership.
+Flow:
 
-Never trust client-supplied visibility.
+Client
+→ authenticated upload request
+→ validate user/account
+→ validate intended media type
+→ validate size limits
+→ create media record
+→ generate short-lived signed upload authorization
+→ return upload information
 
-Never trust client-supplied moderation status.
+Never trust the client to decide that an object uploaded to S3 is valid.
 
-Never expose private-media credentials.
+Server-side validation must occur after upload.
 
-────────────────────────────────────────
+==================================================
+8. DIRECT S3 UPLOAD
+===================
 
-DOMAIN OWNERSHIP
+Large media files should upload directly from clients to S3.
 
-Maintain explicit boundaries between:
+Application servers should not proxy the entire payload unnecessarily.
 
-• Media
-• Posts
-• Stories
-• Reels
-• Audio
-• Hashtags
-• Mentions
-• Locations
-• Drafts
+Signed upload authorization must:
 
-Do not combine:
+- expire
+- be scoped
+- target controlled object paths
+- prevent unintended object replacement
+- restrict content type where practical
+- enforce object size policy through the upload workflow
 
-• Media asset with post
-• Processing job with publication state
-• Story with reel
-• Audio rights with audio metadata
-• Search data with canonical content
-• CDN access with content authorization
+==================================================
+9. UPLOAD COMPLETION
+====================
 
-────────────────────────────────────────
+Implement an upload completion endpoint/workflow.
 
-MEDIA ASSET DOMAIN
+The backend must:
 
-Implement canonical media assets.
+1. authenticate user
+2. locate the media asset
+3. verify ownership
+4. verify expected object location
+5. confirm object existence
+6. validate object metadata
+7. transition media state
+8. enqueue processing
+9. return processing state
+
+Calling completion multiple times must not create duplicate processing workflows.
+
+==================================================
+10. ABANDONED UPLOADS
+=====================
+
+Implement cleanup for incomplete uploads.
+
+Track upload age.
+
+Use BullMQ scheduled jobs to identify and clean expired temporary objects.
+
+Cleanup must be safe when:
+
+- upload already completed
+- object was deleted externally
+- processing already started
+- completion was delayed
+
+==================================================
+11. MEDIA VALIDATION
+====================
+
+Validate uploaded media independently of client declarations.
+
+Check where appropriate:
+
+- content type
+- actual file format
+- file size
+- dimensions
+- duration
+- codec
+- corruption
+- supported formats
+
+Reject unsupported or dangerous content.
+
+Never execute untrusted files directly on the host.
+
+==================================================
+12. IMAGE PROCESSING
+====================
+
+Implement asynchronous image-processing jobs.
 
 Support:
 
-• Media ID
-• Owner
-• Media type
-• Original object
-• Processing state
-• Moderation state
-• Rights state
-• Visibility reference
-• Version
-• Region
-• Created time
-• Updated time
+- dimensions
+- thumbnails
+- resized variants
+- optimization
+- supported output formats
 
-Types:
+Processing must protect against:
 
-• Image
-• Video
+- decompression bombs
+- extreme dimensions
+- malformed files
+- excessive memory use
 
-────────────────────────────────────────
+Define bounded worker concurrency.
 
-MEDIA LIFECYCLE
+==================================================
+13. VIDEO PROCESSING
+====================
 
-States:
+Use FFmpeg in isolated worker execution.
 
-• Uploading
-• Uploaded
-• Validating
-• Processing
-• Moderating
-• Ready
-• Restricted
-• Failed
-• Deleted
+The workflow should include:
 
-Define valid transitions.
+- metadata extraction
+- codec validation
+- duration validation
+- resolution validation
+- transcoding
+- thumbnails
+- poster frame
+- playback variants
+- streaming packaging where appropriate
 
-Every transition must be:
+Never construct shell commands unsafely from user-provided values.
 
-• Authorized
-• Version-aware
-• Auditable
-• Idempotent where appropriate
+All user media metadata must be treated as untrusted input.
 
-────────────────────────────────────────
+==================================================
+14. FFmpeg RESOURCE CONTROLS
+============================
 
-MEDIA OWNERSHIP
+Workers must enforce:
 
-Every media asset must be bound to:
+- maximum processing duration
+- CPU constraints
+- memory constraints
+- concurrency limits
+- file-size limits
+- output-size limits
 
-• User
-• Creator
-• Business where authorized
+A single malicious or pathological video must not consume all worker capacity.
 
-Never allow one user to reference another user's private source asset.
+==================================================
+15. PROCESSING RETRIES
+======================
 
-────────────────────────────────────────
+Media jobs should have bounded retries.
 
-UPLOAD AUTHORIZATION
+Use:
+
+- exponential backoff
+- retry count limits
+- failure classification
+
+Do not retry permanently invalid media indefinitely.
+
+After final failure:
+
+- mark asset failed
+- persist failure reason safely
+- emit media-processing failure event
+- notify relevant application workflow where required
+
+==================================================
+16. MEDIA PROCESSING IDEMPOTENCY
+================================
+
+Processing must be safe against:
+
+- duplicate job creation
+- worker retries
+- worker crashes
+- duplicate events
+
+Generated variants must not produce unlimited duplicates.
+
+Use deterministic identifiers or equivalent idempotency controls.
+
+==================================================
+17. POST MODEL
+==============
+
+Implement a Post entity supporting:
+
+- post ID
+- author ID
+- caption
+- visibility
+- status
+- created timestamp
+- updated timestamp
+- deleted timestamp
+- media relationship
+- moderation state
+
+Posts must not be published using media that is not authorized for the user.
+
+==================================================
+18. POST MEDIA RELATIONSHIP
+===========================
+
+Support multiple media assets per post.
+
+Store:
+
+- post ID
+- media ID
+- ordering
+- media role where useful
+
+Ordering must be deterministic.
+
+Do not expose a way for a user to attach another user's media asset.
+
+==================================================
+19. POST CREATION
+=================
 
 Implement:
 
-• Upload session
-• Direct S3 authorization
-• Object namespace
-• Owner binding
-• Expiration
-• File-size limits
-• Content-type constraints
-• Upload checksum
+1. authenticate author
+2. verify account state
+3. validate caption
+4. validate visibility
+5. validate media ownership
+6. verify media state
+7. validate media count
+8. validate mentions/hashtags
+9. perform transactional creation
+10. create outbox/domain event
+11. schedule asynchronous derived processing
 
-────────────────────────────────────────
+The post should become authoritative only through the successful database transaction.
 
-UPLOAD SESSION
+==================================================
+20. POST CAPTIONS
+=================
 
-Fields:
+Define strict limits for:
 
-• Upload session ID
-• Owner
-• Media type
-• Expected size
-• Expected MIME
-• Object key reference
-• Status
-• Created
-• Expiration
-• Completed time
+- caption length
+- Unicode handling
+- number of mentions
+- number of hashtags
 
-States:
+Do not permit unbounded user-generated text.
 
-• Initialized
-• Uploading
-• Completed
-• Expired
-• Canceled
-• Failed
+Do not store unnecessary duplicated parsing state unless justified.
 
-────────────────────────────────────────
+==================================================
+21. HASHTAG EXTRACTION
+======================
 
-MULTIPART UPLOAD
+Implement deterministic hashtag extraction.
 
-Support:
+Normalize hashtags consistently.
 
-• Multipart initialization
-• Part authorization
-• Part completion
-• Part retry
-• Pause
-• Resume
-• Finalization
-• Abort
+Avoid duplicate hashtag associations within one post.
 
-Use idempotency.
+Create or reuse hashtag records safely under concurrency.
 
-Do not create duplicate media assets because a client retries completion.
+Emit indexing events for search/discovery.
 
-────────────────────────────────────────
+==================================================
+22. MENTION EXTRACTION
+======================
 
-UPLOAD VALIDATION
+Mentions must:
 
-Validate server-side:
+- validate username format
+- resolve users through authoritative data
+- ignore nonexistent users
+- respect account state
+- respect privacy/product rules
+- avoid duplicate associations
 
-• File signature
-• MIME
-• Size
-• Container
-• Codec
-• Resolution
-• Frame rate
-• Duration
-• Orientation
-• Metadata
-• Corruption
+Mention processing must not allow unauthorized information exposure.
 
-Client metadata is advisory only.
+==================================================
+23. POST VISIBILITY
+===================
 
-────────────────────────────────────────
+Support visibility states appropriate for the product, such as:
 
-OBJECT KEY DESIGN
+- public
+- followers
+- restricted/private contexts
 
-Create deterministic namespaced object references using:
+Visibility must be enforced in:
 
-• Environment
-• Region
-• Owner reference
-• Media ID
-• Version
-• Asset type
+- direct post retrieval
+- feeds
+- search
+- notifications
+- profile grids
+- recommendations
+- shared links
 
-Do not expose raw storage structure as a public contract.
+Never rely only on frontend filtering.
 
-────────────────────────────────────────
+==================================================
+24. POST RETRIEVAL
+==================
 
-MEDIA SECURITY
+Post retrieval must:
 
-Protect against:
+- authenticate where required
+- verify visibility
+- verify account state
+- check block/restriction relationships
+- confirm moderation status
+- omit inaccessible media
+- return stable DTOs
 
-• Path traversal
-• Malicious files
-• MIME spoofing
-• Oversized files
-• Unsupported formats
-• Malformed media
-• Zip/decompression bombs where relevant
-• Unauthorized object access
+A known post ID must not bypass authorization.
 
-────────────────────────────────────────
+==================================================
+25. POST UPDATE
+===============
 
-IMAGE PROCESSING
+Support updating permitted fields such as:
 
-Implement asynchronous processing for:
+- caption
+- visibility
 
-• Thumbnail
-• Small
-• Medium
-• Large
-• Feed
-• Story
-• Avatar
-• Reel cover
-• Business image
-• Product image
+Every update must:
 
-Support:
+- authenticate
+- authorize ownership
+- validate current state
+- update transactionally
+- emit update event
+- update derived systems asynchronously
 
-• Resize
-• Compression
-• Orientation normalization
-• Metadata handling
-• Modern image formats
+Do not allow mutation of immutable ownership information.
 
-────────────────────────────────────────
+==================================================
+26. POST DELETION
+=================
 
-VIDEO PROCESSING
+Deletion must immediately prevent normal access.
 
-Implement asynchronous processing for:
+Implementation must:
 
-• Metadata extraction
-• Validation
-• Transcoding
-• Poster
-• Thumbnail
-• Preview
-• HLS
-• Captions foundation
-• Quality validation
+- mark post deleted or otherwise transition it out of active state
+- invalidate relevant caches
+- emit deletion event
+- remove search representation
+- remove/disable feed eligibility
+- asynchronously clean related derived objects
+- clean media objects according to lifecycle policy
 
-Use FFmpeg workers where approved.
+A stale cache must not make deleted content readable.
 
-────────────────────────────────────────
+==================================================
+27. STORY MODEL
+===============
 
-VIDEO RENDITIONS
+Implement:
 
-Support configurable profiles:
+- Story
+- StoryItem
+- StoryView
 
-• Resolution
-• Bitrate
-• Codec
-• Frame rate
-• Audio
+Stories must support:
 
-Every rendition references:
+- author
+- media
+- ordering
+- expiration timestamp
+- visibility
+- creation time
+- deletion status
 
-• Media ID
-• Processing version
-• Profile
-• Resolution
-• Codec
-• Bitrate
-
-────────────────────────────────────────
-
-HLS
-
-Generate:
-
-• Master manifest
-• Variant playlists
-• Media segments
+==================================================
+28. STORY CREATION
+==================
 
 Validate:
 
-• Manifest references
-• Segment availability
-• Rendition completeness
-• Version consistency
+- ownership
+- media readiness
+- supported media type
+- account state
+- visibility
+- expiration configuration
 
-────────────────────────────────────────
+Create story transactionally.
 
-MEDIA VERSIONING
+Emit appropriate asynchronous event.
 
-Every processing run must have:
+==================================================
+29. STORY EXPIRATION
+====================
 
-• Media version
-• Processing version
-• Profile version
-
-Older processing jobs must never overwrite newer outputs.
-
-────────────────────────────────────────
-
-MEDIA PROCESSING CONCURRENCY
-
-Prevent:
-
-• Duplicate processing
-• Stale worker overwrite
-• Double publication
-• Concurrent state corruption
-
-Use:
-
-• Idempotency
-• Version checks
-• Locks where required
-• Processing revision
-
-────────────────────────────────────────
-
-MEDIA ACCESS
-
-Support:
-
-• Public media
-• Followers-only media
-• Close-friends media
-• Private media
-• Restricted media
-
-Access must be determined server-side.
-
-────────────────────────────────────────
-
-CDN ACCESS
-
-Provide short-lived secure media access where required.
-
-Use:
-
-• Signed URL/cookie foundation
-• CloudFront origin protection
-• Object storage privacy
-
-Never expose unrestricted private S3 objects.
-
-────────────────────────────────────────
-
-POST DOMAIN
+Stories must expire automatically.
 
 Implement:
 
-• Post
-• Post media
-• Post visibility
-• Post state
-• Caption
-• Location reference
-• Publication timestamp
-• Creator reference
+- database-level expiration fields
+- request-time expiration checks
+- scheduled cleanup jobs
+- cache invalidation
+- object cleanup
 
-────────────────────────────────────────
+Never rely solely on the cleanup job.
 
-POST TYPES
+A story with expiration in the past must be inaccessible immediately even if its cleanup job has not run.
 
-Support:
+==================================================
+30. STORY ACCESS
+================
 
-• Single image
-• Single video
-• Carousel
+Story access must verify:
 
-Do not duplicate the media binary inside post storage.
+- story exists
+- story is not expired
+- story not deleted
+- viewer relationship
+- block state
+- account privacy
+- story-specific visibility
 
-────────────────────────────────────────
+Do not expose expired story content.
 
-POST LIFECYCLE
+==================================================
+31. STORY VIEW TRACKING
+=======================
 
-States:
+Implement story-view tracking with duplicate protection.
 
-• Draft
-• Uploading
-• Processing
-• Moderation
-• Scheduled
-• Published
-• Restricted
-• Archived
-• Deleted
+A viewer should not create unlimited logical duplicate views for the same story item unless explicitly required.
 
-Visibility remains a separate attribute.
+Use an appropriate uniqueness model.
 
-────────────────────────────────────────
+High-volume view counting should avoid turning one database row into an unavoidable hotspot.
 
-POST PUBLICATION
+==================================================
+32. REELS MODEL
+===============
 
-Publish only when:
-
-• All required media is ready
-• Required moderation has completed
-• Rights state permits
-• Visibility settings are valid
-• Creator/account is eligible
-
-Publication must be idempotent.
-
-────────────────────────────────────────
-
-SCHEDULED PUBLICATION FOUNDATION
+Implement a dedicated Reel domain that can reference video media.
 
 Support:
 
-• Scheduled time
-• Time zone
-• Scheduled state
-• Cancellation
-• Publication worker
+- reel ID
+- author
+- media asset
+- caption
+- thumbnail
+- duration
+- publication state
+- moderation state
+- created timestamp
+- updated timestamp
+- deleted timestamp
 
-Do not let client clocks determine server publication time.
+Reels must use processed video variants.
 
-────────────────────────────────────────
+==================================================
+33. REEL PUBLICATION
+====================
 
-POST VISIBILITY
+A reel may only become publicly available when:
 
-Support:
+- media processing succeeded
+- required variants are ready
+- moderation requirements are satisfied
+- author is allowed to publish
 
-• Public
-• Followers
-• Close Friends
+Do not expose partially processed media as finished content.
 
-Integrate with:
+==================================================
+34. VIDEO DELIVERY METADATA
+===========================
 
-• Private accounts
-• Blocks
-• Restrictions
+Return only necessary media delivery metadata.
 
-────────────────────────────────────────
+For a ready reel, provide:
 
-CONTENT AUTHORIZATION
+- playback URL or signed access strategy
+- poster/thumbnail
+- dimensions
+- duration
+- available variants
 
-For every read determine:
+Do not expose private S3 credentials or internal infrastructure metadata.
 
-• Viewer
-• Owner
-• Account state
-• Block state
-• Restriction
-• Follow relationship
-• Visibility
-• Rights
-• Moderation
-• Region
+==================================================
+35. LIKE MODEL
+==============
 
-────────────────────────────────────────
+Implement durable likes with uniqueness:
 
-CAROUSELS
+(user_id, target_content_id)
+
+A user must not create duplicate logical likes.
+
+Use database constraints to enforce uniqueness under concurrent requests.
+
+==================================================
+36. LIKE OPERATIONS
+===================
 
 Implement:
 
-• Carousel
-• Ordered media
-• Cover item
-• Item order
-• Caption
-• Hashtags
-• Mentions
-• Location
+- like
+- unlike
+- like-state retrieval
 
-Publication requires every required media item to be valid.
+The API must be safe under repeated calls.
 
-────────────────────────────────────────
+For example, repeated unlike operations should not create inconsistent counters or errors that leak internal state.
 
-DRAFTS
+==================================================
+37. ENGAGEMENT COUNTERS
+=======================
 
-Support drafts for:
+Counters for:
 
-• Posts
-• Carousels
-• Reels
-• Stories
+- likes
+- comments
+- saves
+- shares
+- views
 
-Drafts are:
+may be eventually consistent.
 
-• Private
-• User-owned
-• Versioned
-• Recoverable
+The authoritative underlying relationships must remain correct.
 
-────────────────────────────────────────
+Counter updates should use asynchronous events or atomic aggregation techniques as appropriate.
 
-DRAFT VERSIONING
-
-Prevent concurrent editing conflicts using:
-
-• Revision number
-• Updated time
-• Optimistic concurrency
-
-────────────────────────────────────────
-
-STORIES
+==================================================
+38. COMMENT MODEL
+=================
 
 Implement:
 
-• Story
-• Story item
-• Story sequence
-• Expiration
-• Visibility
-• Viewer state
-• Reply
-• Reaction
-• Mention
-• Highlight reference
+- Comment
+- parent comment relationship where replies are supported
+- author
+- target content
+- body
+- status
+- moderation state
+- timestamps
+- deletion state
 
-────────────────────────────────────────
+Use bounded reply depth.
 
-STORY TYPES
+Do not implement arbitrary recursive comment trees unless there is a concrete requirement.
 
-Support:
+==================================================
+39. COMMENT CREATION
+====================
 
-• Image
-• Video
+Validate:
 
-Use common media pipeline.
+- authenticated user
+- target visibility
+- account state
+- text limits
+- moderation
+- mention rules where supported
+- rate limits
 
-────────────────────────────────────────
+Create comment transactionally.
 
-STORY LIFECYCLE
+Emit event afterward.
 
-States:
+==================================================
+40. COMMENT DELETION
+====================
 
-• Draft
-• Processing
-• Moderation
-• Published
-• Restricted
-• Expired
-• Archived
-• Deleted
+Comment deletion must respect:
 
-────────────────────────────────────────
+- author ownership
+- moderator privileges
+- content status
+- parent/reply relationships
 
-STORY EXPIRATION
+Deleted comments must not reappear through:
 
-Every story item has:
+- cached lists
+- feeds
+- notifications
+- search where indexed
 
-• Published time
-• Expiration time
+==================================================
+41. COMMENT PAGINATION
+======================
 
-Expired story content must not appear in:
+Use cursor pagination.
 
-• Feed
-• Search
-• Explore
-• Public profiles
+Define stable ordering, such as:
 
-unless explicitly preserved as an authorized highlight representation.
+- newest-first
+- oldest-first
+- ranking order where explicitly supported
 
-────────────────────────────────────────
+Never accept unrestricted pagination sizes.
 
-STORY VIEWER MODEL
+==================================================
+42. SAVE MODEL
+==============
 
-Support:
+Implement user-specific saves.
 
-• Story
-• Viewer
-• Seen timestamp
+A save must associate:
 
-Avoid writing duplicate viewer events indefinitely.
+- user
+- content
+- created time
 
-Use appropriate unique constraints.
+Prevent duplicate saves.
 
-────────────────────────────────────────
+Saving must not expose content to users who are otherwise unauthorized to access it.
 
-STORY REPLIES
+==================================================
+43. SHARE MODEL
+===============
 
-Support:
+Define a share operation appropriate to the product.
 
-• Reply
-• Author
-• Story
-• Message reference where applicable
+Do not implement sharing by blindly copying private content into public storage.
 
-Respect:
+A share must respect original content visibility and authorization.
 
-• Block
-• Restriction
-• Messaging permissions
-• Story visibility
+Emit a share event for engagement/analytics.
 
-────────────────────────────────────────
+==================================================
+44. ENGAGEMENT EVENT FLOW
+=========================
 
-STORY REACTIONS
+Implement domain events such as:
 
-Support reaction foundation:
+- PostCreated
+- PostUpdated
+- PostDeleted
+- ReelPublished
+- StoryCreated
+- StoryExpired
+- MediaUploaded
+- MediaProcessingCompleted
+- MediaProcessingFailed
+- PostLiked
+- PostUnliked
+- CommentCreated
+- CommentDeleted
+- PostSaved
+- PostUnsaved
+- PostShared
+
+Events should include:
 
-• Reaction
-• Type
-• Author
-• Story
-• Created time
+- event ID
+- type
+- version
+- timestamp
+- aggregate ID
+- actor ID when appropriate
+- correlation ID
+- trace ID where available
 
-Ensure duplicate reaction behavior is deterministic.
+Never publish passwords, access tokens, refresh tokens, or unnecessary private message data.
 
-────────────────────────────────────────
+==================================================
+45. OUTBOX PATTERN
+==================
 
-STORY HIGHLIGHTS
+For authoritative content mutations:
 
-Implement:
+database transaction
+→ content state
+→ outbox event
 
-• Highlight
-• Title
-• Cover
-• Ordered story references
-• Visibility
+A publisher then delivers the event to Kafka/Redpanda.
 
-A highlight may preserve eligible story content after normal expiration.
+Do not require the HTTP request to remain active while asynchronous event delivery occurs.
 
-────────────────────────────────────────
+==================================================
+46. BULLMQ WORKERS
+==================
 
-REELS
+Create appropriate workers for:
 
-Implement:
+- image processing
+- video processing
+- thumbnail generation
+- story cleanup
+- media cleanup
+- search indexing triggers
+- engagement aggregation
+- abandoned upload cleanup
 
-• Reel
-• Media reference
-• Cover
-• Caption
-• Audio
-• Hashtags
-• Mentions
-• Location
-• Visibility
-• Publication state
+Each worker must provide:
 
-────────────────────────────────────────
+- bounded concurrency
+- retry policy
+- timeout
+- structured logging
+- metrics
+- failure handling
 
-REEL LIFECYCLE
+==================================================
+47. REDIS CACHE
+===============
 
-States:
+Cache suitable read-heavy data such as:
 
-• Draft
-• Processing
-• Moderation
-• Published
-• Restricted
-• Archived
-• Deleted
+- post summary
+- profile/content relationship data where appropriate
+- engagement summaries
+- story metadata
+- media delivery metadata
 
-────────────────────────────────────────
+Every cache must define:
 
-REEL DISTRIBUTION
+- TTL
+- invalidation rules
+- stale-data tolerance
 
-Publish events for downstream:
+Never use cache alone for access-control decisions.
 
-• Feed
-• Explore
-• Search
-• Recommendation
-• Trending
-• Analytics
+==================================================
+48. CACHE INVALIDATION
+======================
 
-The Reel service itself does not implement final ranking.
+Mutations must invalidate or update relevant cache entries.
 
-────────────────────────────────────────
+At minimum consider:
 
-CAPTIONS
+- post update
+- post deletion
+- like/unlike
+- comment changes
+- save changes
+- story expiration
+- block relationship changes
+- privacy changes
 
-Support:
+When invalidation is asynchronous, authoritative request-time authorization must still protect data.
 
-• Caption text
-• Language
-• Accessibility metadata
-• Auto-caption status
-• Caption version
+==================================================
+49. SEARCH INTEGRATION
+======================
 
-Prepare for generated captions.
+Content changes should publish search indexing events.
 
-────────────────────────────────────────
+Index only information that is intended to be searchable.
 
-HASHTAGS
+When content becomes:
 
-Implement canonical hashtag domain.
+- deleted
+- private
+- restricted
+- suspended
+- moderation-blocked
 
-Support:
+the derived search representation must be removed or updated.
 
-• Normalized value
-• Display value
-• Identity
-• Usage
-• Status
+Search remains a derived system.
 
-Associate content through references rather than duplicate hashtag strings everywhere.
+==================================================
+50. MODERATION INTEGRATION
+==========================
 
-────────────────────────────────────────
+Content creation should integrate with moderation workflows.
 
-HASHTAG NORMALIZATION
+Media/content may transition through moderation states such as:
 
-Normalize:
+- pending
+- approved
+- rejected
+- restricted
 
-• Case
-• Unicode
-• Whitespace
-• Supported punctuation
+The API must not expose prohibited content merely because media processing succeeded.
 
-Prevent visually equivalent duplicates where policy requires.
-
-────────────────────────────────────────
-
-MENTIONS
-
-Implement:
-
-• Mention
-• Target user
-• Content
-• Position
-• Visibility
-• Notification eligibility
-
-Before creating mention:
-
-• Validate target
-• Validate content permissions
-• Check block/restriction rules
-
-────────────────────────────────────────
-
-LOCATION TAGGING
-
-Support:
-
-• Location reference
-• Display name
-• Provider/source reference where needed
-
-Do not automatically expose precise creator/device location.
-
-────────────────────────────────────────
-
-AUDIO DOMAIN
-
-Implement:
-
-• Audio
-• Source
-• Creator/rights owner reference
-• Duration
-• Usage count
-• Region
-• Rights state
-• Availability
-
-────────────────────────────────────────
-
-AUDIO STATES
-
-Support:
-
-• Active
-• Restricted
-• Region Restricted
-• Removed
-• Expired
-
-────────────────────────────────────────
-
-AUDIO USAGE
-
-Track references from:
-
-• Reels
-• Stories where supported
-• Posts where supported
-
-Do not duplicate audio binaries across content.
-
-────────────────────────────────────────
-
-AUDIO RIGHTS
-
-Support:
-
-• Rights claim
-• Region
-• Effective time
-• Expiration
-• Restriction
-
-Rights state must affect publication and playback.
-
-────────────────────────────────────────
-
-CONTENT RIGHTS
-
-Every post/reel/story media relationship may be affected by:
-
-• Rights
-• Moderation
-• Region
-• Account state
-
-Read paths must enforce current effective state.
-
-────────────────────────────────────────
-
-CONTENT DELETION
-
-Support:
-
-• User deletion
-• Admin removal
-• Moderation removal
-• Rights removal
-• Privacy deletion
-
-Deletion must propagate to:
-
-• Search
-• Feed
-• Explore
-• Recommendations
-• Trending
-• Notifications
-• Analytics
-• Caches
-
-────────────────────────────────────────
-
-CONTENT RESTORATION
-
-Support authorized restoration after:
-
-• Moderation reversal
-• Appeal
-• Rights restoration
-• Administrative correction
-
-Re-restoration must create new state/revision as needed.
-
-────────────────────────────────────────
-
-CONTENT ARCHIVAL
-
-Support archival where business rules require.
-
-Archived content must not automatically remain publicly discoverable.
-
-────────────────────────────────────────
-
-CONTENT VERSIONING
-
-Track revisions to:
-
-• Caption
-• Visibility
-• Media arrangement
-• Location
-• Mentions
-• Hashtags
-• Cover
-• Audio
-
-Use immutable audit history where needed.
-
-────────────────────────────────────────
-
-POST UPDATE CONCURRENCY
-
-Use optimistic concurrency for:
-
-• Caption changes
-• Media reordering where allowed
-• Visibility
-• Cover
-• Metadata
-
-Prevent stale clients from silently overwriting newer updates.
-
-────────────────────────────────────────
-
-DATABASE
-
-Implement Prisma models and migrations for:
-
-MEDIA
-
-• MediaAsset
-• MediaVersion
-• MediaRendition
-• MediaProcessingJob
-• MediaManifest
-• MediaCaption
-• UploadSession
-• UploadPart
-
-POSTS
-
-• Post
-• PostMedia
-• PostLocation
-• PostHashtag
-• PostMention
-• PostRevision
-
-CAROUSELS
-
-• Carousel
-• CarouselItem
-
-DRAFTS
-
-• ContentDraft
-• DraftRevision
-
-STORIES
-
-• Story
-• StoryItem
-• StoryViewer
-• StoryReplyReference
-• StoryReaction
-• StoryHighlight
-• StoryHighlightItem
-
-REELS
-
-• Reel
-• ReelRevision
-• ReelAudioReference
-• ReelHashtag
-• ReelMention
-• ReelLocation
-
-AUDIO
-
-• Audio
-• AudioUsage
-• AudioRights
-
-HASHTAGS
-
-• Hashtag
-
-MENTIONS
-
-• Mention
-
-RIGHTS
-
-• RightsReference
-• RightsRestriction
-
-────────────────────────────────────────
-
-DATABASE CONSTRAINTS
-
-Use:
-
-• Unique identifiers
-• Foreign keys
-• Unique owner/content relationships
-• Composite indexes
-• Status indexes
-• Timestamp indexes
-• Revision/version fields
-
-Prevent:
-
-• Duplicate media
-• Duplicate carousel ordering
-• Duplicate story viewers
-• Duplicate audio usage where applicable
-• Duplicate content relations
-
-────────────────────────────────────────
-
-DATABASE INDEXING
-
-MEDIA:
-
-• Owner
-• Status
-• Type
-• Created
-
-POSTS:
-
-• Owner
-• Visibility
-• State
-• Published time
-
-STORIES:
-
-• Owner
-• State
-• Expiration
-• Published
-
-REELS:
-
-• Owner
-• State
-• Published
-
-HASHTAGS:
-
-• Normalized value
-• Status
-
-AUDIO:
-
-• Status
-• Region
-• Search references
-
-────────────────────────────────────────
-
-REDIS
-
-Use Redis for:
-
-• Upload-session acceleration
-• Media-processing locks
-• Content-read cache
-• Story tray cache
-• Story viewer state
-• Trending counters
-• Hashtag usage cache
-• Audio usage counters
-• Idempotency
-• Rate limiting
-
-Redis must never be authoritative for:
-
-• Posts
-• Stories
-• Reels
-• Media ownership
-• Audio rights
-• Hashtag ownership
-
-────────────────────────────────────────
-
-KAFKA / REDPANDA EVENTS
-
-MEDIA:
-
-• MediaUploadInitialized
-• MediaUploadCompleted
-• MediaValidationStarted
-• MediaValidationCompleted
-• MediaProcessingStarted
-• MediaProcessingCompleted
-• MediaProcessingFailed
-• MediaDeleted
-
-POSTS:
-
-• PostCreated
-• PostPublished
-• PostUpdated
-• PostDeleted
-• PostArchived
-• PostRestored
-
-STORIES:
-
-• StoryCreated
-• StoryPublished
-• StoryViewed
-• StoryExpired
-• StoryDeleted
-• StoryHighlighted
-
-REELS:
-
-• ReelCreated
-• ReelPublished
-• ReelUpdated
-• ReelDeleted
-
-AUDIO:
-
-• AudioCreated
-• AudioRestricted
-• AudioRestored
-• AudioUsageRecorded
-
-HASHTAGS:
-
-• HashtagCreated
-• HashtagReferenced
-
-MENTIONS:
-
-• MentionCreated
-
-All events must be:
-
-• Versioned
-• Idempotent
-• Privacy-aware
-• Correlation-aware
-• Region-aware
-
-────────────────────────────────────────
-
-BULLMQ
-
-Create queues for:
-
-• Upload validation
-• Image processing
-• Video processing
-• HLS packaging
-• Poster generation
-• Thumbnail generation
-• Caption processing
-• Story expiration
-• Scheduled publication
-• Search indexing
-• Feed notification
-• Media cleanup
-• Expired-object cleanup
-• Rights propagation
-• Moderation propagation
-• Reconciliation
-
-Every queue defines:
-
-• Job schema
-• Retry
-• Backoff
-• Timeout
-• Concurrency
-• Idempotency
-• Dead-letter
-• Metrics
-
-────────────────────────────────────────
-
-API
-
-MEDIA
-
-• Initialize upload
-• Get upload status
-• Complete upload
-• Cancel upload
-• Get media status
-• Get media metadata
-• Request secure playback
-• Request image variants
-
-POSTS
-
-• Create draft
-• Get post
-• Update post
-• Publish post
-• Schedule post
-• Archive post
-• Delete post
-• Restore post where authorized
-
-CAROUSELS
-
-• Add item
-• Remove item
-• Reorder item
-• Update cover
-
-STORIES
-
-• Create story
-• Publish
-• Get story
-• Get story tray
-• Mark viewed
-• Reply
-• React
-• Delete
-• Create highlight
-
-REELS
-
-• Create draft
-• Get reel
-• Update
-• Publish
-• Schedule
-• Delete
-
-AUDIO
-
-• Search
-• Get audio
-• Get availability
-• Get usage metadata
-
-HASHTAGS
-
-• Get
-• Search
-• Related
-
-MENTIONS
-
-• Create where authorized
-• Remove where authorized
-
-Every endpoint must implement:
-
-• Authentication
-• Authorization
-• Validation
-• Rate limiting
-• Idempotency where required
-• OpenAPI
-• Consistent error handling
-
-────────────────────────────────────────
-
-MEDIA API SECURITY
-
-Never return:
-
-• S3 credentials
-• Permanent private URLs
-• Internal bucket structure
-• Processing internals unnecessarily
-
-Secure playback must respect:
-
-• Visibility
-• Rights
-• Moderation
-• Region
-• Account state
-
-────────────────────────────────────────
-
-STORY VIEW AUTHORIZATION
-
-Before returning a story evaluate:
-
-• Account state
-• Block
-• Private account
-• Follow relationship
-• Close-friends membership
-• Story visibility
-• Story expiration
-• Moderation
-• Rights
-
-────────────────────────────────────────
-
-POST AUTHORIZATION
-
-Before returning a post evaluate:
-
-• Owner
-• Visibility
-• Follower relationship
-• Close friends
-• Block
-• Restriction
-• Account state
-• Moderation
-• Rights
-• Region
-
-────────────────────────────────────────
-
-REEL AUTHORIZATION
-
-Same principles as posts plus:
-
-• Recommendation eligibility
-• Audio rights
-• Regional playback rights
-
-────────────────────────────────────────
-
-STORY TRAY
-
-Create backend contract for:
-
-• Recent stories
-• Unseen state
-• Eligibility
-• Close friends
-• Creator ordering
-
-Do not implement final recommendation ranking here.
-
-────────────────────────────────────────
-
-STORY VIEW EVENT
-
-Marking a story viewed must be:
-
-• Idempotent
-• Efficient
-• Deduplicated
-
-Do not write infinite duplicate rows for repeated opens.
-
-────────────────────────────────────────
-
-MENTION NOTIFICATIONS
-
-Creating a valid mention may emit a notification event.
-
-Notification delivery belongs to the notification subsystem.
-
-────────────────────────────────────────
-
-HASHTAG USAGE
-
-Increment usage asynchronously.
-
-Do not make content publication depend on a global synchronous hashtag-counter update.
-
-────────────────────────────────────────
-
-AUDIO USAGE
-
-Record usage through asynchronous event processing.
-
-Do not block publication solely on the usage counter.
-
-────────────────────────────────────────
-
-CONTENT PUBLICATION TRANSACTION
-
-Publication should atomically establish:
-
-• Content state
-• Publication time
-• Required metadata
-• Publication event/outbox record
-
-External side effects happen after successful transaction.
-
-────────────────────────────────────────
-
-SCHEDULED PUBLICATION
-
-A scheduled content job must:
-
-• Recheck authorization
-• Recheck account state
-• Recheck media state
-• Recheck moderation
-• Recheck rights
-• Recheck visibility
-
-before publication.
-
-────────────────────────────────────────
-
-SECURITY
+==================================================
+51. SECURITY
+============
 
 Protect against:
 
-• Unauthorized post access
-• Private-story leakage
-• Private-reel leakage
-• Media scraping
-• S3 origin bypass
-• Upload abuse
-• Duplicate upload
-• Malicious media
-• Mention abuse
-• Hashtag spam
-• Audio misuse
-• Cross-user draft access
-• Draft enumeration
-• Content-ID enumeration
-
-────────────────────────────────────────
-
-PRIVACY
-
-Protect:
-
-• Drafts
-• Private posts
-• Close-friends stories
-• Viewer lists
-• Story interactions
-• Private media
-• Search-related content metadata
-• User-generated captions/drafts
-
-Viewer lists should never become public API data unless explicitly authorized.
-
-────────────────────────────────────────
-
-OBSERVABILITY
-
-Instrument:
-
-• Upload initialization
-• Upload completion
-• Media validation
-• Media processing
-• HLS
-• Image processing
-• Publication
-• Story expiration
-• Story viewing
-• Reel publication
-• Audio usage
-• Hashtag usage
-• Content deletion
-• Content restoration
-
-Track:
-
-• Upload latency
-• Processing latency
-• Failure rate
-• Queue depth
-• Processing backlog
-• Publication latency
-• Story expiration lag
-• Media error rate
-• CDN authorization failures
-
-Never log:
-
-• Private content
-• Raw signed URLs
-• User drafts
-• Viewer identities unnecessarily
-
-────────────────────────────────────────
-
-HEALTH CHECKS
-
-Check:
-
-• PostgreSQL
-• Redis
-• Kafka
-• BullMQ
-• S3
-
-Separate liveness from dependency readiness.
-
-────────────────────────────────────────
-
-TESTING
-
-UNIT TESTS
-
-Test:
-
-• Media lifecycle
-• Upload lifecycle
-• Post lifecycle
-• Story lifecycle
-• Reel lifecycle
-• Visibility
-• Publication
-• Expiration
-• Mention rules
-• Hashtag normalization
-• Audio rights
-• Revision conflicts
-
-MEDIA TESTS
-
-• Valid image
-• Invalid image
-• Valid video
-• Invalid video
-• MIME spoof
-• Corrupt file
-• Oversize file
-• Unsupported codec
-• Duplicate completion
-• Expired upload
-
-IMAGE TESTS
-
-• Resize
-• Orientation
-• Compression
-• Metadata
-
-VIDEO TESTS
-
-• Transcoding
-• Renditions
-• HLS
-• Poster
-• Thumbnail
-
-POST TESTS
-
-• Draft
-• Publish
-• Schedule
-• Update
-• Delete
-• Restore
-
-STORY TESTS
-
-• Publish
-• Visibility
-• View
-• Reply
-• Reaction
-• Expiration
-• Highlight
-
-REEL TESTS
-
-• Draft
-• Publish
-• Delete
-• Audio
-• Rights
-
-SECURITY TESTS
-
-• Private-content IDOR
-• Draft access
-• Media access
-• Signed URL abuse
-• Story viewer leakage
-• Cross-account media access
-
-CONCURRENCY TESTS
-
-• Duplicate upload completion
-• Concurrent publication
-• Stale post update
-• Story view race
-• Media processing race
-• Scheduled publication race
-
-PERFORMANCE TESTS
-
-• Upload initialization
-• Media status
-• Story tray
-• Content reads
-• Publication
-• Media-processing queues
-
-────────────────────────────────────────
-
-DOCUMENTATION
-
-Generate:
-
-• Media architecture
-• Upload lifecycle
-• Multipart uploads
-• Media validation
-• Image processing
-• Video processing
-• HLS
-• Media versioning
-• CDN access
-• Post architecture
-• Post lifecycle
-• Visibility
-• Publication
-• Scheduling
-• Carousels
-• Drafts
-• Stories
-• Story viewers
-• Story replies
-• Story reactions
-• Highlights
-• Reels
-• Captions
-• Hashtags
-• Mentions
-• Locations
-• Audio
-• Rights
-• Deletion
-• Restoration
-• API contracts
-• Event contracts
-• Queue contracts
-• Database schema
-• Redis catalog
-• Security
-• Privacy
-• Observability
-• Testing
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Update the backend Project Index with:
-
-• Media
-• Upload sessions
-• Upload parts
-• Media versions
-• Renditions
-• Processing jobs
-• HLS manifests
-• Captions
-• Posts
-• Post media
-• Post revisions
-• Carousels
-• Carousel items
-• Drafts
-• Draft revisions
-• Stories
-• Story items
-• Story viewers
-• Story replies
-• Story reactions
-• Story highlights
-• Reels
-• Reel revisions
-• Audio
-• Audio usage
-• Audio rights
-• Hashtags
-• Mentions
-• Locations
-• Rights references
-• APIs
-• Kafka topics
-• BullMQ queues
-• Redis keys
-• Database migrations
-• Security
-• Privacy
-• Observability
-• Tests
-• Generated files
-• Modified files
-• Remaining work
-• Current milestone
-• Dependencies
-
-────────────────────────────────────────
-
-IMPLEMENTATION MILESTONES
-
-BACKEND MILESTONE 11
-
-Media assets, upload sessions, direct S3 authorization, multipart uploads, validation, object ownership, media lifecycle, and secure access.
-
-BACKEND MILESTONE 12
-
-Image processing, video processing, FFmpeg workers, renditions, posters, thumbnails, HLS packaging, media versioning, and processing concurrency.
-
-BACKEND MILESTONE 13
-
-Posts, post media, carousels, captions, locations, visibility, publication, scheduling foundation, archival, deletion, restoration, and revisions.
-
-BACKEND MILESTONE 14
-
-Drafts, draft revisions, story creation, story publication, story visibility, expiration, viewers, replies, reactions, and highlights.
-
-BACKEND MILESTONE 15
-
-Reels, reel lifecycle, audio integration, captions, hashtags, mentions, locations, rights state, and publication propagation.
-
-BACKEND MILESTONE 16
-
-Content authorization, secure playback, privacy enforcement, blocks/restrictions integration, rights enforcement, moderation integration, and deletion propagation.
-
-BACKEND MILESTONE 17
-
-Kafka events, transactional outbox integration, BullMQ workers, scheduled publication, story expiration, media cleanup, reconciliation, and derived-state propagation.
-
-BACKEND MILESTONE 18
-
-API hardening, rate limiting, security testing, media-abuse protection, content-access testing, concurrency controls, and performance optimization.
-
-BACKEND MILESTONE 19
-
-Observability, metrics, tracing, queue monitoring, media operational dashboards, publication diagnostics, failure handling, and recovery.
-
-BACKEND MILESTONE 20
-
-Full integration, regression testing, security validation, privacy validation, load testing, documentation, Project Index completion, and production-readiness review.
-
-Each milestone should contain approximately 20–40 files where practical.
-
-Every milestone must compile before proceeding.
-
-────────────────────────────────────────
-
-OUTPUT FORMAT
-
-For every generated file provide:
-
-1. Exact file path
-2. Complete file contents
-
-Never truncate code.
-
-Never summarize source code instead of generating it.
-
-Never generate pseudo-code.
-
-Never generate placeholders.
-
-Never generate TODO implementations.
-
-When modifying an existing file:
-
-1. Provide the exact file path.
-2. State why it must change.
-3. Provide the complete updated file.
-
-Never regenerate unchanged files.
-
-────────────────────────────────────────
-
-SCOPE RESTRICTION
-
-This volume covers the core content and media backend:
-
-• Media
-• Upload
-• Multipart/resumable upload
-• Image processing
-• Video processing
-• HLS
-• Media versions
-• Posts
-• Carousels
-• Drafts
-• Stories
-• Story viewers
-• Story replies
-• Story reactions
-• Highlights
-• Reels
-• Captions
-• Hashtags
-• Mentions
-• Locations
-• Audio
-• Rights integration
-• Visibility
-• Publication
-• Scheduling foundation
-• Deletion
-• Restoration
-• Content authorization
-• Related events
-• Related queues
-• Related APIs
-• Related tests
-
-Do not implement complete:
-
-• Feed ranking
-• Recommendation algorithms
-• Explore ranking
-• Trending algorithms
-• Search ranking
-• Full messaging
-• Notification delivery
-• Full moderation platform
-• Full rights platform
-• Advertising
-• Commerce
-• Analytics platform
-• Administration UI
-• Frontend
-• Mobile
-• Infrastructure
-
-Use the existing identity, social graph, account, profile, security, privacy, database, Redis, Kafka, BullMQ, WebSocket, and S3 foundations.
-
-────────────────────────────────────────
-
-QUALITY BAR
-
-Treat media, content ownership, content visibility, publication, and private-content access as mission-critical.
-
-Assume:
-
-• Hundreds of millions of users
-• Millions of creators
-• Billions of media objects
-• Massive upload traffic
-• Massive video-processing workloads
-• Massive story/reel traffic
-• Multiple regions
-• Strict privacy
-• High availability
-
-Prioritize:
-
-• Media integrity
-• Secure storage
-• Secure playback
-• Correct visibility
-• Idempotent publication
-• Reliable processing
-• Efficient CDN delivery
-• Concurrency safety
-• Rights enforcement
-• Privacy
-• Security
-• Scalability
-• Observability
-• Maintainability
-• Production readiness
+- unauthorized media access
+- object-key manipulation
+- IDOR
+- malicious uploads
+- oversized files
+- image bombs
+- malicious videos
+- command injection through media metadata
+- privacy bypass
+- spam
+- automated engagement abuse
+
+Validate both authorization and ownership.
+
+==================================================
+52. RATE LIMITING
+=================
+
+Apply distributed limits to:
+
+- media upload initialization
+- upload completion
+- post creation
+- comment creation
+- likes
+- saves
+- shares
+- story creation
+- reel publication
+
+Rates should be configurable.
+
+==================================================
+53. DATABASE INDEXING
+=====================
+
+Create indexes supporting:
+
+Posts:
+
+- author
+- created time
+- status
+- visibility
+
+Post media:
+
+- post
+- media
+- ordering
+
+Comments:
+
+- target
+- created time
+- parent
+
+Likes:
+
+- user + target
+- target + created time
+
+Saves:
+
+- user + target
+
+Stories:
+
+- author
+- expiration
+- active status
+
+Story views:
+
+- story item + viewer
+
+Reels:
+
+- author
+- publication state
+- created time
+
+Do not add indexes without query justification.
+
+==================================================
+54. CONCURRENCY
+===============
+
+Handle simultaneous operations for:
+
+- like/unlike
+- save/unsave
+- post creation
+- post deletion
+- story expiration
+- media completion
+- processing retries
+- comment creation
+
+Use:
+
+- unique constraints
+- transactions
+- atomic updates
+- idempotency keys
+- state-transition checks
+
+==================================================
+55. MEDIA DELETION
+==================
+
+When media is no longer referenced and retention rules permit deletion:
+
+- remove derived access
+- delete or schedule deletion of variants
+- delete S3 objects
+- invalidate CDN references where applicable
+- mark media deleted
+- emit cleanup events
+
+Do not delete media that remains referenced by an active valid object.
+
+==================================================
+56. CDN ARCHITECTURE
+====================
+
+Use CloudFront for media distribution.
+
+Do not make application servers the default video/image streaming path.
+
+Public assets may use public CDN caching.
+
+Private assets require controlled access mechanisms.
+
+CDN configuration must avoid bypassing application authorization for private resources.
+
+==================================================
+57. API CONTRACTS
+=================
+
+Implement stable DTOs for:
+
+- media
+- posts
+- stories
+- reels
+- comments
+- likes
+- saves
+- shares
+
+Never expose Prisma entities directly.
+
+Define explicit API contracts.
+
+==================================================
+58. API EXAMPLES
+================
+
+Provide production endpoints following the application's versioned API convention.
+
+Examples include:
+
+POST /api/v1/media/uploads
+POST /api/v1/media/uploads/:mediaId/complete
+
+POST /api/v1/posts
+GET /api/v1/posts/:postId
+PATCH /api/v1/posts/:postId
+DELETE /api/v1/posts/:postId
+
+POST /api/v1/posts/:postId/like
+DELETE /api/v1/posts/:postId/like
+
+GET /api/v1/posts/:postId/comments
+POST /api/v1/posts/:postId/comments
+
+POST /api/v1/posts/:postId/save
+DELETE /api/v1/posts/:postId/save
+
+POST /api/v1/stories
+GET /api/v1/stories
+POST /api/v1/stories/:storyId/view
+DELETE /api/v1/stories/:storyId
+
+POST /api/v1/reels
+GET /api/v1/reels/:reelId
+
+Use the repository's established naming/versioning convention when one already exists.
+
+==================================================
+59. ERROR HANDLING
+==================
+
+Return stable application errors for:
+
+- invalid media
+- unauthorized access
+- missing resource
+- expired story
+- unavailable content
+- invalid state transition
+- duplicate interaction
+- rate limiting
+- processing failure
+- dependency failure
+
+Never expose raw S3, FFmpeg, Prisma, or filesystem errors.
+
+==================================================
+60. OBSERVABILITY
+=================
+
+Trace:
+
+- media upload initialization
+- upload completion
+- processing jobs
+- post creation
+- post retrieval
+- engagement operations
+- story retrieval
+- reel publication
+- S3 operations
+- Redis operations
+- Kafka operations
+- BullMQ jobs
+
+Record metrics such as:
+
+- media-processing duration
+- media failure rate
+- upload completion rate
+- post creation latency
+- engagement write rate
+- comment latency
+- queue depth
+- queue wait time
+- cache hit rate
+
+Use structured logs without exposing secrets.
+
+==================================================
+61. TESTING
+===========
+
+Implement tests for:
+
+Media:
+
+- upload authorization
+- ownership
+- validation
+- duplicate completion
+- unsupported media
+- processing failure
+- processing retry
+- cleanup
+
+Posts:
+
+- create
+- update
+- delete
+- visibility
+- multiple media
+- unauthorized access
+
+Stories:
+
+- create
+- expiration
+- expired access rejection
+- viewer authorization
+- duplicate view prevention
+
+Reels:
+
+- processing requirement
+- publication rules
+- access
+
+Engagement:
+
+- duplicate likes
+- unlike
+- duplicate saves
+- comments
+- replies
+- deletion
+- shares
+
+==================================================
+62. SECURITY TESTING
+====================
+
+Explicitly test:
+
+- IDOR
+- attaching another user's media
+- accessing private post
+- accessing expired story
+- accessing deleted content
+- manipulating S3 object identifiers
+- bypassing moderation state
+- abusing upload completion
+- replaying engagement mutations
+- unauthorized deletion
+- unauthorized editing
+
+==================================================
+63. ACCEPTANCE CRITERIA
+=======================
+
+This implementation is complete only when:
+
+- media lifecycle exists
+- upload authorization exists
+- direct S3 upload flow exists
+- upload completion exists
+- abandoned-upload cleanup exists
+- image processing exists
+- video processing exists
+- FFmpeg processing is isolated and bounded
+- media variants exist
+- posts work
+- multi-media posts work
+- captions work
+- mentions work
+- hashtags work
+- visibility is enforced
+- post update works
+- post deletion works
+- stories work
+- story expiration is enforced
+- story views work
+- reels work
+- likes work
+- comments work
+- replies work
+- saves work
+- shares work
+- engagement counters are handled safely
+- domain events are published reliably
+- background workers exist
+- search integration exists
+- moderation integration exists
+- cache behavior is implemented
+- security controls exist
+- observability exists
+- OpenAPI contracts are updated
+- automated tests cover critical behavior
+- TypeScript compiles
+- Prisma migrations succeed
+- no required functionality is left as a placeholder
+
+==================================================
+64. IMPLEMENTATION FINISHING RULE
+=================================
+
+Do not stop after creating schemas, entities, or controllers.
+
+Complete the actual functionality.
+
+Inspect the existing repository first.
+
+Reuse compatible components.
+
+Integrate with existing infrastructure.
+
+Do not rewrite unrelated working code.
+
+Run appropriate validation for:
+
+- formatting
+- linting
+- type checking
+- Prisma validation
+- database migrations
+- unit tests
+- integration tests
+- security tests
+- relevant worker execution
+
+The resulting backend must provide a real production-grade content and media subsystem.
